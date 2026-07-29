@@ -1,0 +1,4 @@
+.claude/
+.shopify/
+node_modules/
+.env
