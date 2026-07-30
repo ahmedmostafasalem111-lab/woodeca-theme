@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "type": "header",
   "name": "t:names.header",
@@ -8,91 +17,117 @@
         "utility_contact": {
           "type": "utility_left",
           "settings": {
-            "label": "Contact us"
+            "label": "Contact us",
+            "menu": "",
+            "link": ""
           }
         },
         "utility_buyers": {
           "type": "utility_right",
           "settings": {
-            "label": "For buyers"
+            "label": "For buyers",
+            "menu": "",
+            "link": ""
           }
         },
         "utility_bonuses": {
           "type": "utility_right",
           "settings": {
-            "label": "Lorem Club bonuses"
+            "label": "Lorem Club bonuses",
+            "menu": "",
+            "link": ""
           }
         },
         "utility_business": {
           "type": "utility_right",
           "settings": {
-            "label": "For business"
+            "label": "For business",
+            "menu": "",
+            "link": ""
           }
         },
         "utility_designers": {
           "type": "utility_right",
           "settings": {
-            "label": "For designers"
+            "label": "For designers",
+            "menu": "",
+            "link": ""
           }
         },
         "nav_stock": {
           "type": "nav_link",
           "settings": {
-            "label": "Stock"
+            "label": "Stock",
+            "link": ""
           }
         },
         "nav_magazine": {
           "type": "nav_link",
           "settings": {
-            "label": "Magazine"
+            "label": "Magazine",
+            "link": ""
           }
         },
         "nav_showrooms": {
           "type": "nav_link",
           "settings": {
-            "label": "Showrooms"
+            "label": "Showrooms",
+            "link": ""
           }
         },
         "promo_express": {
           "type": "promo_link",
           "settings": {
-            "label": "Express design"
+            "label": "Express design",
+            "link": "",
+            "highlight": false
           }
         },
         "promo_children": {
           "type": "promo_link",
           "settings": {
-            "label": "Children's furniture"
+            "label": "Children's furniture",
+            "link": "",
+            "highlight": false
           }
         },
         "promo_office": {
           "type": "promo_link",
           "settings": {
-            "label": "Office furniture"
+            "label": "Office furniture",
+            "link": "",
+            "highlight": false
           }
         },
         "promo_decor": {
           "type": "promo_link",
           "settings": {
-            "label": "Decor and textiles"
+            "label": "Decor and textiles",
+            "link": "",
+            "highlight": false
           }
         },
         "promo_sale": {
           "type": "promo_link",
           "settings": {
-            "label": "Up to 50% off home and garden furniture"
+            "label": "Up to 50% off home and garden furniture",
+            "link": "",
+            "highlight": false
           }
         },
         "promo_collab": {
           "type": "promo_link",
           "settings": {
-            "label": "lorem.ipsum x DOLOR"
+            "label": "lorem.ipsum x DOLOR",
+            "link": "",
+            "highlight": false
           }
         },
         "promo_discount": {
           "type": "promo_link",
           "settings": {
             "label": "Discount",
+            "link": "",
             "highlight": true
           }
         }
@@ -115,24 +150,56 @@
         "promo_discount"
       ],
       "settings": {
+        "logo_image": "shopify://shop_images/Untitled_design_c5698217-c5e7-47a5-beb2-913d362867fc.svg",
         "logo_text": "lorem.ipsum",
+        "logo_font_size": "var(--font-size--2xl)",
         "show_utility_bar": true,
         "show_location": true,
         "location_label": "Lorem City",
+        "location_menu": "",
+        "dropdown_empty_text": "Pick a navigation menu for this dropdown.",
+        "utility_font_size": "var(--font-size--xs)",
         "show_catalog_button": true,
         "catalog_label": "Catalog",
         "catalog_menu": "main-menu",
+        "nav_font_size": "var(--font-size--md)",
+        "nav_label": "Main navigation",
+        "menu_label": "Menu",
         "search_placeholder": "Enter your query",
+        "search_submit_label": "Search",
         "show_photo_search": true,
         "photo_search_label": "Search by photo",
+        "photo_search_link": "",
         "show_account": true,
+        "account_label": "Account",
+        "account_link": "",
         "show_wishlist": true,
+        "wishlist_label": "Wishlist",
+        "wishlist_link": "",
+        "cart_label": "Cart",
         "show_cart_count": true,
         "show_mobile_chat": true,
+        "mobile_chat_label": "Chat",
+        "mobile_chat_link": "",
         "show_mobile_location": true,
-        "sticky_main_row": true
+        "mobile_location_link": "",
+        "sticky_main_row": true,
+        "promo_font_size": "var(--font-size--sm)",
+        "promo_highlight_color": "#e8342a",
+        "background_color": "#ffffff",
+        "text_color": "#1c1c1c",
+        "utility_background_color": "#fafafa",
+        "utility_text_color": "#5c5c5c",
+        "promo_text_color": "#1c1c1c",
+        "search_background_color": "#f2f2f0",
+        "photo_search_border_color": "#3b7de0",
+        "photo_search_text_color": "#1c1c1c",
+        "cart_bubble_background": "#e8705a",
+        "cart_bubble_text": "#ffffff"
       }
     }
   },
-  "order": ["showcase_header"]
+  "order": [
+    "showcase_header"
+  ]
 }
