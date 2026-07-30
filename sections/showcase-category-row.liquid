@@ -74,13 +74,21 @@
     font-size: var(--font-size--2xl);
   }
 
+  /*
+    The card surface lives on the tile itself, not on the media box, so the image and
+    its label sit inside one enclosed card rather than reading as two stacked elements.
+  */
   .category-tile {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--gap-xs);
+    padding-block-end: var(--padding-sm);
+    border-radius: var(--category-tile-radius, 0px);
+    background-color: var(--category-tile-background);
     color: var(--color-foreground);
     text-decoration: none;
+    overflow: hidden;
   }
 
   .category-tile__media {
@@ -91,9 +99,6 @@
     aspect-ratio: 1 / 1;
     /* Generous inset so the product photo floats inside the tile. */
     padding: 14%;
-    border-radius: var(--category-tile-radius, 0px);
-    background-color: var(--category-tile-background);
-    overflow: hidden;
   }
 
   .category-tile__image {
@@ -108,6 +113,8 @@
   }
 
   .category-tile__label {
+    /* Keeps longer labels off the card's rounded edges. */
+    padding-inline: var(--padding-xs);
     font-size: var(--category-label-size, var(--font-size--sm));
     font-weight: var(--category-label-weight, 500);
     text-align: center;
