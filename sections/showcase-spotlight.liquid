@@ -1,0 +1,621 @@
+{% comment %}
+  Featured collection spotlight: heading + description above a two-column layout —
+  a tall lifestyle photograph on the left and a scrollable mini product list on
+  the right — with a full-width pill CTA underneath. On mobile the image stacks on
+  top and the mini list becomes a horizontal swipe carousel.
+{% endcomment %}
+
+{% liquid
+  # The photo — not the number of products — sets the row height, so the list can
+  # scroll inside a box that tracks it. Falls back to a landscape ratio when no
+  # image is picked and the placeholder SVG is shown instead.
+  assign spotlight_ratio = section.settings.image.aspect_ratio | default: 1.45
+%}
+
+<div
+  class="section-background"
+  {% if section.settings.background_color != blank %}
+    style="background-color: {{ section.settings.background_color }};"
+  {% endif %}
+></div>
+
+<div
+  class="section section--{{ section.settings.section_width }} showcase-spotlight spacing-style"
+  style="
+    {% render 'spacing-padding', settings: section.settings %}
+    {% if section.settings.text_color != blank %}
+      --color-foreground: {{ section.settings.text_color }};
+      --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+    {% endif %}
+    --spotlight-image-width: {{ section.settings.image_width }}%;
+    --spotlight-heading-size: {{ section.settings.heading_size }};
+    --spotlight-cta-background: {{ section.settings.cta_background | default: '#333333' }};
+    --spotlight-cta-text: {{ section.settings.cta_text_color | default: '#ffffff' }};
+    --spotlight-thumb-background: {{ section.settings.thumb_background | default: '#f2f2f0' }};
+    --spotlight-image-ratio: {{ spotlight_ratio }};
+  "
+>
+  {% if section.settings.heading != blank or section.settings.description != blank %}
+    <div class="showcase-spotlight__header">
+      {% if section.settings.heading != blank %}
+        <h2 class="showcase-spotlight__heading">{{ section.settings.heading }}</h2>
+      {% endif %}
+
+      {% if section.settings.description != blank %}
+        <div class="showcase-spotlight__description">{{ section.settings.description }}</div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="showcase-spotlight__columns">
+    <div class="showcase-spotlight__media">
+      {% if section.settings.image != blank %}
+        {{
+          section.settings.image
+          | image_url: width: 1600
+          | image_tag: loading: 'lazy', class: 'showcase-spotlight__image', alt: section.settings.heading
+        }}
+      {% else %}
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'showcase-spotlight__image showcase-spotlight__image--placeholder' }}
+      {% endif %}
+    </div>
+
+    <div class="showcase-spotlight__list-column">
+      <div class="showcase-spotlight__list">
+        {% for block in section.blocks %}
+          {% liquid
+            assign item_product = block.settings.product
+            if item_product != blank
+              assign item_title = item_product.title
+              assign item_price = item_product.price | money
+              assign item_image = item_product.featured_image
+              assign item_url = item_product.url
+            else
+              assign item_title = block.settings.title
+              assign item_price = block.settings.price
+              assign item_image = block.settings.image
+              assign item_url = block.settings.url
+            endif
+            assign item_url = item_url | default: '#'
+          %}
+          <div
+            class="spotlight-item"
+            {{ block.shopify_attributes }}
+          >
+            <div class="spotlight-item__media">
+              <a
+                href="{{ item_url }}"
+                tabindex="-1"
+                aria-hidden="true"
+                class="spotlight-item__media-link"
+              >
+                {% if item_image != blank %}
+                  {{
+                    item_image
+                    | image_url: width: 300
+                    | image_tag: loading: 'lazy', class: 'spotlight-item__image', alt: item_title
+                  }}
+                {% else %}
+                  {{ 'product-apparel-1' | placeholder_svg_tag: 'spotlight-item__image spotlight-item__image--placeholder' }}
+                {% endif %}
+              </a>
+
+              {% if section.settings.show_wishlist %}
+                <button
+                  type="button"
+                  class="spotlight-item__wishlist"
+                  aria-label="Add {{ item_title | escape }} to wishlist"
+                >
+                  <span class="svg-wrapper" aria-hidden="true">
+                    {{- 'icon-heart.svg' | inline_asset_content -}}
+                  </span>
+                </button>
+              {% endif %}
+            </div>
+
+            <div class="spotlight-item__info">
+              <a
+                href="{{ item_url }}"
+                class="spotlight-item__title"
+              >
+                {{- item_title -}}
+              </a>
+              <p class="spotlight-item__price">{{ item_price }}</p>
+
+              {% if section.settings.add_to_cart_label != blank %}
+                <button
+                  type="button"
+                  class="spotlight-item__add"
+                >
+                  {{ section.settings.add_to_cart_label }}
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {% if section.settings.cta_label != blank %}
+    <a
+      href="{{ section.settings.cta_link | default: '#' }}"
+      class="showcase-spotlight__cta"
+    >
+      <span>{{ section.settings.cta_label }}</span>
+      <span class="svg-wrapper" aria-hidden="true">
+        {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+      </span>
+    </a>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .showcase-spotlight__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+    margin-block-end: var(--margin-xl);
+  }
+
+  .showcase-spotlight__heading {
+    margin: 0;
+    font-size: var(--spotlight-heading-size, var(--font-size--3xl));
+    line-height: var(--line-height--heading-tight);
+  }
+
+  .showcase-spotlight__description {
+    max-width: 80ch;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+    font-size: var(--font-size--md);
+  }
+
+  .showcase-spotlight__description > :first-child {
+    margin-block-start: 0;
+  }
+
+  .showcase-spotlight__description > :last-child {
+    margin-block-end: 0;
+  }
+
+  .showcase-spotlight__columns {
+    display: grid;
+    grid-template-columns: var(--spotlight-image-width) 1fr;
+    gap: var(--gap-lg);
+    align-items: stretch;
+  }
+
+  /*
+    The photo is the only thing that sizes the grid row: its aspect ratio gives it a
+    definite height, and the list column opts out of row sizing entirely (below), so
+    the panel tracks the image rather than the image stretching to fit the cards.
+  */
+  .showcase-spotlight__media {
+    min-height: 420px;
+    max-height: 780px;
+    border-radius: var(--style-border-radius-inputs, 8px);
+    aspect-ratio: var(--spotlight-image-ratio, 1.45);
+    overflow: hidden;
+  }
+
+  .showcase-spotlight__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .showcase-spotlight__image--placeholder {
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    fill: rgb(var(--color-foreground-rgb) / var(--opacity-20));
+  }
+
+  /*
+    Absolutely positioning the list means it contributes zero height to the grid row,
+    so however many products the merchant adds — 4 or 12 — the box stays the height of
+    the photo and the overflow scrolls instead of squeezing the cards.
+  */
+  .showcase-spotlight__list-column {
+    position: relative;
+    min-height: 0;
+  }
+
+  .showcase-spotlight__list {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-md);
+    padding-inline-end: var(--padding-xs);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--color-foreground-rgb) / var(--opacity-30)) transparent;
+  }
+
+  /* Cards keep their natural height — never stretched to make the list fit. */
+  .showcase-spotlight__list > .spotlight-item {
+    flex: 0 0 auto;
+  }
+
+  .showcase-spotlight__list::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .showcase-spotlight__list::-webkit-scrollbar-track {
+    border-radius: 999px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .showcase-spotlight__list::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-30));
+  }
+
+  .spotlight-item {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: var(--gap-sm);
+    align-items: start;
+  }
+
+  .spotlight-item__media {
+    position: relative;
+    border-radius: var(--style-border-radius-inputs, 8px);
+    background-color: var(--spotlight-thumb-background);
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+
+  .spotlight-item__media-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .spotlight-item__image {
+    width: 82%;
+    height: 82%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  .spotlight-item__image--placeholder {
+    fill: rgb(var(--color-foreground-rgb) / var(--opacity-20));
+  }
+
+  .spotlight-item__wishlist {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-foreground);
+    cursor: pointer;
+  }
+
+  .spotlight-item__wishlist .svg-wrapper,
+  .spotlight-item__wishlist svg {
+    width: var(--icon-size-xs);
+    height: var(--icon-size-xs);
+  }
+
+  .spotlight-item__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-2xs);
+    align-items: flex-start;
+  }
+
+  .spotlight-item__title {
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    text-decoration: none;
+  }
+
+  .spotlight-item__price {
+    margin: 0;
+    font-size: var(--font-size--md);
+    font-weight: 600;
+  }
+
+  .spotlight-item__add {
+    width: 100%;
+    padding-block: var(--padding-2xs);
+    border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: var(--style-border-radius-buttons-primary, 4px);
+    background-color: transparent;
+    color: var(--color-foreground);
+    font-size: var(--font-size--xs);
+    cursor: pointer;
+    transition: background-color var(--animation-speed) var(--animation-easing);
+  }
+
+  .spotlight-item__add:hover {
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+  }
+
+  /* Full-width dark pill CTA under both columns. */
+  .showcase-spotlight__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-xs);
+    width: 100%;
+    margin-block-start: var(--margin-xl);
+    padding-block: var(--padding-md);
+    border-radius: 999px;
+    background-color: var(--spotlight-cta-background);
+    color: var(--spotlight-cta-text);
+    font-size: var(--font-size--md);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .showcase-spotlight__cta .svg-wrapper,
+  .showcase-spotlight__cta svg {
+    width: var(--icon-size-xs);
+    height: var(--icon-size-xs);
+  }
+
+  @media screen and (max-width: 989px) {
+    .showcase-spotlight__columns {
+      grid-template-columns: 1fr;
+    }
+
+    .showcase-spotlight__media {
+      min-height: 280px;
+      max-height: 420px;
+    }
+
+    /*
+      Below the photo the list becomes a single-row swipe carousel with the next card
+      peeking in at the right edge, matching the other product carousels in the theme.
+      The absolute positioning used on desktop is undone here so the row sits in flow.
+    */
+    .showcase-spotlight__list-column {
+      position: static;
+    }
+
+    .showcase-spotlight__list {
+      position: static;
+      flex-direction: row;
+      padding-inline-end: 0;
+      padding-block-end: var(--padding-xs);
+      overflow-x: auto;
+      overflow-y: visible;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .showcase-spotlight__list > .spotlight-item {
+      flex: 0 0 var(--spotlight-card-width, 32%);
+      grid-template-columns: minmax(0, 1fr);
+      scroll-snap-align: start;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .showcase-spotlight__heading {
+      font-size: var(--font-size--xl);
+    }
+
+    .showcase-spotlight__description {
+      font-size: var(--font-size--sm);
+    }
+
+    /* Roughly two cards plus a peek of the third. */
+    .showcase-spotlight__list {
+      --spotlight-card-width: 44%;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collection spotlight",
+  "tag": "section",
+  "class": "section-showcase-spotlight",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Lorem ipsum dolor. SIT."
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        { "value": "var(--font-size--2xl)", "label": "Medium" },
+        { "value": "var(--font-size--3xl)", "label": "Large" },
+        { "value": "var(--font-size--4xl)", "label": "Extra large" }
+      ],
+      "default": "var(--font-size--3xl)"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>A collection of lorem ipsum dolor sit amet that accommodates and adapts to all consectetur adipiscing elit.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Feature image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Lifestyle image"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "Image column width",
+      "min": 40,
+      "max": 70,
+      "step": 5,
+      "unit": "%",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Product list"
+    },
+    {
+      "type": "text",
+      "id": "add_to_cart_label",
+      "label": "Add to cart button label",
+      "default": "Add to cart",
+      "info": "Leave blank to hide the buttons."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "label": "Show wishlist hearts",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Call to action"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "View the entire collection"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "thumb_background",
+      "label": "Product thumbnail background",
+      "default": "#f2f2f0"
+    },
+    {
+      "type": "color",
+      "id": "cta_background",
+      "label": "CTA background",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "CTA text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product",
+          "info": "When set, real product data replaces the placeholder fields below."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Placeholder title",
+          "default": "Lorem ipsum dolor 158x91"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Placeholder price",
+          "default": "31,890"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Placeholder image"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection spotlight",
+      "blocks": [
+        { "type": "item" },
+        { "type": "item", "settings": { "title": "Consectetur adipiscing 120", "price": "43,990" } },
+        { "type": "item", "settings": { "title": "Sed do eiusmod 120x180", "price": "9,890" } },
+        { "type": "item", "settings": { "title": "Tempor incididunt 120x67", "price": "24,740" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

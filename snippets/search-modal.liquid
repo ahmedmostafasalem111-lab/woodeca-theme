@@ -3,6 +3,7 @@
 
   @param {block} [block] - The block object, used for Shopify editor attributes.
   @param {string} [class] - Additional CSS classes to apply to the predictive search component.
+  @param {object} [section] - The header section, used to render the category dropdown with the merchant's search settings.
 {% enddoc %}
 
 {% render 'pills-styles' %}
@@ -38,6 +39,11 @@
     >
       {{ 'content.search' | t }}
     </h2>
+
+    {% if section.settings.show_search %}
+      {% render 'header-category-search', section: section, layout: 'modal', id_suffix: 'modal' %}
+    {% endif %}
+
     <predictive-search-component
       class="predictive-search color-custom-popover{% if class != blank %} {{ class | strip }}{% endif %}"
       style="--product-corner-radius: {{ settings.product_corner_radius | default: 8 | append: 'px' }}; --card-corner-radius: {{ settings.card_corner_radius | default: 8 | append: 'px' }};{% if settings.card_title_case == 'uppercase' %} --title-case: uppercase;{% endif %}"

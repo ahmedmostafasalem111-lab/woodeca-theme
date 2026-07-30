@@ -574,7 +574,11 @@
     "input_style": "Style de champ",
     "selected_button_style": "Style du bouton sélectionné",
     "open_by_default": "Ouvert par défaut",
-    "title_preset": "Préréglage du titre"
+    "title_preset": "Préréglage du titre",
+    "phone_number": "Phone number",
+    "phone_label": "Call us label",
+    "search_placeholder": "Search placeholder",
+    "all_categories_label": "\"All categories\" label"
   },
   "options": {
     "apple": "Pomme",
@@ -978,7 +982,10 @@
     "gift_card_products": "Produits cartes-cadeaux",
     "disclosures": "Divulgations",
     "disclosures_metafield_content": "Avertissements de sécurité obligatoires et informations réglementaires pour ce produit.",
-    "page_text_color_contrast_info": "Les sections avec une couleur d’arrière-plan personnalisée utiliseront cette couleur de texte uniquement si le contraste des couleurs est suffisant."
+    "page_text_color_contrast_info": "Les sections avec une couleur d’arrière-plan personnalisée utiliseront cette couleur de texte uniquement si le contraste des couleurs est suffisant.",
+    "search_bar": "Search bar",
+    "search_bar_info": "The inline search bar with category dropdown replaces the search icon on desktop. The icon remains as the search entry point on mobile.",
+    "call_us": "Call us"
   },
   "html_defaults": {
     "share_information_about_your": "<p>Partagez des informations sur votre marque avec vos clients. Décrivez un produit, faites des annonces ou accueillez les clients dans votre boutique.</p>",
@@ -1102,7 +1109,10 @@
     "page_text_color_default_info": "Par défaut pour les sections du thème",
     "actions_display_style": "Les icônes sont toujours utilisées sur mobile",
     "edit_input_field_in_theme_settings": "Modifier le champ de saisie dans les [paramètres du thème](/editor?context=theme&category=input%20fields)",
-    "edit_variants_in_theme_settings": "Modifier le style des variantes dans les [paramètres du thème](/editor?context=theme&category=variant%20pickers)"
+    "edit_variants_in_theme_settings": "Modifier le style des variantes dans les [paramètres du thème](/editor?context=theme&category=variant%20pickers)",
+    "phone_number": "Shown as a tap-to-call icon in the header. Leave blank to hide it.",
+    "search_categories": "Shown in the search bar's category dropdown. Leave blank to only show \"All Categories\".",
+    "announcement_text_color": "Default for all slides. Individual slides can override this."
   },
   "categories": {
     "basic": "De base",

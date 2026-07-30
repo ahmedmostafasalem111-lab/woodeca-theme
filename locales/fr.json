@@ -75,7 +75,8 @@
     "search_suggestions_available": "Rechercher des suggestions disponibles pour « {{ query }} »",
     "price_filter_low": "Prix bas",
     "price_filter_high": "Prix élevé",
-    "view_disclosure_information_for_product": "Afficher les informations sur le produit {{ product_title }}"
+    "view_disclosure_information_for_product": "Afficher les informations sur le produit {{ product_title }}",
+    "call_us": "Call us"
   },
   "actions": {
     "add_to_cart": "Ajouter au panier",
@@ -280,7 +281,8 @@
       "many": "{{ count }} articles ajoutés au panier"
     },
     "quick_order_list": "Liste de commande rapide",
-    "product_disclosures": "Informations sur le produit"
+    "product_disclosures": "Informations sur le produit",
+    "all_categories": "All Categories"
   },
   "gift_cards": {
     "issued": {

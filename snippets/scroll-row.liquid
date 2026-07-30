@@ -1,0 +1,246 @@
+{% doc %}
+  Renders a horizontally scrollable row with optional arrow navigation and a thin
+  scroll-progress indicator beneath it. Shared by the category tile row, the
+  product carousels, the info card grid and the social gallery so all of them get
+  the same swipe / arrow / progress-bar mechanic.
+
+  Each direct child of `content` becomes one item and is sized automatically from
+  the `columns` / `columns_mobile` params — callers don't need to add a class.
+
+  @param {string} content - Captured HTML for the row items.
+  @param {number} [columns] - Items visible per view on desktop. Default 4.
+  @param {number} [columns_mobile] - Items visible per view on mobile. Default 2.
+  @param {number} [peek] - Extra fraction of an item visible on mobile to hint scrollability. Default 0.2.
+  @param {boolean} [show_arrows] - Render prev/next arrow buttons. Default true.
+  @param {boolean} [show_progress] - Render the scroll progress bar. Default true.
+  @param {string} [gap] - CSS length for the gap between items. Default var(--gap-md).
+  @param {string} [align] - Vertical alignment of items: 'stretch' or 'start'. Default 'stretch'.
+  @param {string} [class] - Extra classes for the wrapper element.
+  @param {string} [prev_label] - Accessible label for the previous button.
+  @param {string} [next_label] - Accessible label for the next button.
+
+  @example
+  {% capture items %}
+    <div>Item one</div>
+    <div>Item two</div>
+  {% endcapture %}
+  {% render 'scroll-row', content: items, columns: 4, columns_mobile: 2 %}
+{% enddoc %}
+
+{% liquid
+  assign columns = columns | default: 4
+  assign columns_mobile = columns_mobile | default: 2
+
+  if peek == blank
+    assign peek = 0.2
+  endif
+
+  if show_arrows == nil
+    assign show_arrows = true
+  endif
+
+  if show_progress == nil
+    assign show_progress = true
+  endif
+
+  assign gap = gap | default: 'var(--gap-md)'
+  assign align = align | default: 'stretch'
+
+  # The mobile view shows a partial extra item so the row reads as scrollable.
+  assign columns_mobile_effective = columns_mobile | plus: peek
+
+  assign prev_label = prev_label | default: 'Previous'
+  assign next_label = next_label | default: 'Next'
+%}
+
+<scroll-row-component
+  class="scroll-row{% if class != blank %} {{ class | strip }}{% endif %}"
+  style="
+    --scroll-row-columns: {{ columns }};
+    --scroll-row-columns-mobile: {{ columns_mobile_effective }};
+    --scroll-row-gap: {{ gap }};
+    --scroll-row-align: {{ align }};
+  "
+>
+  <div class="scroll-row__viewport">
+    <div
+      class="scroll-row__track"
+      ref="track"
+      tabindex="0"
+    >
+      {{ content }}
+    </div>
+
+    {% if show_arrows %}
+      <button
+        type="button"
+        class="scroll-row__arrow scroll-row__arrow--prev"
+        ref="prev"
+        on:click="/scrollPrev"
+        aria-label="{{ prev_label | escape }}"
+      >
+        <span class="svg-wrapper" aria-hidden="true">
+          {{- 'icon-chevron-left.svg' | inline_asset_content -}}
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="scroll-row__arrow scroll-row__arrow--next"
+        ref="next"
+        on:click="/scrollNext"
+        aria-label="{{ next_label | escape }}"
+      >
+        <span class="svg-wrapper" aria-hidden="true">
+          {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+        </span>
+      </button>
+    {% endif %}
+  </div>
+
+  {% if show_progress %}
+    <div
+      class="scroll-row__progress"
+      role="presentation"
+    >
+      <span
+        class="scroll-row__progress-thumb"
+        ref="progressThumb"
+      ></span>
+    </div>
+  {% endif %}
+</scroll-row-component>
+
+<script
+  src="{{ 'scroll-row.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+{% stylesheet %}
+  .scroll-row {
+    --scroll-row-arrow-size: 44px;
+
+    display: block;
+    position: relative;
+  }
+
+  .scroll-row__viewport {
+    position: relative;
+  }
+
+  .scroll-row__track {
+    display: flex;
+    align-items: var(--scroll-row-align, stretch);
+    gap: var(--scroll-row-gap);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x proximity;
+    /* Firefox */
+    scrollbar-width: none;
+    /* IE / legacy Edge */
+    -ms-overflow-style: none;
+  }
+
+  .scroll-row__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scroll-row__track:focus-visible {
+    outline: var(--focus-outline-width) solid var(--color-foreground);
+    outline-offset: var(--focus-outline-offset);
+  }
+
+  /* Size every direct child from the column count so callers stay markup-agnostic. */
+  .scroll-row__track > * {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    width: calc(
+      (100% - (var(--scroll-row-gap) * (var(--scroll-row-columns) - 1))) / var(--scroll-row-columns)
+    );
+  }
+
+  @media screen and (max-width: 749px) {
+    .scroll-row__track > * {
+      width: calc(
+        (100% - (var(--scroll-row-gap) * (var(--scroll-row-columns-mobile) - 1))) /
+          var(--scroll-row-columns-mobile)
+      );
+    }
+  }
+
+  /* Arrows sit vertically centred on the row and overlap its edges. */
+  .scroll-row__arrow {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: var(--layer-raised);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--scroll-row-arrow-size);
+    height: var(--scroll-row-arrow-size);
+    padding: 0;
+    border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    border-radius: 50%;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    box-shadow: var(--shadow-popover);
+    cursor: pointer;
+    transition: opacity var(--animation-speed) var(--animation-easing);
+  }
+
+  .scroll-row__arrow .svg-wrapper,
+  .scroll-row__arrow svg {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
+  }
+
+  .scroll-row__arrow--prev {
+    left: 0;
+    translate: -50% -50%;
+  }
+
+  .scroll-row__arrow--next {
+    right: 0;
+    translate: 50% -50%;
+  }
+
+  /* Only reveal arrows on pointer devices once there's actually overflow. */
+  @media screen and (min-width: 750px) {
+    .scroll-row[data-scrollable] .scroll-row__arrow {
+      display: flex;
+    }
+  }
+
+  .scroll-row__arrow:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .scroll-row__progress {
+    position: relative;
+    height: 2px;
+    margin-block-start: var(--margin-lg);
+    border-radius: 2px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    overflow: hidden;
+  }
+
+  /* Hidden when everything already fits — nothing to indicate. */
+  .scroll-row:not([data-scrollable]) .scroll-row__progress {
+    visibility: hidden;
+  }
+
+  /* `left` resolves against the rail width, so the JS-supplied offset maps 1:1. */
+  .scroll-row__progress-thumb {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--scroll-row-thumb-offset, 0%);
+    width: var(--scroll-row-thumb-width, 25%);
+    border-radius: 2px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+  }
+{% endstylesheet %}

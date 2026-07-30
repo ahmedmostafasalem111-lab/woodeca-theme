@@ -136,6 +136,9 @@
     "resource_reference_product_variant_picker": "Displays variants from parent product",
     "resource_reference_product_custom_property": "Add customizable input fields to collect custom information that will be added to this order line item, later visible in the order details.",
     "search": "Search",
+    "search_bar": "Search bar",
+    "search_bar_info": "The inline search bar with category dropdown replaces the search icon on desktop. The icon remains as the search entry point on mobile.",
+    "call_us": "Call us",
     "section_layout": "Section layout",
     "section_link": "Section link",
     "section_size": "Section size",
@@ -249,7 +252,10 @@
     "video_autoplay": "Videos will be muted by default",
     "video_external": "Use a YouTube or Vimeo URL",
     "pills_usage": "Used for applied filters, discount codes, and search suggestions",
-    "media_type_info": "Features are populated from your menu links"
+    "media_type_info": "Features are populated from your menu links",
+    "phone_number": "Shown as a tap-to-call icon in the header. Leave blank to hide it.",
+    "search_categories": "Shown in the search bar's category dropdown. Leave blank to only show \"All Categories\".",
+    "announcement_text_color": "Default for all slides. Individual slides can override this."
   },
   "names": {
     "column": "Column",
@@ -798,6 +804,10 @@
     "auto_open_cart_drawer": "\"Add to cart\" auto-opens drawer",
     // Text case setting for typography (uppercase/lowercase)
     "case": "Case",
+    "phone_number": "Phone number",
+    "phone_label": "Call us label",
+    "search_placeholder": "Search placeholder",
+    "all_categories_label": "\"All categories\" label",
     "checkout_buttons": "Accelerated checkout buttons",
     "collection": "Collection",
     "collection_count": "Collection count",

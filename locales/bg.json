@@ -74,7 +74,8 @@
     "search_suggestions_available": "Налични са предложения за търсене за „{{ query }}“",
     "price_filter_low": "Ниска цена",
     "price_filter_high": "Висока цена",
-    "view_disclosure_information_for_product": "Преглед на оповестената информация за {{ product_title }}"
+    "view_disclosure_information_for_product": "Преглед на оповестената информация за {{ product_title }}",
+    "call_us": "Call us"
   },
   "actions": {
     "add_to_cart": "Добавяне към количката",
@@ -274,7 +275,8 @@
       "other": "{{ count }} артикула са добавени в количката"
     },
     "quick_order_list": "Бърз списък с поръчки",
-    "product_disclosures": "Оповестявания за продукта"
+    "product_disclosures": "Оповестявания за продукта",
+    "all_categories": "All Categories"
   },
   "gift_cards": {
     "issued": {

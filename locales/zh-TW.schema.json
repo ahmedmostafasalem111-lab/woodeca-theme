@@ -574,7 +574,11 @@
     "input_style": "輸入欄位樣式",
     "selected_button_style": "選取的按鈕樣式",
     "open_by_default": "預設為開啟",
-    "title_preset": "標題預設設定"
+    "title_preset": "標題預設設定",
+    "phone_number": "Phone number",
+    "phone_label": "Call us label",
+    "search_placeholder": "Search placeholder",
+    "all_categories_label": "\"All categories\" label"
   },
   "options": {
     "apple": "Apple",
@@ -978,7 +982,10 @@
     "gift_card_products": "禮品卡產品",
     "disclosures": "資訊揭露",
     "disclosures_metafield_content": "此商品必備的安全警告與法規資訊揭露。",
-    "page_text_color_contrast_info": "具備自訂背景顏色的區段，只有在色彩對比度足夠時才會使用此文字顏色。"
+    "page_text_color_contrast_info": "具備自訂背景顏色的區段，只有在色彩對比度足夠時才會使用此文字顏色。",
+    "search_bar": "Search bar",
+    "search_bar_info": "The inline search bar with category dropdown replaces the search icon on desktop. The icon remains as the search entry point on mobile.",
+    "call_us": "Call us"
   },
   "html_defaults": {
     "share_information_about_your": "<p>向顧客分享您的品牌故事。可用來敘述產品、發布公告，或歡迎顧客造訪您的商店。</p>",
@@ -1102,7 +1109,10 @@
     "page_text_color_default_info": "佈景主題區段的預設值",
     "actions_display_style": "在行動裝置上一律使用圖示",
     "edit_input_field_in_theme_settings": "在 [佈景主題設定](/editor?context=theme&category=input%20fields) 中編輯輸入欄位",
-    "edit_variants_in_theme_settings": "在[主題設定](/editor?context=theme&category=variant%20pickers)中編輯子類樣式"
+    "edit_variants_in_theme_settings": "在[主題設定](/editor?context=theme&category=variant%20pickers)中編輯子類樣式",
+    "phone_number": "Shown as a tap-to-call icon in the header. Leave blank to hide it.",
+    "search_categories": "Shown in the search bar's category dropdown. Leave blank to only show \"All Categories\".",
+    "announcement_text_color": "Default for all slides. Individual slides can override this."
   },
   "categories": {
     "basic": "基本",

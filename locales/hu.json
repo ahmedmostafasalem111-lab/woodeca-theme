@@ -74,7 +74,8 @@
     "search_suggestions_available": "Keresési javaslatok a következőhöz: „{{ query }}”",
     "price_filter_low": "Ár szerint növekvő",
     "price_filter_high": "Ár szerint csökkenő",
-    "view_disclosure_information_for_product": "Tájékoztató adatok megtekintése a következőhöz: {{ product_title }}"
+    "view_disclosure_information_for_product": "Tájékoztató adatok megtekintése a következőhöz: {{ product_title }}",
+    "call_us": "Call us"
   },
   "actions": {
     "add_to_cart": "Hozzáadás a kosárhoz",
@@ -274,7 +275,8 @@
     },
     "item_count_cutoff": "Több mint {{ count }} tétel",
     "quick_order_list": "Gyorsrendelési lista",
-    "product_disclosures": "Terméktájékoztatók"
+    "product_disclosures": "Terméktájékoztatók",
+    "all_categories": "All Categories"
   },
   "gift_cards": {
     "issued": {

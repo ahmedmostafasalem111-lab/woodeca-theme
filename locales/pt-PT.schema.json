@@ -574,7 +574,11 @@
     "input_style": "Estilo do campo",
     "selected_button_style": "Estilo do botão selecionado",
     "open_by_default": "Aberto por predefinição",
-    "title_preset": "Predefinição do título"
+    "title_preset": "Predefinição do título",
+    "phone_number": "Phone number",
+    "phone_label": "Call us label",
+    "search_placeholder": "Search placeholder",
+    "all_categories_label": "\"All categories\" label"
   },
   "options": {
     "apple": "Maçã",
@@ -978,7 +982,10 @@
     "gift_card_products": "Produtos de cartão de oferta",
     "disclosures": "Divulgações",
     "disclosures_metafield_content": "Avisos de segurança e divulgações regulamentares obrigatórios para este produto.",
-    "page_text_color_contrast_info": "As secções com uma cor de fundo personalizada apenas utilizam esta cor do texto quando existe contraste de cor suficiente."
+    "page_text_color_contrast_info": "As secções com uma cor de fundo personalizada apenas utilizam esta cor do texto quando existe contraste de cor suficiente.",
+    "search_bar": "Search bar",
+    "search_bar_info": "The inline search bar with category dropdown replaces the search icon on desktop. The icon remains as the search entry point on mobile.",
+    "call_us": "Call us"
   },
   "html_defaults": {
     "share_information_about_your": "<p>Partilhe informações sobre a sua marca com os seus clientes. Descreva um produto, faça anúncios ou dê as boas-vindas aos clientes na sua loja.</p>",
@@ -1102,7 +1109,10 @@
     "page_text_color_default_info": "Predefinição para secções do tema",
     "actions_display_style": "Os ícones são sempre utilizados em telemóvel",
     "edit_input_field_in_theme_settings": "Editar campo de introdução nas [definições do tema](/editor?context=theme&category=input%20fields)",
-    "edit_variants_in_theme_settings": "Edite o estilo das variantes nas [definições do tema](/editor?context=theme&category=variant%20pickers)"
+    "edit_variants_in_theme_settings": "Edite o estilo das variantes nas [definições do tema](/editor?context=theme&category=variant%20pickers)",
+    "phone_number": "Shown as a tap-to-call icon in the header. Leave blank to hide it.",
+    "search_categories": "Shown in the search bar's category dropdown. Leave blank to only show \"All Categories\".",
+    "announcement_text_color": "Default for all slides. Individual slides can override this."
   },
   "categories": {
     "basic": "Básico",

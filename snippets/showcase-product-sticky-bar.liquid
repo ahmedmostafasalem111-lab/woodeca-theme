@@ -1,0 +1,199 @@
+{% doc %}
+  Condensed sticky bar that takes over from the hero once it scrolls out of view:
+  product thumbnail, title with anchor links to the specs and delivery blocks,
+  price, add-to-cart and wishlist.
+
+  Rendered once inside the product hero section. It is `position: sticky` with a
+  solid background, so it pins to the top and sits above whatever section scrolls
+  beneath it. Refs here share the hero's `showcase-product-component`, so a variant
+  change updates both places at once.
+
+  @param {object} product - The product.
+  @param {object} selected_variant - The currently selected variant.
+  @param {object} section - The section, for labels and anchor ids.
+  @param {string} form_id - Id of the hero's product form, so this bar's button submits it.
+
+  @example
+  {% render 'showcase-product-sticky-bar', product: product, selected_variant: variant, section: section, form_id: id %}
+{% enddoc %}
+
+<div class="product-sticky-bar" ref="stickyBar">
+  <div class="product-sticky-bar__inner">
+    <div class="product-sticky-bar__identity">
+      <span class="product-sticky-bar__thumb" ref="stickyThumb">
+        {% if selected_variant.featured_image != blank %}
+          {{
+            selected_variant.featured_image
+            | image_url: width: 160
+            | image_tag: loading: 'lazy', alt: product.title
+          }}
+        {% elsif product.featured_image != blank %}
+          {{ product.featured_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: product.title }}
+        {% endif %}
+      </span>
+
+      <span class="product-sticky-bar__text">
+        <span class="product-sticky-bar__title">{{ product.title }}</span>
+
+        <span class="product-sticky-bar__anchors">
+          <a href="#{{ section.settings.specs_anchor | default: 'specifications' }}">
+            {{- section.settings.specs_anchor_label | default: 'Characteristics' -}}
+          </a>
+          <a href="#{{ section.settings.delivery_anchor | default: 'delivery-and-assembly' }}">
+            {{- section.settings.delivery_anchor_label | default: 'Delivery and assembly' -}}
+          </a>
+        </span>
+      </span>
+    </div>
+
+    <div class="product-sticky-bar__actions">
+      <span class="product-sticky-bar__price" ref="stickyPriceTarget">
+        {{- selected_variant.price | money -}}
+      </span>
+
+      <button
+        type="submit"
+        form="{{ form_id }}"
+        class="product-sticky-bar__add"
+      >
+        {{- section.settings.add_to_cart_label | default: 'Add to cart' -}}
+      </button>
+
+      <button
+        type="button"
+        class="wishlist-button wishlist-button--sm"
+        ref="wishlistButtons[]"
+        data-wishlist
+        aria-pressed="false"
+        aria-label="{{ section.settings.wishlist_label | default: 'Add to wishlist' | escape }}"
+        on:click="/toggleWishlist"
+      >
+        <span class="svg-wrapper" aria-hidden="true">
+          {{- 'icon-heart.svg' | inline_asset_content -}}
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .product-sticky-bar {
+    position: sticky;
+    top: 0;
+    z-index: var(--layer-sticky, 20);
+    background-color: var(--product-sticky-background, var(--color-background));
+    border-block-end: var(--border-width-sm) solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .product-sticky-bar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-lg);
+    max-width: var(--page-width);
+    margin-inline: auto;
+    padding: var(--padding-2xs) var(--page-margin);
+  }
+
+  .product-sticky-bar__identity {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    min-width: 0;
+  }
+
+  .product-sticky-bar__thumb {
+    display: block;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5));
+    overflow: hidden;
+  }
+
+  .product-sticky-bar__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  .product-sticky-bar__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .product-sticky-bar__title {
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .product-sticky-bar__anchors {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+  }
+
+  .product-sticky-bar__anchors a {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+    font-size: var(--font-size--xs);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .product-sticky-bar__anchors a:hover {
+    color: var(--color-foreground);
+  }
+
+  .product-sticky-bar__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    flex-shrink: 0;
+  }
+
+  .product-sticky-bar__price {
+    font-size: var(--font-size--lg);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .product-sticky-bar__add {
+    padding: var(--padding-sm) var(--padding-2xl);
+    border: none;
+    border-radius: var(--style-border-radius-buttons-primary, 4px);
+    background-color: var(--product-cta-background, #333);
+    color: var(--product-cta-text, #fff);
+    font-size: var(--font-size--sm);
+    cursor: pointer;
+  }
+
+  @media screen and (max-width: 989px) {
+    /* Mobile shows a compact price + CTA row; the anchor links and thumbnail
+       would crowd it out, and the fixed bottom tab bar already sits below. */
+    .product-sticky-bar__identity {
+      display: none;
+    }
+
+    .product-sticky-bar__inner {
+      justify-content: space-between;
+      padding-block: var(--padding-2xs);
+    }
+
+    .product-sticky-bar__actions {
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    .product-sticky-bar__add {
+      flex-grow: 1;
+      max-width: 60%;
+    }
+  }
+{% endstylesheet %}

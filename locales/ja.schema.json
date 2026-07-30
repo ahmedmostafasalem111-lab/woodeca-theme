@@ -574,7 +574,11 @@
     "input_style": "入力スタイル",
     "selected_button_style": "選択したボタンのスタイル",
     "open_by_default": "デフォルトで開く",
-    "title_preset": "タイトルプリセット"
+    "title_preset": "タイトルプリセット",
+    "phone_number": "Phone number",
+    "phone_label": "Call us label",
+    "search_placeholder": "Search placeholder",
+    "all_categories_label": "\"All categories\" label"
   },
   "options": {
     "apple": "Apple",
@@ -978,7 +982,10 @@
     "gift_card_products": "ギフトカード商品",
     "disclosures": "開示情報",
     "disclosures_metafield_content": "この商品に必要な安全に関する警告および規制に基づく開示情報です。",
-    "page_text_color_contrast_info": "カスタム背景色が設定されたセクションでは、十分な色のコントラストがある場合にのみ、このテキストの配色を使用します。"
+    "page_text_color_contrast_info": "カスタム背景色が設定されたセクションでは、十分な色のコントラストがある場合にのみ、このテキストの配色を使用します。",
+    "search_bar": "Search bar",
+    "search_bar_info": "The inline search bar with category dropdown replaces the search icon on desktop. The icon remains as the search entry point on mobile.",
+    "call_us": "Call us"
   },
   "html_defaults": {
     "share_information_about_your": "<p>ブランドに関する情報をお客様に伝えましょう。商品の説明、お知らせ、ストアへのお客様への歓迎メッセージなどに使用します。</p>",
@@ -1102,7 +1109,10 @@
     "page_text_color_default_info": "テーマセクションのデフォルト",
     "actions_display_style": "モバイルでは常にアイコンが表示されます",
     "edit_input_field_in_theme_settings": "[テーマ設定](/editor?context=theme&category=input%20fields)で入力フィールドを編集する",
-    "edit_variants_in_theme_settings": "[テーマ設定](/editor?context=theme&category=variant%20pickers)でバリエーションのスタイルを編集する"
+    "edit_variants_in_theme_settings": "[テーマ設定](/editor?context=theme&category=variant%20pickers)でバリエーションのスタイルを編集する",
+    "phone_number": "Shown as a tap-to-call icon in the header. Leave blank to hide it.",
+    "search_categories": "Shown in the search bar's category dropdown. Leave blank to only show \"All Categories\".",
+    "announcement_text_color": "Default for all slides. Individual slides can override this."
   },
   "categories": {
     "product_list": "特集コレクション",

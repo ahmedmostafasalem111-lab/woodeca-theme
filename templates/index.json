@@ -1,282 +1,531 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
-    "hero_jVaWmY": {
-      "type": "hero",
+    "s1_hero": {
+      "type": "showcase-hero",
       "blocks": {
-        "text_YLPk4p": {
-          "type": "text",
-          "name": "t:names.heading",
+        "slide_1": {
+          "type": "slide",
           "settings": {
-            "text": "<p>Browse our latest products</p>",
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "h2",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "text_color": "{{ settings.color_palette.background }}",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
+            "eyebrow": "1–31 Lorem",
+            "heading": "Everything at once. EASY.",
+            "subheading": "Collection for teenagers",
+            "link_text": "Read more"
+          }
         },
-        "button_H9gpTf": {
-          "type": "button",
-          "name": "t:names.button",
+        "slide_2": {
+          "type": "slide",
           "settings": {
-            "label": "Shop all",
-            "link": "shopify://collections/all",
-            "open_in_new_tab": false,
-            "style_class": "button-custom",
-            "custom_button_background": "rgba(0, 0, 0, 0)",
-            "custom_button_text": "{{ settings.color_palette.background }}",
-            "custom_button_border": "{{ settings.color_palette.background }}",
-            "width": "fit-content",
-            "custom_width": 100,
-            "width_mobile": "fit-content",
-            "custom_width_mobile": 100
-          },
-          "blocks": {}
+            "eyebrow": "1–28 Ipsum",
+            "heading": "Amet consectetur. ELIT.",
+            "subheading": "Sed do eiusmod tempor",
+            "link_text": "Read more"
+          }
+        },
+        "slide_3": {
+          "type": "slide",
+          "settings": {
+            "eyebrow": "1–30 Dolor",
+            "heading": "Tempor incididunt. LABORE.",
+            "subheading": "Ut enim ad minim veniam",
+            "link_text": "Buy"
+          }
         }
       },
-      "block_order": [
-        "text_YLPk4p",
-        "button_H9gpTf"
-      ],
-      "name": "t:names.hero",
+      "block_order": ["slide_1", "slide_2", "slide_3"],
       "settings": {
-        "media_type_1": "image",
-        "media_type_2": "image",
-        "link": "",
-        "open_in_new_tab": false,
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "space-between",
-        "vertical_alignment": "flex-end",
-        "align_baseline": true,
-        "horizontal_alignment_flex_direction_column": "center",
-        "vertical_alignment_flex_direction_column": "flex-end",
-        "gap": 24,
-        "section_width": "page-width",
-        "section_height": "medium",
-        "section_height_custom": 50,
-        "toggle_overlay": true,
-        "overlay_color": "#12121266",
-        "overlay_style": "solid",
-        "gradient_direction": "to bottom",
-        "blurred_reflection": false,
-        "reflection_opacity": 75,
-        "padding-block-start": 100,
-        "padding-block-end": 72
+        "autoplay": true,
+        "autoplay_speed": 6,
+        "show_arrows": true,
+        "show_dots": true,
+        "height": 620,
+        "height_mobile": 460
       }
     },
-    "product_list_fa6P9H": {
-      "type": "product-list",
+    "s2_categories": {
+      "type": "showcase-category-row",
       "blocks": {
-        "static-header": {
-          "type": "_product-list-content",
-          "name": "t:names.header",
-          "static": true,
+        "cat_1": { "type": "category", "settings": { "label": "Sofas and armchairs" } },
+        "cat_2": { "type": "category", "settings": { "label": "Beds and mattresses" } },
+        "cat_3": { "type": "category", "settings": { "label": "Cabinets and shelving" } },
+        "cat_4": { "type": "category", "settings": { "label": "Office furniture" } },
+        "cat_5": { "type": "category", "settings": { "label": "Chests of drawers" } },
+        "cat_6": { "type": "category", "settings": { "label": "Tables and chairs" } },
+        "cat_7": { "type": "category", "settings": { "label": "Children's furniture" } },
+        "cat_8": { "type": "category", "settings": { "label": "Garden furniture" } },
+        "cat_9": { "type": "category", "settings": { "label": "Lorem ipsum dolor" } },
+        "cat_10": { "type": "category", "settings": { "label": "Consectetur elit" } }
+      },
+      "block_order": [
+        "cat_1",
+        "cat_2",
+        "cat_3",
+        "cat_4",
+        "cat_5",
+        "cat_6",
+        "cat_7",
+        "cat_8",
+        "cat_9",
+        "cat_10"
+      ],
+      "settings": {
+        "columns": 8,
+        "columns_mobile": 3
+      }
+    },
+    "s3_carousel_study": {
+      "type": "showcase-product-carousel",
+      "blocks": {
+        "p1": {
+          "type": "product",
           "settings": {
-            "content_direction": "row",
-            "vertical_on_mobile": false,
-            "horizontal_alignment": "space-between",
-            "vertical_alignment": "flex-end",
-            "align_baseline": true,
-            "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
-            "gap": 12,
-            "width": "fill",
-            "custom_width": 100,
-            "width_mobile": "fill",
-            "custom_width_mobile": 100,
-            "height": "fit",
-            "custom_height": 100,
-            "background_media": "none",
-            "video_position": "cover",
-            "background_image_position": "cover",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_list_text_YFtzcL": {
-              "type": "_product-list-text",
-              "name": "t:names.collection_title",
-              "settings": {
-                "text": "<h3>{{ closest.collection.title }}</h3>",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "h4",
-                "font": "var(--font-body--family)",
-                "font_size": "",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_list_button_MWeP9V": {
-              "type": "_product-list-button",
-              "name": "t:names.product_list_button",
-              "settings": {
-                "label": "View all",
-                "open_in_new_tab": false,
-                "style_class": "button-unstyled",
-                "width": "fit-content",
-                "custom_width": 100,
-                "width_mobile": "fit-content",
-                "custom_width_mobile": 100
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_list_text_YFtzcL",
-            "product_list_button_MWeP9V"
-          ]
+            "title": "Lorem ipsum desk 120x60",
+            "price": "24,740",
+            "compare_price": "27,490",
+            "badge": "A great deal",
+            "stock_text": "In stock: 9 pcs."
+          }
         },
-        "static-product-card": {
-          "type": "_product-card",
-          "name": "t:names.product_card",
-          "static": true,
+        "p2": {
+          "type": "product",
           "settings": {
-            "product_card_gap": 4,
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_card_gallery_677WP3": {
-              "type": "_product-card-gallery",
-              "name": "t:names.product_card_media",
-              "settings": {
-                "image_ratio": "adapt",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_title_YXxMTj": {
-              "type": "product-title",
-              "name": "t:names.product_title",
-              "settings": {
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "paragraph",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 4,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "price_JQzVV4": {
-              "type": "price",
-              "name": "t:names.product_price",
-              "settings": {
-                "show_sale_price_first": true,
-                "show_installments": false,
-                "show_tax_info": false,
-                "type_preset": "h6",
-                "width": "100%",
-                "alignment": "left",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_card_gallery_677WP3",
-            "product_title_YXxMTj",
-            "price_JQzVV4"
-          ]
+            "title": "Dolor sit desk 100x55",
+            "price": "18,690",
+            "compare_price": "23,090",
+            "badge": "A great deal",
+            "stock_text": "In stock: 1 pc.",
+            "stock_level": "low"
+          }
+        },
+        "p3": {
+          "type": "product",
+          "settings": {
+            "title": "Consectetur office chair",
+            "price": "16,820",
+            "compare_price": "20,890",
+            "stock_text": "In stock: more than 20 pcs."
+          }
+        },
+        "p4": {
+          "type": "product",
+          "settings": {
+            "title": "Adipiscing desk 160x107",
+            "price": "28,040",
+            "compare_price": "32,990",
+            "badge": "A great deal",
+            "stock_text": "In stock: 3 pcs."
+          }
+        },
+        "p5": {
+          "type": "product",
+          "settings": {
+            "title": "Eiusmod tempor shelf 90x200",
+            "price": "31,890",
+            "compare_price": "",
+            "stock_text": "In stock: 8 pcs."
+          }
+        },
+        "p6": {
+          "type": "product",
+          "settings": {
+            "title": "Incididunt labore table",
+            "price": "43,990",
+            "compare_price": "",
+            "stock_text": "In stock: 2 pcs."
+          }
         }
       },
-      "name": "t:names.featured_collection",
+      "block_order": ["p1", "p2", "p3", "p4", "p5", "p6"],
       "settings": {
-        "collection": "all",
-        "layout_type": "grid",
-        "carousel_on_mobile": false,
-        "max_products": 8,
+        "heading": "For study and work",
         "columns": 4,
-        "mobile_columns": "2",
-        "mobile_card_size": "60cqw",
-        "columns_gap": 8,
-        "rows_gap": 24,
-        "icons_style": "arrow",
-        "icons_shape": "none",
-        "section_width": "page-width",
-        "horizontal_alignment": "flex-start",
-        "gap": 28,
-        "padding-block-start": 48,
-        "padding-block-end": 48
+        "columns_mobile": 2
+      }
+    },
+    "s4_spotlight": {
+      "type": "showcase-spotlight",
+      "blocks": {
+        "i1": {
+          "type": "item",
+          "settings": { "title": "Chest of drawers 158x91", "price": "31,890" }
+        },
+        "i2": {
+          "type": "item",
+          "settings": { "title": "Bed lorem 120 velvet", "price": "43,990" }
+        },
+        "i3": {
+          "type": "item",
+          "settings": { "title": "Carpet ipsum 120x180", "price": "9,890" }
+        },
+        "i4": {
+          "type": "item",
+          "settings": { "title": "Desk dolor 120x67", "price": "24,740" }
+        },
+        "i5": {
+          "type": "item",
+          "settings": { "title": "Wardrobe amet 220x60", "price": "58,400" }
+        },
+        "i6": {
+          "type": "item",
+          "settings": { "title": "Armchair elit velvet", "price": "18,250" }
+        },
+        "i7": {
+          "type": "item",
+          "settings": { "title": "Shelf tempor 180x35", "price": "12,600" }
+        },
+        "i8": {
+          "type": "item",
+          "settings": { "title": "Bedside sed 45x40", "price": "7,320" }
+        },
+        "i9": {
+          "type": "item",
+          "settings": { "title": "Sofa incididunt 240", "price": "76,900" }
+        },
+        "i10": {
+          "type": "item",
+          "settings": { "title": "Mirror labore 90x60", "price": "5,980" }
+        }
+      },
+      "block_order": ["i1", "i2", "i3", "i4", "i5", "i6", "i7", "i8", "i9", "i10"],
+      "settings": {
+        "heading": "Everything at once. EASY.",
+        "description": "<p>A collection of furniture and textiles for teenagers that accommodates and adapts to all personalities.</p>",
+        "cta_label": "View the entire collection",
+        "image_width": 60
+      }
+    },
+    "s5_collections": {
+      "type": "showcase-collections-grid",
+      "blocks": {
+        "tab_all": { "type": "tab", "settings": { "label": "All", "filter_key": "" } },
+        "tab_collections": {
+          "type": "tab",
+          "settings": { "label": "Collections", "filter_key": "collections" }
+        },
+        "tab_cocreation": {
+          "type": "tab",
+          "settings": { "label": "Co-creation", "filter_key": "co-creation" }
+        },
+        "card_1": {
+          "type": "card",
+          "settings": {
+            "title": "Everything at once. EASY.",
+            "subtitle": "Collection for teenagers",
+            "badge": "New product",
+            "show_badge": true,
+            "filter_keys": "collections"
+          }
+        },
+        "card_2": {
+          "type": "card",
+          "settings": {
+            "title": "lorem.ipsum x DOLOR",
+            "subtitle": "Children's poufs and pillows",
+            "badge": "New product",
+            "show_badge": true,
+            "filter_keys": "co-creation"
+          }
+        },
+        "card_3": {
+          "type": "card",
+          "settings": {
+            "title": "Consectetur",
+            "subtitle": "Bright furniture for home and garden",
+            "show_badge": false,
+            "filter_keys": "collections, co-creation"
+          }
+        }
+      },
+      "block_order": ["tab_all", "tab_collections", "tab_cocreation", "card_1", "card_2", "card_3"],
+      "settings": {
+        "heading": "Collections and co-creation",
+        "columns": 3
+      }
+    },
+    "s6_carousel_hits": {
+      "type": "showcase-product-carousel",
+      "blocks": {
+        "h1": {
+          "type": "product",
+          "settings": {
+            "title": "Straight sofa lorem 120 yellow",
+            "price": "32,990",
+            "compare_price": "",
+            "stock_text": "In stock: 9 pcs."
+          }
+        },
+        "h2": {
+          "type": "product",
+          "settings": {
+            "title": "Bed ipsum 120 velour olive",
+            "price": "40,690",
+            "compare_price": "",
+            "badge": "A great deal",
+            "stock_text": "In stock: 4 pcs."
+          }
+        },
+        "h3": {
+          "type": "product",
+          "settings": {
+            "title": "Dolor mini velour straight sofa",
+            "price": "73,690",
+            "compare_price": "",
+            "stock_text": "In stock: more than 20 pcs."
+          }
+        },
+        "h4": {
+          "type": "product",
+          "settings": {
+            "title": "Children's bed amet 90 velour",
+            "price": "52,790",
+            "compare_price": "",
+            "badge": "A great deal",
+            "stock_text": "In stock: 1 pc.",
+            "stock_level": "low"
+          }
+        },
+        "h5": {
+          "type": "product",
+          "settings": {
+            "title": "Corner sofa consectetur milk",
+            "price": "87,990",
+            "compare_price": "",
+            "stock_text": "In stock: 1 pc.",
+            "stock_level": "low"
+          }
+        },
+        "h6": {
+          "type": "product",
+          "settings": {
+            "title": "Armchair elit boucle terracotta",
+            "price": "25,290",
+            "compare_price": "",
+            "stock_text": "In stock: 6 pcs."
+          }
+        }
+      },
+      "block_order": ["h1", "h2", "h3", "h4", "h5", "h6"],
+      "settings": {
+        "heading": "Online sales hits",
+        "description": "<p>Our online store features only carefully selected models, exceptional lorem ipsum bestsellers. Each model in our catalog embodies excellent design and is a legend in the industry.</p>",
+        "columns": 4,
+        "columns_mobile": 2
+      }
+    },
+    "s7_promo": {
+      "type": "showcase-promo-grid",
+      "blocks": {
+        "t1": { "type": "tile", "settings": { "name": "Sofas", "discount": "-40%" } },
+        "t2": { "type": "tile", "settings": { "name": "Cabinets and shelving", "discount": "-50%" } },
+        "t3": {
+          "type": "tile",
+          "settings": { "name": "Chests of drawers and bedside tables", "discount": "-60%" }
+        },
+        "t4": { "type": "tile", "settings": { "name": "Carpets and textiles", "discount": "-60%" } },
+        "t5": { "type": "tile", "settings": { "name": "Tables and chairs", "discount": "-50%" } },
+        "t6": { "type": "tile", "settings": { "name": "Armchairs", "discount": "-40%" } },
+        "t7": { "type": "tile", "settings": { "name": "Beds and mattresses", "discount": "-55%" } },
+        "t8": { "type": "tile", "settings": { "name": "Bed sheets", "discount": "-45%" } },
+        "t9": { "type": "tile", "settings": { "name": "Lighting", "discount": "-45%" } },
+        "t10": { "type": "tile", "settings": { "name": "Lorem dolor", "discount": "-30%" } },
+        "t11": { "type": "tile", "settings": { "name": "Ipsum amet", "discount": "-35%" } },
+        "t12": { "type": "tile", "settings": { "name": "Consectetur", "discount": "-25%" } }
+      },
+      "block_order": [
+        "t1",
+        "t2",
+        "t3",
+        "t4",
+        "t5",
+        "t6",
+        "t7",
+        "t8",
+        "t9",
+        "t10",
+        "t11",
+        "t12"
+      ],
+      "settings": {
+        "heading": "We will deliver quickly",
+        "show_heading_icon": true,
+        "heading_icon": "truck",
+        "heading_suffix": "from 1 day",
+        "subtext": "Furniture and home goods you don't have to wait for",
+        "button_label": "See all",
+        "columns": 6
+      }
+    },
+    "s8_carousel_new": {
+      "type": "showcase-product-carousel",
+      "blocks": {
+        "n1": {
+          "type": "product",
+          "settings": {
+            "title": "Corner sofa lorem-2 milk velour",
+            "price": "87,990",
+            "compare_price": "",
+            "stock_text": "In stock: 1 pc.",
+            "stock_level": "low"
+          }
+        },
+        "n2": {
+          "type": "product",
+          "settings": {
+            "title": "Bed ipsum 90 velour olive",
+            "price": "25,290",
+            "compare_price": "",
+            "stock_text": "Available in other colors: 2 pcs."
+          }
+        },
+        "n3": {
+          "type": "product",
+          "settings": {
+            "title": "Bed dolor 120 velour beige",
+            "price": "28,590",
+            "compare_price": "",
+            "badge": "Easy cleaning",
+            "stock_text": "Available in other colors: 2 pcs."
+          }
+        },
+        "n4": {
+          "type": "product",
+          "settings": {
+            "title": "Amet 120 velour terracotta bed",
+            "price": "47,290",
+            "compare_price": "",
+            "stock_text": "In stock: 5 pcs."
+          }
+        },
+        "n5": {
+          "type": "product",
+          "settings": {
+            "title": "Consectetur shelf unit 180",
+            "price": "19,450",
+            "compare_price": "",
+            "stock_text": "In stock: 7 pcs."
+          }
+        },
+        "n6": {
+          "type": "product",
+          "settings": {
+            "title": "Adipiscing dining table 140",
+            "price": "34,120",
+            "compare_price": "",
+            "stock_text": "In stock: 3 pcs."
+          }
+        }
+      },
+      "block_order": ["n1", "n2", "n3", "n4", "n5", "n6"],
+      "settings": {
+        "heading": "New Products Catalog",
+        "description": "<p>Lorem ipsum is an online store for truly comfortable furniture. We offer our customers modern sofas, manufactured in-house, and guarantee not only high quality but also affordable prices.</p>",
+        "columns": 4,
+        "columns_mobile": 2
+      }
+    },
+    "s9_info": {
+      "type": "showcase-info-cards",
+      "blocks": {
+        "ic1": {
+          "type": "card",
+          "settings": {
+            "heading": "Design project as a gift",
+            "subtext": "We will refund its cost with loyalty program bonuses."
+          }
+        },
+        "ic2": {
+          "type": "card",
+          "settings": {
+            "heading": "Lorem Club bonuses",
+            "subtext": "Update your interior profitably"
+          }
+        },
+        "ic3": {
+          "type": "card",
+          "settings": {
+            "heading": "You can try it on",
+            "subtext": "We deliver fabric samples to your home – order now"
+          }
+        }
+      },
+      "block_order": ["ic1", "ic2", "ic3"],
+      "settings": {
+        "heading": "More useful information",
+        "columns": 3
+      }
+    },
+    "s10_map": {
+      "type": "showcase-showroom-map",
+      "blocks": {
+        "loc1": {
+          "type": "location",
+          "settings": {
+            "name": "Lorem Central",
+            "address": "12 Ipsum Avenue, Dolor District",
+            "tags": "New"
+          }
+        },
+        "loc2": {
+          "type": "location",
+          "settings": { "name": "Sit Amet Plaza", "address": "45 Consectetur Road, Adipiscing" }
+        },
+        "loc3": {
+          "type": "location",
+          "settings": {
+            "name": "Elit Mall",
+            "address": "78 Tempor Boulevard, Incididunt",
+            "tags": "Flagship"
+          }
+        },
+        "loc4": {
+          "type": "location",
+          "settings": { "name": "Labore Park", "address": "90 Magna Street, Aliqua" }
+        },
+        "loc5": {
+          "type": "location",
+          "settings": { "name": "Veniam Square", "address": "34 Nostrud Lane, Exercitation" }
+        }
+      },
+      "block_order": ["loc1", "loc2", "loc3", "loc4", "loc5"],
+      "settings": {
+        "heading": "Seeing is believing!",
+        "description": "<p>We offer the most up-to-date selection and provide our customers with every opportunity to feel confident in their purchase. We invite you to visit our showrooms and personally evaluate the quality of our fabrics and materials.</p>",
+        "search_placeholder": "Address or name",
+        "map_width": 65,
+        "map_height": 520
+      }
+    },
+    "s11_gallery": {
+      "type": "showcase-social-gallery",
+      "blocks": {
+        "g1": { "type": "photo", "settings": { "caption": "@lorem_ipsum" } },
+        "g2": { "type": "photo", "settings": { "caption": "@lorem_ipsum" } },
+        "g3": { "type": "photo", "settings": { "caption": "@lorem_ipsum" } },
+        "g4": { "type": "photo", "settings": { "caption": "@lorem_ipsum" } },
+        "g5": { "type": "photo", "settings": { "caption": "@lorem_ipsum" } },
+        "g6": { "type": "photo", "settings": { "caption": "@lorem_ipsum" } }
+      },
+      "block_order": ["g1", "g2", "g3", "g4", "g5", "g6"],
+      "settings": {
+        "heading": "Decorating your home? Get inspired by real interiors!",
+        "subtext": "Thousands of our clients have already shared photos of stylish apartments furnished with our furniture.",
+        "seo_heading": "Online furniture and home goods store in Lorem City",
+        "seo_body": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>",
+        "columns": 4,
+        "columns_mobile": 2
       }
     }
   },
   "order": [
-    "hero_jVaWmY",
-    "product_list_fa6P9H"
+    "s1_hero",
+    "s2_categories",
+    "s3_carousel_study",
+    "s4_spotlight",
+    "s5_collections",
+    "s6_carousel_hits",
+    "s7_promo",
+    "s8_carousel_new",
+    "s9_info",
+    "s10_map",
+    "s11_gallery"
   ]
 }

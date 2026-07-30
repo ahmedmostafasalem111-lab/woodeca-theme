@@ -1,0 +1,706 @@
+{% doc %}
+  Renders the collection filter and sort bar: a sort dropdown, a "Filters" button
+  that opens the full drawer, boolean facets as toggle-switch pills, and every
+  other facet as an outline pill that opens its own popover panel.
+
+  Everything is driven by Shopify's native facet system (`collection.filters` and
+  `collection.sort_options`), so filters reflect whatever is configured in Search &
+  Discovery for each collection rather than being hardcoded per collection.
+
+  Each control is a real link or form submit, so the bar works without JS.
+
+  @param {object} collection - The current collection (or search) object.
+  @param {object} section - The section, for labels and colour settings.
+
+  @example
+  {% render 'showcase-collection-filters', collection: collection, section: section %}
+{% enddoc %}
+
+{% liquid
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+  assign current_sort_label = ''
+  for option in collection.sort_options
+    if option.value == sort_by
+      assign current_sort_label = option.name
+    endif
+  endfor
+  if current_sort_label == blank
+    assign current_sort_label = section.settings.sort_default_label | default: 'The most popular'
+  endif
+
+  # Split facets: booleans become toggle pills, everything else a popover pill.
+  assign boolean_filters = collection.filters | where: 'type', 'boolean'
+  assign has_filters = false
+  if collection.filters.size > 0
+    assign has_filters = true
+  endif
+
+  # Count applied facet values so the Filters button can show a badge.
+  assign active_count = 0
+  for filter in collection.filters
+    for value in filter.active_values
+      assign active_count = active_count | plus: 1
+    endfor
+  endfor
+%}
+
+<div class="collection-bar">
+  <div class="collection-bar__scroll">
+    {%- comment -%} ---- Sort dropdown ---- {%- endcomment -%}
+    {% if collection.sort_options.size > 0 %}
+      <div
+        class="collection-pill-wrap"
+        ref="popovers[]"
+        data-popover-id="sort"
+      >
+        <button
+          type="button"
+          class="collection-pill collection-pill--outline"
+          data-popover-trigger
+          aria-expanded="false"
+          aria-haspopup="listbox"
+          on:click="/togglePopover?id=sort"
+        >
+          <span class="svg-wrapper collection-pill__icon" aria-hidden="true">
+            {{- 'icon-double-chevron.svg' | inline_asset_content -}}
+          </span>
+          <span class="collection-pill__label">{{ current_sort_label }}</span>
+          <span class="svg-wrapper collection-pill__caret" aria-hidden="true">
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          </span>
+        </button>
+
+        <div class="collection-popover" role="listbox">
+          <ul class="collection-popover__list">
+            {% for option in collection.sort_options %}
+              {%- assign sort_url = collection.url | append: '?sort_by=' | append: option.value -%}
+              <li>
+                <button
+                  type="button"
+                  class="collection-popover__option{% if option.value == sort_by %} collection-popover__option--active{% endif %}"
+                  role="option"
+                  aria-selected="{% if option.value == sort_by %}true{% else %}false{% endif %}"
+                  data-sort-url="{{ sort_url }}"
+                  on:click="/selectSort"
+                >
+                  {{- option.name -}}
+                </button>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
+
+    {%- comment -%} ---- Filters drawer trigger ---- {%- endcomment -%}
+    {% if has_filters %}
+      <button
+        type="button"
+        class="collection-pill collection-pill--filled"
+        on:click="/openDrawer"
+      >
+        <span class="svg-wrapper collection-pill__icon" aria-hidden="true">
+          {{- 'icon-filter.svg' | inline_asset_content -}}
+        </span>
+        <span class="collection-pill__label">
+          {{- section.settings.filters_label | default: 'Filters' -}}
+        </span>
+        {% if active_count > 0 %}
+          <span class="collection-pill__badge">{{ active_count }}</span>
+        {% endif %}
+      </button>
+    {% endif %}
+
+    {%- comment -%}
+      ---- Configured quick-toggle pills ----
+      Merchant-defined toggles mapped onto a specific facet param/value. When the
+      pair is found among the native facets we use its real add/remove URLs and
+      active state; otherwise we fall back to appending the param, which Shopify
+      applies if the filter exists and ignores harmlessly if it doesn't.
+    {%- endcomment -%}
+    {% assign quick_toggles = section.blocks | where: 'type', 'quick_toggle' %}
+    {% for block in quick_toggles %}
+      {% liquid
+        assign wanted_param = block.settings.param_name
+        assign wanted_value = block.settings.value
+        assign matched = null
+
+        for filter in collection.filters
+          if filter.type == 'boolean'
+            if filter.true_value.param_name == wanted_param
+              assign matched = filter.true_value
+            endif
+          else
+            for value in filter.values
+              if value.param_name == wanted_param and value.value == wanted_value
+                assign matched = value
+              endif
+            endfor
+          endif
+        endfor
+
+        if matched != null
+          assign toggle_is_on = matched.active
+          if toggle_is_on
+            assign quick_url = matched.url_to_remove
+          else
+            assign quick_url = matched.url_to_add
+          endif
+        else
+          assign toggle_is_on = false
+          assign quick_url = collection.url | append: '?' | append: wanted_param | append: '=' | append: wanted_value
+        endif
+      %}
+      <a
+        href="{{ quick_url }}"
+        class="collection-pill collection-pill--outline collection-pill--toggle"
+        role="switch"
+        aria-checked="{% if toggle_is_on %}true{% else %}false{% endif %}"
+        {{ block.shopify_attributes }}
+      >
+        <span class="collection-pill__label">{{ block.settings.label }}</span>
+        <span class="collection-toggle" aria-hidden="true">
+          <span class="collection-toggle__knob"></span>
+        </span>
+      </a>
+    {% endfor %}
+
+    {%- comment -%} ---- Native boolean facets as toggle-switch pills ---- {%- endcomment -%}
+    {% for filter in boolean_filters %}
+      {% liquid
+        assign true_value = filter.true_value
+        assign is_on = false
+        if true_value.active
+          assign is_on = true
+        endif
+        if is_on
+          assign toggle_url = true_value.url_to_remove
+        else
+          assign toggle_url = true_value.url_to_add
+        endif
+      %}
+      <a
+        href="{{ toggle_url }}"
+        class="collection-pill collection-pill--outline collection-pill--toggle"
+        role="switch"
+        aria-checked="{% if is_on %}true{% else %}false{% endif %}"
+      >
+        <span class="collection-pill__label">{{ filter.label }}</span>
+        <span class="collection-toggle" aria-hidden="true">
+          <span class="collection-toggle__knob"></span>
+        </span>
+      </a>
+    {% endfor %}
+
+    {%- comment -%} ---- Remaining facets as popover pills ---- {%- endcomment -%}
+    {% for filter in collection.filters %}
+      {% if filter.type == 'boolean' %}
+        {% continue %}
+      {% endif %}
+
+      <div
+        class="collection-pill-wrap"
+        ref="popovers[]"
+        data-popover-id="filter-{{ forloop.index }}"
+      >
+        <button
+          type="button"
+          class="collection-pill collection-pill--outline{% if filter.active_values.size > 0 %} collection-pill--active{% endif %}"
+          data-popover-trigger
+          aria-expanded="false"
+          on:click="/togglePopover?id=filter-{{ forloop.index }}"
+        >
+          <span class="collection-pill__label">{{ filter.label }}</span>
+          {% if filter.active_values.size > 0 %}
+            <span class="collection-pill__badge">{{ filter.active_values.size }}</span>
+          {% endif %}
+        </button>
+
+        <div class="collection-popover">
+          <form
+            method="get"
+            action="{{ collection.url }}"
+            class="collection-popover__form"
+          >
+            {% render 'showcase-facet-inputs', filter: filter, collection: collection %}
+
+            <div class="collection-popover__actions">
+              {% if filter.active_values.size > 0 %}
+                <a
+                  href="{{ filter.url_to_remove }}"
+                  class="collection-popover__clear"
+                >
+                  {{- section.settings.clear_label | default: 'Clear' -}}
+                </a>
+              {% endif %}
+              <button type="submit" class="collection-popover__apply">
+                {{- section.settings.apply_label | default: 'Apply' -}}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {%- comment -%} ---- Active facet chips ---- {%- endcomment -%}
+  {% if active_count > 0 %}
+    <div class="collection-bar__active">
+      {% for filter in collection.filters %}
+        {% for value in filter.active_values %}
+          <a
+            href="{{ value.url_to_remove }}"
+            class="collection-chip"
+          >
+            <span>{{ filter.label }}: {{ value.label }}</span>
+            <span class="svg-wrapper" aria-hidden="true">
+              {{- 'icon-close.svg' | inline_asset_content -}}
+            </span>
+          </a>
+        {% endfor %}
+      {% endfor %}
+
+      <a
+        href="{{ collection.url }}"
+        class="collection-chip collection-chip--clear-all"
+      >
+        {{- section.settings.clear_all_label | default: 'Clear all' -}}
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+{%- comment -%} ---- Full filter drawer ---- {%- endcomment -%}
+{% if has_filters %}
+  <div
+    class="collection-drawer"
+    ref="drawer"
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ section.settings.filters_label | default: 'Filters' | escape }}"
+  >
+    <div
+      class="collection-drawer__overlay"
+      on:click="/closeDrawer"
+    ></div>
+
+    <div class="collection-drawer__panel">
+      <div class="collection-drawer__header">
+        <h2 class="collection-drawer__title">
+          {{- section.settings.filters_label | default: 'Filters' -}}
+        </h2>
+        <button
+          type="button"
+          class="collection-drawer__close"
+          aria-label="{{ section.settings.close_label | default: 'Close' | escape }}"
+          on:click="/closeDrawer"
+        >
+          <span class="svg-wrapper" aria-hidden="true">
+            {{- 'icon-close.svg' | inline_asset_content -}}
+          </span>
+        </button>
+      </div>
+
+      <form
+        method="get"
+        action="{{ collection.url }}"
+        class="collection-drawer__form"
+      >
+        {% for filter in collection.filters %}
+          <details class="collection-drawer__group" open>
+            <summary class="collection-drawer__group-summary">
+              <span>{{ filter.label }}</span>
+              <span class="svg-wrapper collection-pill__caret" aria-hidden="true">
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </span>
+            </summary>
+            <div class="collection-drawer__group-body">
+              {% render 'showcase-facet-inputs', filter: filter, collection: collection %}
+            </div>
+          </details>
+        {% endfor %}
+
+        <div class="collection-drawer__actions">
+          <a
+            href="{{ collection.url }}"
+            class="collection-drawer__clear"
+          >
+            {{- section.settings.clear_all_label | default: 'Clear all' -}}
+          </a>
+          <button type="submit" class="collection-drawer__apply">
+            {{- section.settings.apply_label | default: 'Apply' -}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .collection-bar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+    margin-block: var(--margin-lg);
+  }
+
+  /* Horizontally scrollable pill row, scrollbar hidden. */
+  .collection-bar__scroll {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    overflow-x: auto;
+    padding-block: 2px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .collection-bar__scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .collection-pill-wrap {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .collection-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    flex-shrink: 0;
+    padding: var(--padding-2xs) var(--padding-md);
+    border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    line-height: 1.6;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color var(--animation-speed) var(--animation-easing),
+      border-color var(--animation-speed) var(--animation-easing);
+  }
+
+  .collection-pill:hover {
+    border-color: rgb(var(--color-foreground-rgb) / var(--opacity-40));
+  }
+
+  .collection-pill--filled {
+    border-color: var(--collection-filters-button-background, #333);
+    background-color: var(--collection-filters-button-background, #333);
+    color: var(--collection-filters-button-text, #fff);
+  }
+
+  .collection-pill--active {
+    border-color: var(--color-foreground);
+  }
+
+  .collection-pill__icon,
+  .collection-pill__icon svg {
+    width: var(--icon-size-xs);
+    height: var(--icon-size-xs);
+  }
+
+  .collection-pill__caret,
+  .collection-pill__caret svg {
+    width: var(--icon-size-2xs);
+    height: var(--icon-size-2xs);
+    transition: rotate var(--animation-speed) var(--animation-easing);
+  }
+
+  .collection-pill-wrap[data-open='true'] .collection-pill__caret {
+    rotate: 180deg;
+  }
+
+  .collection-pill__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding-inline: 5px;
+    border-radius: 999px;
+    background-color: var(--collection-badge-background, #e8705a);
+    color: var(--collection-badge-text, #fff);
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  /* Toggle-switch pill: switch sits right-aligned inside the pill. */
+  .collection-pill--toggle {
+    padding-inline-end: var(--padding-2xs);
+  }
+
+  .collection-toggle {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 20px;
+    border-radius: 999px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-15));
+    transition: background-color var(--animation-speed) var(--animation-easing);
+  }
+
+  .collection-toggle__knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgb(0 0 0 / var(--opacity-25));
+    transition: translate var(--animation-speed) var(--animation-easing);
+  }
+
+  .collection-pill--toggle[aria-checked='true'] {
+    border-color: var(--collection-toggle-active, #7ec8e8);
+    background-color: var(--collection-toggle-active-bg, #d6f0fa);
+  }
+
+  .collection-pill--toggle[aria-checked='true'] .collection-toggle {
+    background-color: var(--collection-toggle-active, #7ec8e8);
+  }
+
+  .collection-pill--toggle[aria-checked='true'] .collection-toggle__knob {
+    translate: 14px 0;
+  }
+
+  /* ---- Popovers ---- */
+  .collection-popover {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: var(--layer-raised);
+    display: none;
+    min-width: 240px;
+    max-width: 320px;
+    padding: var(--padding-sm);
+    border-radius: var(--style-border-radius-popover, 8px);
+    background-color: var(--color-background);
+    box-shadow: var(--shadow-popover);
+  }
+
+  .collection-pill-wrap[data-open='true'] .collection-popover {
+    display: block;
+  }
+
+  .collection-popover__list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .collection-popover__option {
+    width: 100%;
+    padding: var(--padding-2xs) var(--padding-xs);
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .collection-popover__option:hover {
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+  }
+
+  .collection-popover__option--active {
+    font-weight: 600;
+  }
+
+  .collection-popover__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-sm);
+    margin-block-start: var(--margin-md);
+  }
+
+  .collection-popover__clear {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+  }
+
+  .collection-popover__apply {
+    margin-inline-start: auto;
+    padding: var(--padding-2xs) var(--padding-md);
+    border: none;
+    border-radius: 999px;
+    background-color: var(--collection-filters-button-background, #333);
+    color: var(--collection-filters-button-text, #fff);
+    font-size: var(--font-size--xs);
+    cursor: pointer;
+  }
+
+  /* ---- Active facet chips ---- */
+  .collection-bar__active {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-2xs);
+  }
+
+  .collection-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-3xs);
+    padding: 3px var(--padding-2xs);
+    border-radius: 999px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+    color: var(--color-foreground);
+    font-size: var(--font-size--xs);
+    text-decoration: none;
+  }
+
+  .collection-chip .svg-wrapper,
+  .collection-chip svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  .collection-chip--clear-all {
+    background-color: transparent;
+    text-decoration: underline;
+  }
+
+  /* ---- Drawer ---- */
+  .collection-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: var(--layer-window-overlay, 60);
+    display: none;
+  }
+
+  .collection-drawer[data-open='true'] {
+    display: block;
+  }
+
+  .collection-drawer__overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgb(0 0 0 / var(--opacity-40));
+  }
+
+  .collection-drawer__panel {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    display: flex;
+    flex-direction: column;
+    width: min(420px, 92vw);
+    background-color: var(--color-background);
+    box-shadow: var(--shadow-popover);
+  }
+
+  .collection-drawer__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--padding-lg);
+    border-block-end: var(--border-width-sm) solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .collection-drawer__title {
+    margin: 0;
+    font-size: var(--font-size--lg);
+  }
+
+  .collection-drawer__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-foreground);
+    cursor: pointer;
+  }
+
+  .collection-drawer__close .svg-wrapper,
+  .collection-drawer__close svg {
+    width: var(--icon-size-xs);
+    height: var(--icon-size-xs);
+  }
+
+  .collection-drawer__form {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+
+  .collection-drawer__group {
+    border-block-end: var(--border-width-sm) solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .collection-drawer__group-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--padding-md) var(--padding-lg);
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .collection-drawer__group-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .collection-drawer__group[open] .collection-pill__caret {
+    rotate: 180deg;
+  }
+
+  .collection-drawer__group-body {
+    padding: 0 var(--padding-lg) var(--padding-md);
+  }
+
+  .collection-drawer__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-md);
+    margin-block-start: auto;
+    padding: var(--padding-lg);
+    border-block-start: var(--border-width-sm) solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .collection-drawer__clear {
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    text-decoration: underline;
+  }
+
+  .collection-drawer__apply {
+    flex-grow: 1;
+    max-width: 60%;
+    padding: var(--padding-sm);
+    border: none;
+    border-radius: 999px;
+    background-color: var(--collection-filters-button-background, #333);
+    color: var(--collection-filters-button-text, #fff);
+    font-size: var(--font-size--sm);
+    cursor: pointer;
+  }
+
+  @media screen and (max-width: 749px) {
+    .collection-popover {
+      /* Keep popovers inside the viewport on narrow screens. */
+      position: fixed;
+      inset-inline: var(--page-margin);
+      top: auto;
+      max-width: none;
+      min-width: 0;
+    }
+  }
+{% endstylesheet %}

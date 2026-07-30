@@ -76,7 +76,8 @@
     "search_suggestions_available": "Vyhledat dostupné návrhy pro výraz „{{ query }}“",
     "price_filter_low": "Nízká cena",
     "price_filter_high": "Vysoká cena",
-    "view_disclosure_information_for_product": "Zobrazit povinné informace o produktu {{ product_title }}"
+    "view_disclosure_information_for_product": "Zobrazit povinné informace o produktu {{ product_title }}",
+    "call_us": "Call us"
   },
   "actions": {
     "add_to_cart": "Přidat do košíku",
@@ -286,7 +287,8 @@
     },
     "item_count_cutoff": "Počet položek: více než {{ count }}",
     "quick_order_list": "Seznam pro rychlou objednávku",
-    "product_disclosures": "Povinné informace o produktu"
+    "product_disclosures": "Povinné informace o produktu",
+    "all_categories": "All Categories"
   },
   "gift_cards": {
     "issued": {

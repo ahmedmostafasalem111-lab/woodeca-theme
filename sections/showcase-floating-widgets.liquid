@@ -1,0 +1,190 @@
+{% comment %}
+  Two optional viewport-fixed widgets seen throughout the reference screenshots:
+  a circular chat/support bubble pinned bottom-right, and a vertical rotated-text
+  feedback tab pinned to the left edge. Each toggles independently.
+
+  The chat bubble lifts above the mobile tab bar when that section is enabled.
+{% endcomment %}
+
+{% if section.settings.show_chat_bubble %}
+  <a
+    href="{{ section.settings.chat_link | default: '#' }}"
+    class="floating-chat"
+    aria-label="{{ section.settings.chat_label | default: 'Open support chat' | escape }}"
+    style="
+      --chat-background: {{ section.settings.chat_background | default: '#f2f2f0' }};
+      --chat-icon-color: {{ section.settings.chat_icon_color | default: '#1c1c1c' }};
+      --chat-size: {{ section.settings.chat_size }}px;
+    "
+  >
+    <span class="svg-wrapper" aria-hidden="true">
+      {{- 'icon-chat.svg' | inline_asset_content -}}
+    </span>
+  </a>
+{% endif %}
+
+{% if section.settings.show_feedback_tab and section.settings.feedback_label != blank %}
+  <a
+    href="{{ section.settings.feedback_link | default: '#' }}"
+    class="floating-feedback"
+    style="
+      --feedback-background: {{ section.settings.feedback_background | default: '#333333' }};
+      --feedback-text: {{ section.settings.feedback_text_color | default: '#ffffff' }};
+    "
+  >
+    {{ section.settings.feedback_label }}
+  </a>
+{% endif %}
+
+{% stylesheet %}
+  .floating-chat {
+    position: fixed;
+    right: var(--padding-lg);
+    bottom: var(--padding-lg);
+    z-index: var(--layer-sticky, 20);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--chat-size, 56px);
+    height: var(--chat-size, 56px);
+    border-radius: 50%;
+    background-color: var(--chat-background);
+    color: var(--chat-icon-color);
+    box-shadow: 0 4px 16px rgb(0 0 0 / var(--opacity-15));
+    transition: scale var(--animation-speed) var(--animation-timing-bounce);
+  }
+
+  .floating-chat:hover {
+    scale: 1.06;
+  }
+
+  .floating-chat .svg-wrapper,
+  .floating-chat svg {
+    width: 55%;
+    height: 55%;
+  }
+
+  /* Vertical tab on the left edge, text rotated to read bottom-to-top. */
+  .floating-feedback {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: var(--layer-sticky, 20);
+    padding: var(--padding-md) var(--padding-2xs);
+    border-start-end-radius: 6px;
+    border-end-end-radius: 6px;
+    background-color: var(--feedback-background);
+    color: var(--feedback-text);
+    font-size: var(--font-size--2xs);
+    text-decoration: none;
+    writing-mode: vertical-rl;
+    rotate: 180deg;
+  }
+
+  @media screen and (max-width: 989px) {
+    /* Clear the fixed mobile tab bar when it's present. */
+    .floating-chat {
+      right: var(--padding-sm);
+      bottom: calc(var(--mobile-tab-bar-height, 0px) + var(--padding-sm) + env(safe-area-inset-bottom, 0px));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Floating widgets",
+  "tag": "aside",
+  "class": "floating-widgets-section",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Viewport-fixed chat bubble and side feedback tab, shown on every page this section is added to."
+    },
+    {
+      "type": "header",
+      "content": "Chat bubble"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_chat_bubble",
+      "label": "Show chat bubble",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "chat_label",
+      "label": "Accessible label",
+      "default": "Open support chat"
+    },
+    {
+      "type": "url",
+      "id": "chat_link",
+      "label": "Link"
+    },
+    {
+      "type": "range",
+      "id": "chat_size",
+      "label": "Size",
+      "min": 40,
+      "max": 72,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "color",
+      "id": "chat_background",
+      "label": "Background",
+      "default": "#f2f2f0"
+    },
+    {
+      "type": "color",
+      "id": "chat_icon_color",
+      "label": "Icon",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "header",
+      "content": "Side feedback tab"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_feedback_tab",
+      "label": "Show feedback tab",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "feedback_label",
+      "label": "Tab text",
+      "default": "Site feedback"
+    },
+    {
+      "type": "url",
+      "id": "feedback_link",
+      "label": "Link"
+    },
+    {
+      "type": "color",
+      "id": "feedback_background",
+      "label": "Background",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "feedback_text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Floating widgets"
+    }
+  ]
+}
+{% endschema %}

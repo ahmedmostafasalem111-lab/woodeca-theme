@@ -1,0 +1,26 @@
+{% doc %}
+  A secondary heading part-way down a footer column, so one column can hold more
+  than one titled group (e.g. "Partners" beneath "Contact us").
+{% enddoc %}
+
+<li
+  class="footer-column__item footer-column__item--subheading"
+  {{ block.shopify_attributes }}
+>
+  <span class="footer-column__subheading">{{ block.settings.text }}</span>
+</li>
+
+{% schema %}
+{
+  "name": "Sub-heading",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "Partners"
+    }
+  ]
+}
+{% endschema %}

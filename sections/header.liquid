@@ -126,6 +126,9 @@
       endif
     endif
   endif
+
+  assign order = order | append: ',search_bar'
+
   capture search
     render 'search', style: search_style, class: search_class, display_style: section.settings.actions_display_style
   endcapture
@@ -144,6 +147,12 @@
       render 'search', class: 'search-action--hidden-on-menu', style: search_style, display_style: section.settings.actions_display_style
     endcapture
   endif
+
+  capture search_bar
+    if section.settings.show_search
+      render 'header-category-search', section: section, layout: 'inline', id_suffix: 'inline'
+    endif
+  endcapture
 
   assign show_language = section.settings.show_language
   if localization.available_languages.size <= 1
@@ -326,6 +335,9 @@
   class="{{ class }}"
   data-theme-color="rgb({{ section.settings.background_color_top.rgb | default: settings.page_background_color.rgb }})"
   data-bubble-style="{{ section.settings.bubble_style }}"
+  {% if section.settings.show_search %}
+    data-search-style="bar"
+  {% endif %}
   {% if transparent %}
     transparent="{{ transparent }}"
   {% endif %}
@@ -435,7 +447,8 @@
         actions: actions,
         localization: localization_markup,
         search: search,
-        drawer_search: drawer_search
+        drawer_search: drawer_search,
+        search_bar: search_bar
       %}
     {% endcapture %}
 
@@ -461,6 +474,8 @@
     </div>
   {% endif %}
 </header-component>
+
+{% render 'search-modal', section: section %}
 
 <script
   src="{{ 'header.js' | asset_url }}"
@@ -610,6 +625,14 @@
   .header-section {
     position: relative;
     z-index: var(--layer-menu-drawer);
+  }
+
+  /* The inline category-search bar replaces the icon-triggered search modal on desktop;
+     the icon keeps working as the mobile search entry point. */
+  @media screen and (min-width: 750px) {
+    [data-search-style='bar'] .search-action {
+      display: none;
+    }
   }
 
   /* need default values for non-flash transitions on first overflow menu open */
@@ -825,6 +848,21 @@
       --header-center: auto;
       --header-left: minmax(max-content, 1fr);
       --header-right: minmax(max-content, 1fr);
+    }
+
+    /* Let the inline category-search bar stretch to fill whichever column it's placed in */
+    &:has(.header__column--center .header-category-search--inline) {
+      --header-center: 1fr;
+      --header-left: minmax(max-content, 1fr);
+      --header-right: minmax(max-content, 1fr);
+    }
+
+    &:has(.header__column--left .header-category-search--inline) {
+      --header-left: 1fr;
+    }
+
+    &:has(.header__column--right .header-category-search--inline) {
+      --header-right: 1fr;
     }
 
     /* If there is no center column, make the column the menu is in grow eagerly */
@@ -1306,6 +1344,143 @@
     },
     {
       "type": "header",
+      "content": "t:content.search_bar"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:content.search_bar_info"
+    },
+    {
+      "type": "collection_list",
+      "id": "search_categories",
+      "label": "t:settings.collection_list",
+      "info": "t:info.search_categories"
+    },
+    {
+      "type": "select",
+      "id": "search_bar_position",
+      "label": "t:settings.position",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:options.left"
+        },
+        {
+          "value": "center",
+          "label": "t:options.center"
+        },
+        {
+          "value": "right",
+          "label": "t:options.right"
+        }
+      ],
+      "default": "center",
+      "visible_if": "{{ section.settings.show_search }}"
+    },
+    {
+      "type": "select",
+      "id": "search_bar_row",
+      "label": "t:settings.row",
+      "options": [
+        {
+          "value": "top",
+          "label": "t:options.top"
+        },
+        {
+          "value": "bottom",
+          "label": "t:options.bottom"
+        }
+      ],
+      "default": "top",
+      "visible_if": "{{ section.settings.show_search }}"
+    },
+    {
+      "type": "text",
+      "id": "all_categories_label",
+      "label": "t:settings.all_categories_label",
+      "default": "All Categories",
+      "visible_if": "{{ section.settings.show_search }}"
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "t:settings.search_placeholder",
+      "default": "Search products",
+      "visible_if": "{{ section.settings.show_search }}"
+    },
+    {
+      "type": "select",
+      "id": "search_bar_font",
+      "label": "t:settings.font",
+      "options": [
+        {
+          "value": "heading",
+          "label": "t:options.heading"
+        },
+        {
+          "value": "subheading",
+          "label": "t:options.subheading"
+        },
+        {
+          "value": "body",
+          "label": "t:options.body"
+        },
+        {
+          "value": "accent",
+          "label": "t:options.accent"
+        }
+      ],
+      "default": "body",
+      "visible_if": "{{ section.settings.show_search }}"
+    },
+    {
+      "type": "select",
+      "id": "search_bar_font_size",
+      "label": "t:settings.size",
+      "options": [
+        {
+          "value": "0.75rem",
+          "label": "12px"
+        },
+        {
+          "value": "0.875rem",
+          "label": "14px"
+        },
+        {
+          "value": "1rem",
+          "label": "16px"
+        },
+        {
+          "value": "1.125rem",
+          "label": "18px"
+        }
+      ],
+      "default": "0.875rem",
+      "visible_if": "{{ section.settings.show_search }}"
+    },
+    {
+      "type": "color",
+      "id": "search_bar_text_color",
+      "label": "t:settings.text_color",
+      "placeholder": "t:settings.default",
+      "visible_if": "{{ section.settings.show_search }}"
+    },
+    {
+      "type": "color",
+      "id": "search_bar_background_color",
+      "label": "t:settings.background_color",
+      "placeholder": "t:settings.default",
+      "visible_if": "{{ section.settings.show_search }}"
+    },
+    {
+      "type": "color",
+      "id": "search_bar_border_color",
+      "label": "t:settings.border_color",
+      "placeholder": "t:settings.default",
+      "visible_if": "{{ section.settings.show_search }}"
+    },
+    {
+      "type": "header",
       "content": "t:content.localization"
     },
     {
@@ -1609,6 +1784,23 @@
       ],
       "default": "none",
       "visible_if": "{{ section.settings.actions_display_style == 'text' }}"
+    },
+    {
+      "type": "header",
+      "content": "t:content.call_us"
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "t:settings.phone_number",
+      "info": "t:info.phone_number"
+    },
+    {
+      "type": "text",
+      "id": "phone_label",
+      "label": "t:settings.phone_label",
+      "default": "Call us",
+      "visible_if": "{{ section.settings.phone_number != blank }}"
     },
     {
       "type": "header",

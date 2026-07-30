@@ -1,0 +1,35 @@
+{% doc %}
+  A single link line inside a footer column.
+{% enddoc %}
+
+<li
+  class="footer-column__item"
+  {{ block.shopify_attributes }}
+>
+  <a
+    href="{{ block.settings.link | default: '#' }}"
+    class="footer-column__link"
+  >
+    {{- block.settings.label -}}
+  </a>
+</li>
+
+{% schema %}
+{
+  "name": "Link",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "Lorem ipsum"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    }
+  ]
+}
+{% endschema %}

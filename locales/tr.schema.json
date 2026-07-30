@@ -574,7 +574,11 @@
     "input_style": "Giriş stili",
     "selected_button_style": "Seçili düğme stili",
     "open_by_default": "Varsayılan olarak açık",
-    "title_preset": "Başlık ön ayarı"
+    "title_preset": "Başlık ön ayarı",
+    "phone_number": "Phone number",
+    "phone_label": "Call us label",
+    "search_placeholder": "Search placeholder",
+    "all_categories_label": "\"All categories\" label"
   },
   "options": {
     "apple": "Apple",
@@ -978,7 +982,10 @@
     "gift_card_products": "Hediye kartı ürünleri",
     "disclosures": "Bildirimler",
     "disclosures_metafield_content": "Bu ürün için zorunlu güvenlik uyarıları ve yasal bildirimler.",
-    "page_text_color_contrast_info": "Özel arka plan rengine sahip bölümler, bu metin rengini yalnızca yeterli renk kontrastı olduğunda kullanır."
+    "page_text_color_contrast_info": "Özel arka plan rengine sahip bölümler, bu metin rengini yalnızca yeterli renk kontrastı olduğunda kullanır.",
+    "search_bar": "Search bar",
+    "search_bar_info": "The inline search bar with category dropdown replaces the search icon on desktop. The icon remains as the search entry point on mobile.",
+    "call_us": "Call us"
   },
   "html_defaults": {
     "share_information_about_your": "<p>Markanızla ilgili bilgileri müşterilerinizle paylaşın. Bir ürünü açıklayın, duyurular yapın veya mağazanıza gelen müşterileri karşılayın.</p>",
@@ -1102,7 +1109,10 @@
     "page_text_color_default_info": "Tema bölümleri için varsayılan",
     "actions_display_style": "Mobilde her zaman simgeler kullanılır",
     "edit_input_field_in_theme_settings": "[Tema ayarlarında](/editor?context=theme&category=input%20fields) giriş alanını düzenle",
-    "edit_variants_in_theme_settings": "Varyasyon stilini [tema ayarlarından](/editor?context=theme&category=variant%20pickers) düzenleyin"
+    "edit_variants_in_theme_settings": "Varyasyon stilini [tema ayarlarından](/editor?context=theme&category=variant%20pickers) düzenleyin",
+    "phone_number": "Shown as a tap-to-call icon in the header. Leave blank to hide it.",
+    "search_categories": "Shown in the search bar's category dropdown. Leave blank to only show \"All Categories\".",
+    "announcement_text_color": "Default for all slides. Individual slides can override this."
   },
   "categories": {
     "product_list": "Öne çıkan koleksiyon",

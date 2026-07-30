@@ -1,0 +1,435 @@
+{% comment %}
+  Reusable product carousel. Covers all three carousel instances on the homepage
+  ("For study and work", "Online sales hits", "New Products Catalog") — the only
+  difference between them is whether the optional description paragraph is filled
+  in, so one section type serves all three.
+
+  Products come from a collection when one is picked, otherwise from the manually
+  authored blocks (which carry placeholder defaults).
+{% endcomment %}
+
+{% liquid
+  assign heading = section.settings.heading
+  assign description = section.settings.description
+  assign source_collection = section.settings.collection
+  assign products_limit = section.settings.products_limit | default: 12
+%}
+
+<div
+  class="section-background"
+  {% if section.settings.background_color != blank %}
+    style="background-color: {{ section.settings.background_color }};"
+  {% endif %}
+></div>
+
+<div
+  class="section section--{{ section.settings.section_width }} showcase-carousel spacing-style"
+  style="
+    {% render 'spacing-padding', settings: section.settings %}
+    {% if section.settings.text_color != blank %}
+      --color-foreground: {{ section.settings.text_color }};
+      --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+    {% endif %}
+    {% if section.settings.badge_background != blank %}
+      --showcase-card-badge-background: {{ section.settings.badge_background }};
+    {% endif %}
+    {% if section.settings.badge_text_color != blank %}
+      --showcase-card-badge-text: {{ section.settings.badge_text_color }};
+    {% endif %}
+    {% if section.settings.discount_background != blank %}
+      --showcase-card-discount-background: {{ section.settings.discount_background }};
+    {% endif %}
+    {% if section.settings.discount_text_color != blank %}
+      --showcase-card-discount-text: {{ section.settings.discount_text_color }};
+    {% endif %}
+    {% if section.settings.quick_add_background != blank %}
+      --showcase-card-quick-add-background: {{ section.settings.quick_add_background }};
+    {% endif %}
+    {% if section.settings.quick_add_icon_color != blank %}
+      --showcase-card-quick-add-icon: {{ section.settings.quick_add_icon_color }};
+    {% endif %}
+    {% if section.settings.card_media_background != blank %}
+      --showcase-card-media-background: {{ section.settings.card_media_background }};
+    {% endif %}
+    --showcase-heading-size: {{ section.settings.heading_size }};
+  "
+>
+  {% if heading != blank or description != blank %}
+    <div class="showcase-carousel__header">
+      {% if heading != blank %}
+        <h2 class="showcase-carousel__heading">{{ heading }}</h2>
+      {% endif %}
+
+      {% if description != blank %}
+        <div class="showcase-carousel__description">{{ description }}</div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {%- capture carousel_items -%}
+    {%- if source_collection != blank and source_collection.products.size > 0 -%}
+      {%- for product in source_collection.products limit: products_limit -%}
+        <div>
+          {% render 'showcase-product-card',
+            product: product,
+            badge: section.settings.default_badge,
+            stock_text: section.settings.default_stock_text,
+            show_wishlist: section.settings.show_wishlist,
+            show_quick_add: section.settings.show_quick_add
+          %}
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      {%- for block in section.blocks -%}
+        <div {{ block.shopify_attributes }}>
+          {% render 'showcase-product-card',
+            product: block.settings.product,
+            title: block.settings.title,
+            price: block.settings.price,
+            compare_price: block.settings.compare_price,
+            image: block.settings.image,
+            badge: block.settings.badge,
+            stock_text: block.settings.stock_text,
+            stock_level: block.settings.stock_level,
+            url: block.settings.url,
+            show_wishlist: section.settings.show_wishlist,
+            show_quick_add: section.settings.show_quick_add
+          %}
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
+  {%- endcapture -%}
+
+  {% render 'scroll-row',
+    content: carousel_items,
+    columns: section.settings.columns,
+    columns_mobile: section.settings.columns_mobile,
+    show_arrows: section.settings.show_arrows,
+    show_progress: section.settings.show_progress,
+    gap: 'var(--gap-lg)',
+    prev_label: 'Previous products',
+    next_label: 'Next products'
+  %}
+</div>
+
+{% stylesheet %}
+  .showcase-carousel__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    margin-block-end: var(--margin-xl);
+  }
+
+  .showcase-carousel__heading {
+    margin: 0;
+    font-size: var(--showcase-heading-size, var(--font-size--3xl));
+    line-height: var(--line-height--heading-tight);
+  }
+
+  .showcase-carousel__description {
+    max-width: 70ch;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+    font-size: var(--font-size--md);
+  }
+
+  .showcase-carousel__description > :first-child {
+    margin-block-start: 0;
+  }
+
+  .showcase-carousel__description > :last-child {
+    margin-block-end: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .showcase-carousel__heading {
+      font-size: var(--font-size--xl);
+    }
+
+    .showcase-carousel__description {
+      font-size: var(--font-size--sm);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product carousel",
+  "tag": "section",
+  "class": "section-showcase-carousel",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Lorem ipsum dolor sit"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        { "value": "var(--font-size--xl)", "label": "Small" },
+        { "value": "var(--font-size--2xl)", "label": "Medium" },
+        { "value": "var(--font-size--3xl)", "label": "Large" },
+        { "value": "var(--font-size--4xl)", "label": "Extra large" }
+      ],
+      "default": "var(--font-size--3xl)"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "info": "Leave blank for a heading-only carousel."
+    },
+    {
+      "type": "header",
+      "content": "Products"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "When set, products come from this collection and the placeholder cards below are ignored."
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Maximum products",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "text",
+      "id": "default_badge",
+      "label": "Badge text for collection products",
+      "info": "Applied to every card when pulling from a collection. Leave blank to hide."
+    },
+    {
+      "type": "text",
+      "id": "default_stock_text",
+      "label": "Stock text for collection products"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Cards visible on desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "label": "Cards visible on mobile",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Show navigation arrows",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress",
+      "label": "Show scroll progress bar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "label": "Show wishlist heart on cards",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Show quick add-to-cart button",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "card_media_background",
+      "label": "Card image background",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "badge_background",
+      "label": "Badge background",
+      "default": "#f6e6c3"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge text",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "discount_background",
+      "label": "Discount badge background",
+      "default": "#e8705a"
+    },
+    {
+      "type": "color",
+      "id": "discount_text_color",
+      "label": "Discount badge text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "quick_add_background",
+      "label": "Quick add button background",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "quick_add_icon_color",
+      "label": "Quick add button icon",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product card",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product",
+          "info": "When set, real product data replaces the placeholder fields below."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Placeholder title",
+          "default": "Lorem ipsum dolor 120x60"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Placeholder price",
+          "default": "24,740"
+        },
+        {
+          "type": "text",
+          "id": "compare_price",
+          "label": "Placeholder compare-at price",
+          "default": "27,490"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Placeholder image"
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge text",
+          "info": "Leave blank to hide the badge."
+        },
+        {
+          "type": "text",
+          "id": "stock_text",
+          "label": "Stock status text",
+          "default": "In stock: 1 pc."
+        },
+        {
+          "type": "select",
+          "id": "stock_level",
+          "label": "Stock status color",
+          "options": [
+            { "value": "in", "label": "In stock" },
+            { "value": "low", "label": "Low stock" },
+            { "value": "out", "label": "Out of stock" }
+          ],
+          "default": "in"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product carousel",
+      "blocks": [
+        { "type": "product", "settings": { "badge": "A great deal" } },
+        { "type": "product", "settings": { "title": "Lorem ipsum sit amet 100x55", "price": "18,690", "compare_price": "23,090" } },
+        { "type": "product", "settings": { "title": "Consectetur adipiscing chair", "price": "16,820", "compare_price": "20,890", "stock_text": "In stock: more than 20 pcs." } },
+        { "type": "product", "settings": { "title": "Dolor sit amet desk 160x107", "price": "28,040", "compare_price": "32,990", "badge": "A great deal", "stock_text": "In stock: 3 pcs.", "stock_level": "low" } },
+        { "type": "product", "settings": { "title": "Elit sed do eiusmod 90x200", "price": "31,890", "compare_price": "", "stock_text": "In stock: 8 pcs." } },
+        { "type": "product", "settings": { "title": "Tempor incididunt ut labore", "price": "43,990", "compare_price": "", "stock_text": "In stock: 2 pcs." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

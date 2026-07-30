@@ -1,0 +1,308 @@
+{% comment %}
+  Designer / collaboration bio block: signature graphic, headline, bio paragraph and
+  a collection link on the left; a thumbnail rail plus one large lifestyle image on
+  the right, swapped by the same click-to-swap pattern as the main gallery.
+
+  Renders only when the product carries a designer name metafield, so ordinary
+  products skip it entirely.
+{% endcomment %}
+
+{% liquid
+  assign ns = section.settings.metafield_namespace | default: 'custom'
+  assign designer_name = product.metafields[ns]['designer_name'].value
+  assign designer_headline = product.metafields[ns]['designer_headline'].value
+  assign designer_bio = product.metafields[ns]['designer_bio'].value
+  assign designer_signature = product.metafields[ns]['designer_signature']
+  assign designer_link = product.metafields[ns]['designer_collection_link'].value
+  assign designer_images = product.metafields[ns]['designer_images'].value
+%}
+
+{% if designer_name != blank %}
+  <showcase-product-component
+    class="section section--{{ section.settings.section_width }} product-designer spacing-style"
+    style="
+      {% render 'spacing-padding', settings: section.settings %}
+      background-color: {{ section.settings.background_color | default: '#f2f2f0' }};
+      {% if section.settings.text_color != blank %}
+        --color-foreground: {{ section.settings.text_color }};
+        --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+      {% endif %}
+    "
+  >
+    <div class="product-designer__grid">
+      <div class="product-designer__copy">
+        {% if designer_signature != blank %}
+          <div class="product-designer__signature">
+            {{
+              designer_signature
+              | image_url: width: 500
+              | image_tag: loading: 'lazy', alt: designer_name
+            }}
+          </div>
+        {% endif %}
+
+        {% if designer_headline != blank %}
+          <h2 class="product-designer__headline">{{ designer_headline }}</h2>
+        {% else %}
+          <h2 class="product-designer__headline">{{ designer_name }}</h2>
+        {% endif %}
+
+        {% if designer_bio != blank %}
+          <div class="product-designer__bio">{{ designer_bio }}</div>
+        {% endif %}
+
+        {% if designer_link != blank %}
+          <a
+            href="{{ designer_link }}"
+            class="product-designer__link"
+          >
+            {{- section.settings.link_label | default: 'View the entire collection' -}}
+          </a>
+        {% endif %}
+      </div>
+
+      {% if designer_images != blank and designer_images.size > 0 %}
+        <div class="product-designer__media">
+          <div class="product-designer__rail">
+            {% for image in designer_images limit: section.settings.thumb_limit %}
+              <button
+                type="button"
+                class="product-thumb{% if forloop.first %} product-thumb--active{% endif %}"
+                ref="thumbs[]"
+                data-full="{{ image | image_url: width: 1400 }}"
+                data-alt="{{ designer_name | escape }}"
+                aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+                aria-label="{{ section.settings.thumb_label | default: 'View image' | escape }} {{ forloop.index }}"
+                on:click="/selectThumb"
+              >
+                {{ image | image_url: width: 200 | image_tag: loading: 'lazy', alt: '' }}
+              </button>
+            {% endfor %}
+          </div>
+
+          <div class="product-designer__stage">
+            {{
+              designer_images[0]
+              | image_url: width: 1400
+              | image_tag: loading: 'lazy', class: 'product-designer__image', alt: designer_name
+            }}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </showcase-product-component>
+
+  <script
+    src="{{ 'showcase-product.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
+
+{% stylesheet %}
+  .product-designer {
+    display: block;
+  }
+
+  .product-designer__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap-3xl);
+    align-items: center;
+  }
+
+  .product-designer__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--gap-md);
+  }
+
+  .product-designer__signature img {
+    display: block;
+    width: auto;
+    max-height: 64px;
+  }
+
+  .product-designer__headline {
+    margin: 0;
+    font-size: var(--font-size--3xl);
+    line-height: var(--line-height--heading-tight);
+    text-wrap: balance;
+  }
+
+  .product-designer__bio {
+    max-width: 60ch;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+    font-size: var(--font-size--md);
+  }
+
+  .product-designer__bio > :first-child {
+    margin-block-start: 0;
+  }
+
+  .product-designer__bio > :last-child {
+    margin-block-end: 0;
+  }
+
+  .product-designer__link {
+    color: var(--color-foreground);
+    font-size: var(--font-size--md);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .product-designer__media {
+    display: grid;
+    grid-template-columns: 88px 1fr;
+    gap: var(--gap-sm);
+  }
+
+  .product-designer__rail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-2xs);
+  }
+
+  .product-designer__stage {
+    border-radius: var(--style-border-radius-inputs, 8px);
+    overflow: hidden;
+  }
+
+  .product-designer__image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  @media screen and (max-width: 989px) {
+    .product-designer__grid {
+      grid-template-columns: 1fr;
+      gap: var(--gap-xl);
+    }
+
+    .product-designer__headline {
+      font-size: var(--font-size--xl);
+    }
+
+    /* Thumb rail moves below the main image and scrolls horizontally. */
+    .product-designer__media {
+      grid-template-columns: 1fr;
+    }
+
+    .product-designer__rail {
+      flex-direction: row;
+      order: 2;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .product-designer__rail::-webkit-scrollbar {
+      display: none;
+    }
+
+    .product-designer__rail .product-thumb {
+      flex: 0 0 72px;
+    }
+
+    .product-designer__stage {
+      order: 1;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product designer bio",
+  "tag": "section",
+  "class": "section-product-designer",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Renders only when the product has a designer_name metafield. All copy and images come from product metafields."
+    },
+    {
+      "type": "text",
+      "id": "metafield_namespace",
+      "label": "Metafield namespace",
+      "default": "custom"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Collection link label",
+      "default": "View the entire collection"
+    },
+    {
+      "type": "range",
+      "id": "thumb_limit",
+      "label": "Maximum thumbnails",
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "text",
+      "id": "thumb_label",
+      "label": "Thumbnail accessible label",
+      "default": "View image"
+    },
+    {
+      "type": "header",
+      "content": "Layout and colors"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "full-width"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#f2f2f0"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "placeholder": "Default"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    }
+  ]
+}
+{% endschema %}

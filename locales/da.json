@@ -74,7 +74,8 @@
     "search_suggestions_available": "Søgeforslag tilgængelige for \"{{ query }}\"",
     "price_filter_low": "Lav pris",
     "price_filter_high": "Høj pris",
-    "view_disclosure_information_for_product": "Se deklarationsoplysninger for {{ product_title }}"
+    "view_disclosure_information_for_product": "Se deklarationsoplysninger for {{ product_title }}",
+    "call_us": "Call us"
   },
   "actions": {
     "add_to_cart": "Læg i indkøbskurven",
@@ -274,7 +275,8 @@
     },
     "item_count_cutoff": "Mere end {{ count }} varer",
     "quick_order_list": "Hurtig ordreliste",
-    "product_disclosures": "Produktdeklarationer"
+    "product_disclosures": "Produktdeklarationer",
+    "all_categories": "All Categories"
   },
   "gift_cards": {
     "issued": {

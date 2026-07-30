@@ -1,0 +1,532 @@
+{% doc %}
+  Renders a single product card in the reference layout: image with an optional
+  corner badge and wishlist heart, then a price row (current / compare-at /
+  discount percentage), title, stock status line, and a circular quick-add button
+  overlapping the image's bottom-right corner.
+
+  Used by every product carousel on the homepage (sections 3, 6 and 8) so the card
+  anatomy is defined in exactly one place.
+
+  Pass either a real `product`, or the individual placeholder fields for use before
+  collections are connected.
+
+  @param {object} [product] - A product object. When present its data wins over the manual fields.
+  @param {string} [title] - Fallback product title.
+  @param {string} [price] - Fallback formatted current price.
+  @param {string} [compare_price] - Fallback formatted compare-at price.
+  @param {object} [image] - Fallback image object.
+  @param {string} [badge] - Badge text shown top-left of the image. Hidden when blank.
+  @param {string} [stock_text] - Stock status line, e.g. "In stock: 1 pc.".
+  @param {string} [stock_level] - 'in', 'low' or 'out'. Drives the status dot colour.
+  @param {string} [url] - Destination link.
+  @param {boolean} [show_wishlist] - Render the heart icon. Default true.
+  @param {boolean} [show_quick_add] - Render the circular add-to-cart button. Default true.
+
+  Collection-grid extras (all off by default so the homepage carousels are unchanged):
+
+  @param {boolean} [show_swatches] - Render a colour swatch row under the title.
+  @param {string} [swatch_option_name] - Which product option holds the colours. Default 'Color'.
+  @param {number} [swatch_limit] - Swatches shown before the "+N" overflow label. Default 5.
+  @param {boolean} [show_variant_button] - Render the "Change color and options" button for products with variants.
+  @param {string} [variant_button_label] - Label for that button.
+  @param {boolean} [show_reviews] - Render the review-count line when review data exists.
+  @param {boolean} [show_dimensions] - Render the dimensions line when the metafield exists.
+  @param {string} [dimensions_namespace] - Metafield namespace for dimensions. Default 'custom'.
+  @param {string} [dimensions_key] - Metafield key for dimensions. Default 'dimensions'.
+  @param {string} [dimensions_label] - Prefix label for the dimensions line.
+
+  @example
+  {% render 'showcase-product-card', product: product, badge: 'A great deal' %}
+  {% render 'showcase-product-card', product: product, show_swatches: true, show_reviews: true %}
+{% enddoc %}
+
+{% liquid
+  if show_wishlist == nil
+    assign show_wishlist = true
+  endif
+  if show_quick_add == nil
+    assign show_quick_add = true
+  endif
+
+  # Prefer live product data, fall back to the placeholder settings.
+  if product != blank and product != nil
+    assign card_title = product.title
+    assign card_url = product.url
+    assign card_image = product.featured_image
+    assign card_price = product.price | money
+    if product.compare_at_price > product.price
+      assign card_compare_price = product.compare_at_price | money
+    endif
+    unless product.available
+      assign resolved_stock_level = 'out'
+    endunless
+  else
+    assign card_title = title
+    assign card_url = url
+    assign card_image = image
+    assign card_price = price
+    assign card_compare_price = compare_price
+  endif
+
+  assign card_url = card_url | default: '#'
+  assign resolved_stock_level = resolved_stock_level | default: stock_level | default: 'in'
+
+  # Discount percentage is derived rather than authored so it can never disagree
+  # with the two prices shown next to it.
+  assign discount_percent = 0
+  if product != blank and product != nil
+    if product.compare_at_price > product.price and product.compare_at_price > 0
+      assign discount_amount = product.compare_at_price | minus: product.price | times: 100.0
+      assign discount_percent = discount_amount | divided_by: product.compare_at_price | round
+    endif
+  endif
+
+  # ---- Collection-grid extras ----
+  assign swatch_limit = swatch_limit | default: 5
+  assign swatch_option_name = swatch_option_name | default: 'Color'
+  assign dimensions_namespace = dimensions_namespace | default: 'custom'
+  assign dimensions_key = dimensions_key | default: 'dimensions'
+
+  assign colour_option = null
+  assign swatch_overflow = 0
+
+  if show_swatches and product != blank and product != nil
+    for product_option in product.options_with_values
+      assign option_name_down = product_option.name | downcase
+      assign wanted_name_down = swatch_option_name | downcase
+      if option_name_down == wanted_name_down
+        assign colour_option = product_option
+      endif
+    endfor
+
+    # Fall back to the first option that actually carries swatch data.
+    if colour_option == null
+      for product_option in product.options_with_values
+        assign swatch_count = product_option.values | map: 'swatch' | compact | size
+        if swatch_count > 0 and colour_option == null
+          assign colour_option = product_option
+        endif
+      endfor
+    endif
+
+    if colour_option != null
+      assign swatch_overflow = colour_option.values.size | minus: swatch_limit
+    endif
+  endif
+
+  # Review count follows the Shopify Product Reviews metafield convention.
+  assign review_count = 0
+  if show_reviews and product != blank and product != nil
+    assign review_count = product.metafields.reviews.rating_count.value | default: 0
+  endif
+
+  assign dimensions_value = null
+  if show_dimensions and product != blank and product != nil
+    assign dimensions_value = product.metafields[dimensions_namespace][dimensions_key].value
+  endif
+
+  assign has_variants = false
+  if product != blank and product != nil and product.variants.size > 1
+    assign has_variants = true
+  endif
+%}
+
+<div class="showcase-card">
+  <div class="showcase-card__media">
+    <a
+      href="{{ card_url }}"
+      class="showcase-card__media-link"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      {% if card_image != blank %}
+        {{
+          card_image
+          | image_url: width: 600
+          | image_tag: loading: 'lazy', class: 'showcase-card__image', alt: card_title
+        }}
+      {% else %}
+        {{ 'product-apparel-1' | placeholder_svg_tag: 'showcase-card__image showcase-card__image--placeholder' }}
+      {% endif %}
+    </a>
+
+    {% if badge != blank %}
+      <span class="showcase-card__badge">{{ badge }}</span>
+    {% endif %}
+
+    {% if show_wishlist %}
+      <button
+        type="button"
+        class="showcase-card__wishlist"
+        aria-label="Add {{ card_title | escape }} to wishlist"
+      >
+        <span class="svg-wrapper" aria-hidden="true">
+          {{- 'icon-heart.svg' | inline_asset_content -}}
+        </span>
+      </button>
+    {% endif %}
+
+    {% if show_quick_add %}
+      <button
+        type="button"
+        class="showcase-card__quick-add"
+        aria-label="Add {{ card_title | escape }} to cart"
+      >
+        <span class="svg-wrapper" aria-hidden="true">
+          {{- 'icon-cart.svg' | inline_asset_content -}}
+        </span>
+      </button>
+    {% endif %}
+  </div>
+
+  <div class="showcase-card__info">
+    <div class="showcase-card__price-row">
+      <span class="showcase-card__price">{{ card_price }}</span>
+
+      {% if card_compare_price != blank %}
+        <s class="showcase-card__compare-price">{{ card_compare_price }}</s>
+      {% endif %}
+
+      {% if discount_percent > 0 %}
+        <span class="showcase-card__discount">-{{ discount_percent }}%</span>
+      {% endif %}
+
+      {% if review_count > 0 %}
+        <span class="showcase-card__reviews">
+          <span class="svg-wrapper" aria-hidden="true">
+            {{- 'icon-chat.svg' | inline_asset_content -}}
+          </span>
+          {{ review_count }}
+          {%- if review_count == 1 %} review{% else %} reviews{% endif -%}
+        </span>
+      {% endif %}
+    </div>
+
+    <a
+      href="{{ card_url }}"
+      class="showcase-card__title"
+    >
+      {{- card_title -}}
+    </a>
+
+    {% if stock_text != blank %}
+      <p class="showcase-card__stock showcase-card__stock--{{ resolved_stock_level }}">
+        <span class="showcase-card__stock-dot" aria-hidden="true"></span>
+        {{ stock_text }}
+      </p>
+    {% endif %}
+
+    {% if dimensions_value != blank %}
+      <p class="showcase-card__dimensions">
+        <span class="showcase-card__dimensions-label">
+          {{- dimensions_label | default: 'Dimensions (L x W x H), cm' -}}
+        </span>
+        <span class="showcase-card__dimensions-value">{{ dimensions_value }}</span>
+      </p>
+    {% endif %}
+
+    {% if colour_option != null %}
+      <div class="showcase-card__swatches">
+        {% for option_value in colour_option.values limit: swatch_limit %}
+          <span class="showcase-card__swatch">
+            {% if option_value.swatch != blank %}
+              {% render 'swatch', swatch: option_value.swatch, mode: 'unscaled', label: option_value.name %}
+            {% else %}
+              <span
+                class="showcase-card__swatch-fallback"
+                title="{{ option_value.name | escape }}"
+              ></span>
+            {% endif %}
+          </span>
+        {% endfor %}
+
+        {% if swatch_overflow > 0 %}
+          <span class="showcase-card__swatch-overflow">+{{ swatch_overflow }}</span>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if show_variant_button and has_variants %}
+      <a
+        href="{{ card_url }}"
+        class="showcase-card__variant-button"
+      >
+        <span class="svg-wrapper" aria-hidden="true">
+          {{- 'icon-filter.svg' | inline_asset_content -}}
+        </span>
+        {{ variant_button_label | default: 'Change color and options' }}
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .showcase-card {
+    --showcase-card-radius: var(--style-border-radius-inputs, 8px);
+
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .showcase-card__media {
+    position: relative;
+    background-color: var(--showcase-card-media-background, rgb(var(--color-foreground-rgb) / var(--opacity-5)));
+    border-radius: var(--showcase-card-radius);
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+
+  .showcase-card__media-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Product photo is inset so it reads as a catalogue shot rather than a bleed image. */
+  .showcase-card__image {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  .showcase-card__image--placeholder {
+    width: 80%;
+    height: 80%;
+    fill: rgb(var(--color-foreground-rgb) / var(--opacity-20));
+  }
+
+  .showcase-card__badge {
+    position: absolute;
+    top: var(--padding-xs);
+    left: var(--padding-xs);
+    padding: 2px var(--padding-2xs);
+    border-radius: 4px;
+    background-color: var(--showcase-card-badge-background, #f6e6c3);
+    color: var(--showcase-card-badge-text, var(--color-foreground));
+    font-size: var(--font-size--2xs);
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+
+  .showcase-card__wishlist {
+    position: absolute;
+    top: var(--padding-2xs);
+    right: var(--padding-2xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--minimum-touch-target);
+    height: var(--minimum-touch-target);
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-foreground);
+    cursor: pointer;
+  }
+
+  .showcase-card__wishlist .svg-wrapper,
+  .showcase-card__wishlist svg {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+  }
+
+  .showcase-card__quick-add {
+    position: absolute;
+    right: var(--padding-xs);
+    bottom: var(--padding-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--showcase-card-quick-add-background, var(--color-foreground));
+    color: var(--showcase-card-quick-add-icon, var(--color-background));
+    cursor: pointer;
+    transition: transform var(--animation-speed) var(--animation-timing-bounce);
+  }
+
+  .showcase-card__quick-add:hover {
+    transform: scale(1.08);
+  }
+
+  .showcase-card__quick-add .svg-wrapper,
+  .showcase-card__quick-add svg {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
+  }
+
+  .showcase-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-3xs);
+    padding-block-start: var(--padding-sm);
+  }
+
+  .showcase-card__price-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-2xs);
+  }
+
+  .showcase-card__price {
+    font-size: var(--font-size--md);
+    font-weight: 600;
+  }
+
+  .showcase-card__compare-price {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--sm);
+  }
+
+  .showcase-card__discount {
+    padding: 1px var(--padding-3xs);
+    border-radius: 4px;
+    background-color: var(--showcase-card-discount-background, #e8705a);
+    color: var(--showcase-card-discount-text, #fff);
+    font-size: var(--font-size--2xs);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* Titles clamp to two lines so cards in a row stay the same height. */
+  .showcase-card__title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    text-decoration: none;
+  }
+
+  .showcase-card__stock {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-3xs);
+    margin: 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--2xs);
+  }
+
+  .showcase-card__stock-dot {
+    flex-shrink: 0;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: currentcolor;
+  }
+
+  .showcase-card__stock--in .showcase-card__stock-dot {
+    background-color: var(--color-instock, #3d8a4f);
+  }
+
+  .showcase-card__stock--low .showcase-card__stock-dot {
+    background-color: var(--color-lowstock, #e8705a);
+  }
+
+  .showcase-card__stock--out .showcase-card__stock-dot {
+    background-color: var(--color-outofstock, #b0b0b0);
+  }
+
+  /* ---- Collection-grid extras ---- */
+  .showcase-card__reviews {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-inline-start: auto;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--2xs);
+    white-space: nowrap;
+  }
+
+  .showcase-card__reviews .svg-wrapper,
+  .showcase-card__reviews svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Dotted leader between the label and the value, as in the reference. */
+  .showcase-card__dimensions {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-3xs);
+    margin: 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--2xs);
+  }
+
+  .showcase-card__dimensions-label {
+    flex-shrink: 0;
+  }
+
+  .showcase-card__dimensions-label::after {
+    content: '';
+    display: inline-block;
+    width: 100%;
+  }
+
+  .showcase-card__dimensions-value {
+    margin-inline-start: auto;
+    white-space: nowrap;
+  }
+
+  .showcase-card__swatches {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-block-start: var(--margin-3xs);
+  }
+
+  .showcase-card__swatch {
+    display: inline-flex;
+    --swatch-size: 16px;
+  }
+
+  .showcase-card__swatch-fallback {
+    display: block;
+    width: 16px;
+    height: 16px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: 50%;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .showcase-card__swatch-overflow {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--2xs);
+  }
+
+  .showcase-card__variant-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-3xs);
+    margin-block-start: var(--margin-2xs);
+    padding: var(--padding-2xs) var(--padding-sm);
+    border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: 999px;
+    color: var(--color-foreground);
+    font-size: var(--font-size--2xs);
+    text-decoration: none;
+    transition: background-color var(--animation-speed) var(--animation-easing);
+  }
+
+  .showcase-card__variant-button:hover {
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+  }
+
+  .showcase-card__variant-button .svg-wrapper,
+  .showcase-card__variant-button svg {
+    width: 12px;
+    height: 12px;
+  }
+{% endstylesheet %}

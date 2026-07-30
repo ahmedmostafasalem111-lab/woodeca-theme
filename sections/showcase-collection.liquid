@@ -1,0 +1,1120 @@
+{% comment %}
+  Collection page: breadcrumbs, title with result count, optional editorial line,
+  optional hero banner, sub-category refinement row, the native-facet filter bar,
+  a four-column product grid with an optional promo banner spliced into the flow,
+  then "Show more" plus numbered pagination.
+
+  This is one section rather than several because `{% paginate %}` has to wrap the
+  grid, the promo insertion is positional within that loop, and the filter bar and
+  grid share the same facet state.
+
+  Products come from whichever collection the template renders, so nothing here is
+  collection-specific — every editable field is a section setting.
+{% endcomment %}
+
+{% liquid
+  assign per_page = section.settings.products_per_page | default: 24
+  assign promo_after = section.settings.promo_after_products | default: 8
+  assign show_promo = false
+  if section.settings.show_promo and section.settings.promo_heading != blank
+    assign show_promo = true
+  endif
+
+  assign subcategory_blocks = section.blocks | where: 'type', 'subcategory'
+%}
+
+<div
+  class="section-background"
+  {% if section.settings.background_color != blank %}
+    style="background-color: {{ section.settings.background_color }};"
+  {% endif %}
+></div>
+
+<showcase-collection-component
+  class="section section--{{ section.settings.section_width }} showcase-collection spacing-style"
+  style="
+    {% render 'spacing-padding', settings: section.settings %}
+    {% if section.settings.text_color != blank %}
+      --color-foreground: {{ section.settings.text_color }};
+      --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+    {% endif %}
+    --collection-columns: {{ section.settings.columns }};
+    --collection-columns-mobile: {{ section.settings.columns_mobile }};
+    --collection-title-size: {{ section.settings.title_size }};
+    --collection-filters-button-background: {{ section.settings.filters_button_background | default: '#333333' }};
+    --collection-filters-button-text: {{ section.settings.filters_button_text | default: '#ffffff' }};
+    --collection-badge-background: {{ section.settings.badge_background | default: '#e8705a' }};
+    --collection-badge-text: {{ section.settings.badge_text_color | default: '#ffffff' }};
+    --collection-toggle-active: {{ section.settings.toggle_active_color | default: '#7ec8e8' }};
+    --collection-toggle-active-bg: {{ section.settings.toggle_active_background | default: '#d6f0fa' }};
+    --collection-tile-background: {{ section.settings.tile_background | default: '#ffffff' }};
+  "
+>
+  {%- comment -%} ---------- Breadcrumbs ---------- {%- endcomment -%}
+  {% if section.settings.show_breadcrumbs %}
+    <nav
+      class="collection-breadcrumbs"
+      aria-label="{{ section.settings.breadcrumbs_label | default: 'Breadcrumb' | escape }}"
+    >
+      <a href="{{ routes.root_url }}">
+        {{- section.settings.breadcrumb_home_label | default: 'Online store' }} {{ shop.name -}}
+      </a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{{ collection.title }}</span>
+    </nav>
+  {% endif %}
+
+  {%- comment -%} ---------- Title + result count ---------- {%- endcomment -%}
+  <div class="collection-heading">
+    <h1 class="collection-heading__title">{{ collection.title }}</h1>
+    {% if section.settings.show_count %}
+      <span class="collection-heading__count">
+        {{- collection.products_count }} {{ section.settings.count_label | default: 'found' -}}
+      </span>
+    {% endif %}
+  </div>
+
+  {%- comment -%} ---------- Editorial line + read more ---------- {%- endcomment -%}
+  {% if section.settings.show_editorial %}
+    {% liquid
+      assign editorial = section.settings.editorial_text
+      if editorial == blank
+        assign editorial = collection.description
+      endif
+    %}
+    {% if editorial != blank %}
+      <div class="collection-editorial">
+        <span class="collection-editorial__text">{{ editorial | strip_html | truncate: 200 }}</span>
+
+        {% if section.settings.editorial_link_text != blank %}
+          <a
+            href="{{ section.settings.editorial_link | default: '#' }}"
+            class="collection-editorial__link"
+          >
+            <span>{{ section.settings.editorial_link_text }}</span>
+            <span class="svg-wrapper" aria-hidden="true">
+              {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+            </span>
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% endif %}
+
+  {%- comment -%} ---------- Hero banner ---------- {%- endcomment -%}
+  {% if section.settings.show_banner %}
+    {% liquid
+      assign banner_image = section.settings.banner_image
+      if banner_image == blank
+        assign banner_image = collection.image
+      endif
+    %}
+    {% if banner_image != blank %}
+      <div
+        class="collection-banner"
+        style="--collection-banner-height: {{ section.settings.banner_height }}px;"
+      >
+        {{
+          banner_image
+          | image_url: width: 2400
+          | image_tag: loading: 'eager', class: 'collection-banner__image', alt: collection.title
+        }}
+      </div>
+    {% endif %}
+  {% endif %}
+
+  {%- comment -%} ---------- Sub-category refinement row ---------- {%- endcomment -%}
+  {% if subcategory_blocks.size > 0 %}
+    <div class="collection-subcats">
+      {% for block in subcategory_blocks %}
+        <a
+          href="{{ block.settings.link | default: '#' }}"
+          class="collection-subcat"
+          {{ block.shopify_attributes }}
+        >
+          <span class="collection-subcat__media">
+            {% if block.settings.icon != blank %}
+              {{
+                block.settings.icon
+                | image_url: width: 200
+                | image_tag: loading: 'lazy', class: 'collection-subcat__icon', alt: block.settings.label
+              }}
+            {% else %}
+              <span class="svg-wrapper collection-subcat__icon-fallback" aria-hidden="true">
+                {{- 'icon-grid-default.svg' | inline_asset_content -}}
+              </span>
+            {% endif %}
+
+            {% if block.settings.count != blank %}
+              <span class="collection-subcat__count">{{ block.settings.count }}</span>
+            {% endif %}
+          </span>
+
+          <span class="collection-subcat__label">{{ block.settings.label }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {%- comment -%} ---------- Filter and sort bar ---------- {%- endcomment -%}
+  {% render 'showcase-collection-filters', collection: collection, section: section %}
+
+  {%- comment -%} ---------- Product grid + pagination ---------- {%- endcomment -%}
+  {% paginate collection.products by per_page %}
+    {% if collection.products.size == 0 %}
+      <div class="collection-empty">
+        <p>{{ section.settings.empty_text | default: 'No products match these filters.' }}</p>
+        <a href="{{ collection.url }}" class="collection-empty__reset">
+          {{- section.settings.clear_all_label | default: 'Clear all' -}}
+        </a>
+      </div>
+    {% else %}
+      <div
+        class="collection-grid"
+        ref="grid"
+      >
+        {% for product in collection.products %}
+          <div
+            class="collection-grid__item"
+            data-grid-item
+          >
+            {% render 'showcase-product-card',
+              product: product,
+              badge: section.settings.card_badge_text,
+              stock_text: section.settings.card_stock_text,
+              show_wishlist: section.settings.show_wishlist,
+              show_quick_add: section.settings.show_quick_add,
+              show_swatches: section.settings.show_swatches,
+              swatch_option_name: section.settings.swatch_option_name,
+              swatch_limit: section.settings.swatch_limit,
+              show_variant_button: section.settings.show_variant_button,
+              variant_button_label: section.settings.variant_button_label,
+              show_reviews: section.settings.show_reviews,
+              show_dimensions: section.settings.show_dimensions,
+              dimensions_namespace: section.settings.dimensions_namespace,
+              dimensions_key: section.settings.dimensions_key,
+              dimensions_label: section.settings.dimensions_label
+            %}
+          </div>
+
+          {%- comment -%}
+            Promo banner is spliced into the grid flow after N products. It only
+            appears on the first page so it stays a single mid-grid placement.
+          {%- endcomment -%}
+          {% if show_promo and paginate.current_page == 1 and forloop.index == promo_after %}
+            <a
+              href="{{ section.settings.promo_link | default: '#' }}"
+              class="collection-promo"
+              style="--collection-promo-span: {{ section.settings.promo_span }};"
+            >
+              {% if section.settings.promo_image != blank %}
+                {{
+                  section.settings.promo_image
+                  | image_url: width: 1600
+                  | image_tag: loading: 'lazy', class: 'collection-promo__image', alt: section.settings.promo_heading
+                }}
+              {% endif %}
+
+              <span class="collection-promo__scrim" aria-hidden="true"></span>
+
+              <span class="collection-promo__content">
+                <span class="collection-promo__heading">{{ section.settings.promo_heading }}</span>
+                {% if section.settings.promo_subtext != blank %}
+                  <span class="collection-promo__subtext">{{ section.settings.promo_subtext }}</span>
+                {% endif %}
+                {% if section.settings.promo_link_text != blank %}
+                  <span class="collection-promo__link">{{ section.settings.promo_link_text }}</span>
+                {% endif %}
+              </span>
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {%- comment -%} ---------- Show more (AJAX append) ---------- {%- endcomment -%}
+      {% if paginate.next %}
+        <div
+          class="collection-load-more"
+          ref="loadMoreWrap"
+        >
+          <button
+            type="button"
+            class="collection-load-more__button"
+            ref="loadMore"
+            data-next-url="{{ paginate.next.url }}"
+            data-loading-label="{{ section.settings.loading_label | default: 'Loading…' | escape }}"
+            on:click="/loadMore"
+          >
+            {{- section.settings.show_more_label | default: 'Show more' -}}
+          </button>
+        </div>
+      {% endif %}
+
+      {%- comment -%} ---------- Numbered pagination ---------- {%- endcomment -%}
+      {% render 'pagination-controls', paginate: paginate %}
+    {% endif %}
+  {% endpaginate %}
+</showcase-collection-component>
+
+<script
+  src="{{ 'showcase-collection.js' | asset_url }}"
+  type="module"
+></script>
+
+{% stylesheet %}
+  .collection-breadcrumbs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-3xs);
+    margin-block-end: var(--margin-lg);
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+  }
+
+  .collection-breadcrumbs a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .collection-breadcrumbs a:hover {
+    text-decoration: underline;
+  }
+
+  /* Title and count share a baseline. */
+  .collection-heading {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--gap-sm);
+  }
+
+  .collection-heading__title {
+    margin: 0;
+    font-size: var(--collection-title-size, var(--font-size--4xl));
+    font-weight: 700;
+    line-height: var(--line-height--heading-tight);
+  }
+
+  .collection-heading__count {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--lg);
+    font-weight: 400;
+  }
+
+  .collection-editorial {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-2xs);
+    margin-block-start: var(--margin-md);
+    font-size: var(--font-size--md);
+  }
+
+  .collection-editorial__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--collection-link-color, #3b7de0);
+    text-decoration: none;
+  }
+
+  .collection-editorial__link:hover {
+    text-decoration: underline;
+  }
+
+  .collection-editorial__link .svg-wrapper,
+  .collection-editorial__link svg {
+    width: var(--icon-size-2xs);
+    height: var(--icon-size-2xs);
+  }
+
+  .collection-banner {
+    margin-block-start: var(--margin-xl);
+    border-radius: var(--style-border-radius-inputs, 8px);
+    overflow: hidden;
+  }
+
+  .collection-banner__image {
+    width: 100%;
+    height: var(--collection-banner-height, 380px);
+    object-fit: cover;
+  }
+
+  /* ---- Sub-category row: icon tiles on desktop ---- */
+  .collection-subcats {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--gap-md);
+    margin-block-start: var(--margin-xl);
+    padding-block-end: var(--padding-lg);
+    border-block-end: var(--border-width-sm) solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .collection-subcats::-webkit-scrollbar {
+    display: none;
+  }
+
+  .collection-subcat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap-2xs);
+    flex: 0 0 auto;
+    width: 120px;
+    color: var(--color-foreground);
+    text-decoration: none;
+  }
+
+  .collection-subcat__media {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 76px;
+  }
+
+  .collection-subcat__icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .collection-subcat__icon-fallback,
+  .collection-subcat__icon-fallback svg {
+    width: 48px;
+    height: 48px;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+  }
+
+  /* Count sits superscript to the label, as in the reference. */
+  .collection-subcat__count {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--2xs);
+  }
+
+  .collection-subcat__label {
+    font-size: var(--font-size--sm);
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .collection-subcat:hover .collection-subcat__label {
+    text-decoration: underline;
+  }
+
+  /* ---- Product grid ---- */
+  .collection-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--collection-columns, 4), minmax(0, 1fr));
+    gap: var(--gap-xl) var(--gap-lg);
+  }
+
+  .collection-grid__item {
+    min-width: 0;
+  }
+
+  /* ---- Mid-grid promo banner ---- */
+  .collection-promo {
+    position: relative;
+    grid-column: span var(--collection-promo-span, 2);
+    display: block;
+    min-height: 100%;
+    border-radius: var(--style-border-radius-inputs, 8px);
+    color: var(--collection-promo-text, #fff);
+    text-decoration: none;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .collection-promo__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .collection-promo__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgb(0 0 0 / var(--opacity-60)), rgb(0 0 0 / var(--opacity-20)));
+  }
+
+  /* Fallback tint so the promo is legible before an image is picked. */
+  .collection-promo:not(:has(.collection-promo__image)) .collection-promo__scrim {
+    background: var(--collection-promo-fallback, #333);
+  }
+
+  .collection-promo__content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--gap-xs);
+    height: 100%;
+    padding: var(--padding-xl);
+  }
+
+  .collection-promo__heading {
+    font-size: var(--font-size--2xl);
+    font-weight: 700;
+    line-height: var(--line-height--heading-tight);
+    text-wrap: balance;
+  }
+
+  .collection-promo__subtext {
+    font-size: var(--font-size--sm);
+  }
+
+  /* Underlined text link, matching the hero carousel treatment. */
+  .collection-promo__link {
+    margin-block-start: auto;
+    font-size: var(--font-size--sm);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  /* ---- Show more ---- */
+  .collection-load-more {
+    display: flex;
+    justify-content: center;
+    margin-block-start: var(--margin-2xl);
+  }
+
+  .collection-load-more__button {
+    min-width: 240px;
+    padding: var(--padding-md) var(--padding-2xl);
+    border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-25));
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--color-foreground);
+    font-size: var(--font-size--md);
+    cursor: pointer;
+    transition: background-color var(--animation-speed) var(--animation-easing);
+  }
+
+  .collection-load-more__button:hover {
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+  }
+
+  .collection-load-more__button[aria-busy='true'] {
+    opacity: var(--opacity-60);
+    pointer-events: none;
+  }
+
+  .collection-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap-sm);
+    padding-block: var(--padding-5xl);
+    text-align: center;
+  }
+
+  .collection-empty__reset {
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    text-decoration: underline;
+  }
+
+  @media screen and (max-width: 989px) {
+    .collection-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .collection-heading__title {
+      font-size: var(--font-size--2xl);
+    }
+
+    .collection-heading__count {
+      font-size: var(--font-size--sm);
+    }
+
+    .collection-editorial {
+      font-size: var(--font-size--sm);
+    }
+
+    .collection-banner__image {
+      height: 200px;
+    }
+
+    .collection-grid {
+      grid-template-columns: repeat(var(--collection-columns-mobile, 2), minmax(0, 1fr));
+      gap: var(--gap-lg) var(--gap-sm);
+    }
+
+    /* Promo spans the full mobile grid width. */
+    .collection-promo {
+      grid-column: 1 / -1;
+      min-height: 160px;
+    }
+
+    .collection-promo__heading {
+      font-size: var(--font-size--lg);
+    }
+
+    .collection-promo__content {
+      padding: var(--padding-lg);
+    }
+
+    .collection-load-more__button {
+      width: 100%;
+    }
+
+    /* Sub-categories collapse to compact pill/tag style per the mobile reference. */
+    .collection-subcats {
+      gap: var(--gap-2xs);
+      padding-block-end: var(--padding-md);
+    }
+
+    .collection-subcat {
+      flex-direction: row;
+      align-items: center;
+      gap: 4px;
+      width: auto;
+      padding: var(--padding-2xs) var(--padding-md);
+      border-radius: 999px;
+      background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+      white-space: nowrap;
+    }
+
+    /* Unwrap the media element so the count becomes a direct pill child,
+       then drop the icon itself — the mobile reference shows label + count only. */
+    .collection-subcat__media {
+      display: contents;
+    }
+
+    .collection-subcat__icon,
+    .collection-subcat__icon-fallback {
+      display: none;
+    }
+
+    .collection-subcat__label {
+      font-size: var(--font-size--xs);
+    }
+
+    .collection-subcat__count {
+      position: static;
+      align-self: flex-start;
+      font-size: 9px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collection page",
+  "tag": "section",
+  "class": "section-showcase-collection",
+  "enabled_on": {
+    "templates": ["collection", "search"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header area"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumbs",
+      "label": "Show breadcrumbs",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "breadcrumb_home_label",
+      "label": "Breadcrumb home label",
+      "default": "Online store",
+      "info": "The shop name is appended automatically."
+    },
+    {
+      "type": "text",
+      "id": "breadcrumbs_label",
+      "label": "Breadcrumb accessible label",
+      "default": "Breadcrumb"
+    },
+    {
+      "type": "select",
+      "id": "title_size",
+      "label": "Title size",
+      "options": [
+        { "value": "var(--font-size--2xl)", "label": "Medium" },
+        { "value": "var(--font-size--3xl)", "label": "Large" },
+        { "value": "var(--font-size--4xl)", "label": "Extra large" },
+        { "value": "var(--font-size--5xl)", "label": "Huge" }
+      ],
+      "default": "var(--font-size--4xl)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_count",
+      "label": "Show result count next to title",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "count_label",
+      "label": "Count label",
+      "default": "found",
+      "info": "Shown after the number, e.g. \"1083 found\"."
+    },
+    {
+      "type": "header",
+      "content": "Editorial line"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_editorial",
+      "label": "Show editorial line",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "editorial_text",
+      "label": "Editorial text",
+      "info": "Leave blank to fall back to the collection description."
+    },
+    {
+      "type": "text",
+      "id": "editorial_link_text",
+      "label": "Read more link text",
+      "default": "Read more"
+    },
+    {
+      "type": "url",
+      "id": "editorial_link",
+      "label": "Read more link"
+    },
+    {
+      "type": "header",
+      "content": "Hero banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner",
+      "label": "Show banner",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner image",
+      "info": "Leave blank to fall back to the collection's own image."
+    },
+    {
+      "type": "range",
+      "id": "banner_height",
+      "label": "Banner height",
+      "min": 160,
+      "max": 700,
+      "step": 20,
+      "unit": "px",
+      "default": 380
+    },
+    {
+      "type": "header",
+      "content": "Filter and sort bar"
+    },
+    {
+      "type": "paragraph",
+      "content": "Filters come from Shopify's native facets. Configure which filters appear per collection in the Search & Discovery app."
+    },
+    {
+      "type": "text",
+      "id": "sort_default_label",
+      "label": "Fallback sort label",
+      "default": "The most popular"
+    },
+    {
+      "type": "text",
+      "id": "filters_label",
+      "label": "Filters button label",
+      "default": "Filters"
+    },
+    {
+      "type": "text",
+      "id": "apply_label",
+      "label": "Apply label",
+      "default": "Apply"
+    },
+    {
+      "type": "text",
+      "id": "clear_label",
+      "label": "Clear label",
+      "default": "Clear"
+    },
+    {
+      "type": "text",
+      "id": "clear_all_label",
+      "label": "Clear all label",
+      "default": "Clear all"
+    },
+    {
+      "type": "text",
+      "id": "close_label",
+      "label": "Close label",
+      "default": "Close"
+    },
+    {
+      "type": "header",
+      "content": "Product grid"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns on desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "label": "Columns on mobile",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "No results message",
+      "default": "No products match these filters."
+    },
+    {
+      "type": "header",
+      "content": "Product card"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "label": "Show wishlist heart",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Show quick add-to-cart button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show colour swatches",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "swatch_option_name",
+      "label": "Colour option name",
+      "default": "Color",
+      "info": "Which product option holds the colours. Falls back to the first option with swatch data."
+    },
+    {
+      "type": "range",
+      "id": "swatch_limit",
+      "label": "Swatches before \"+N\"",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "show_variant_button",
+      "label": "Show \"Change options\" button on products with variants",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "variant_button_label",
+      "label": "Variant button label",
+      "default": "Change color and options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reviews",
+      "label": "Show review count",
+      "default": true,
+      "info": "Reads the reviews.rating_count metafield."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dimensions",
+      "label": "Show dimensions line",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "dimensions_label",
+      "label": "Dimensions label",
+      "default": "Dimensions (L x W x H), cm"
+    },
+    {
+      "type": "text",
+      "id": "dimensions_namespace",
+      "label": "Dimensions metafield namespace",
+      "default": "custom"
+    },
+    {
+      "type": "text",
+      "id": "dimensions_key",
+      "label": "Dimensions metafield key",
+      "default": "dimensions"
+    },
+    {
+      "type": "text",
+      "id": "card_badge_text",
+      "label": "Badge text for all cards",
+      "info": "Applied to every card. Leave blank to hide."
+    },
+    {
+      "type": "text",
+      "id": "card_stock_text",
+      "label": "Stock text for all cards",
+      "info": "Leave blank to hide the stock line."
+    },
+    {
+      "type": "header",
+      "content": "Mid-grid promo banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_promo",
+      "label": "Show promo banner in grid",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "promo_after_products",
+      "label": "Insert after N products",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "promo_span",
+      "label": "Columns to span",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "image_picker",
+      "id": "promo_image",
+      "label": "Promo image"
+    },
+    {
+      "type": "text",
+      "id": "promo_heading",
+      "label": "Promo heading",
+      "default": "The first step to productivity"
+    },
+    {
+      "type": "text",
+      "id": "promo_subtext",
+      "label": "Promo subtext",
+      "default": "Comfortable furniture for work and study with a discount of up to 20%"
+    },
+    {
+      "type": "text",
+      "id": "promo_link_text",
+      "label": "Promo link text",
+      "default": "Buy"
+    },
+    {
+      "type": "url",
+      "id": "promo_link",
+      "label": "Promo link"
+    },
+    {
+      "type": "header",
+      "content": "Pagination"
+    },
+    {
+      "type": "text",
+      "id": "show_more_label",
+      "label": "\"Show more\" label",
+      "default": "Show more"
+    },
+    {
+      "type": "text",
+      "id": "loading_label",
+      "label": "Loading label",
+      "default": "Loading…"
+    },
+    {
+      "type": "header",
+      "content": "Layout and colors"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "filters_button_background",
+      "label": "Filters button background",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "filters_button_text",
+      "label": "Filters button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "toggle_active_color",
+      "label": "Toggle active colour",
+      "default": "#7ec8e8"
+    },
+    {
+      "type": "color",
+      "id": "toggle_active_background",
+      "label": "Toggle active pill background",
+      "default": "#d6f0fa"
+    },
+    {
+      "type": "color",
+      "id": "badge_background",
+      "label": "Filter count badge background",
+      "default": "#e8705a"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Filter count badge text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "quick_toggle",
+      "name": "Quick filter toggle",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "A toggle-switch pill mapped onto one Shopify filter value. Find the parameter name by applying the filter once and copying it out of the URL."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "In stock"
+        },
+        {
+          "type": "text",
+          "id": "param_name",
+          "label": "Filter parameter",
+          "default": "filter.v.availability",
+          "info": "For example filter.v.availability, or filter.p.m.custom.on_sale for a boolean metafield."
+        },
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Filter value",
+          "default": "1"
+        }
+      ]
+    },
+    {
+      "type": "subcategory",
+      "name": "Sub-category tile",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Line-art icon",
+          "info": "Outline illustration rather than a product photo."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Shelves"
+        },
+        {
+          "type": "text",
+          "id": "count",
+          "label": "Count",
+          "default": "184"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Point at a sub-collection or a filtered collection URL."
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

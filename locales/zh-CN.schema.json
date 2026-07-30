@@ -574,7 +574,11 @@
     "input_style": "输入样式",
     "selected_button_style": "所选按钮样式",
     "open_by_default": "默认展开",
-    "title_preset": "标题预设"
+    "title_preset": "标题预设",
+    "phone_number": "Phone number",
+    "phone_label": "Call us label",
+    "search_placeholder": "Search placeholder",
+    "all_categories_label": "\"All categories\" label"
   },
   "options": {
     "apple": "Apple",
@@ -978,7 +982,10 @@
     "gift_card_products": "礼品卡商品",
     "disclosures": "披露信息",
     "disclosures_metafield_content": "此产品所需的安全警告和监管披露信息。",
-    "page_text_color_contrast_info": "仅当颜色对比度足够时，具有自定义背景色的分区才会使用此文本颜色。"
+    "page_text_color_contrast_info": "仅当颜色对比度足够时，具有自定义背景色的分区才会使用此文本颜色。",
+    "search_bar": "Search bar",
+    "search_bar_info": "The inline search bar with category dropdown replaces the search icon on desktop. The icon remains as the search entry point on mobile.",
+    "call_us": "Call us"
   },
   "html_defaults": {
     "share_information_about_your": "<p>与您的客户分享有关您品牌的信息。描述产品、发布公告或欢迎客户光临您的商店。</p>",
@@ -1102,7 +1109,10 @@
     "page_text_color_default_info": "主题分区的默认值",
     "actions_display_style": "在移动设备上始终使用图标",
     "edit_input_field_in_theme_settings": "在[模板设置](/editor?context=theme&category=input%20fields)中编辑输入字段",
-    "edit_variants_in_theme_settings": "在[模板设置](/editor?context=theme&category=variant%20pickers)中编辑多属性样式"
+    "edit_variants_in_theme_settings": "在[模板设置](/editor?context=theme&category=variant%20pickers)中编辑多属性样式",
+    "phone_number": "Shown as a tap-to-call icon in the header. Leave blank to hide it.",
+    "search_categories": "Shown in the search bar's category dropdown. Leave blank to only show \"All Categories\".",
+    "announcement_text_color": "Default for all slides. Individual slides can override this."
   },
   "categories": {
     "basic": "基本",

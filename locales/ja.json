@@ -74,7 +74,8 @@
     "search_suggestions_available": "「{{ query }}」の検索候補が利用可能",
     "price_filter_low": "低価格",
     "price_filter_high": "高価格",
-    "view_disclosure_information_for_product": "{{ product_title }} の開示情報を表示"
+    "view_disclosure_information_for_product": "{{ product_title }} の開示情報を表示",
+    "call_us": "Call us"
   },
   "actions": {
     "add_to_cart": "カートに追加",
@@ -274,7 +275,8 @@
       "other": "{{ count }}個のアイテムがカートに追加されました"
     },
     "quick_order_list": "クイック注文リスト",
-    "product_disclosures": "商品の開示情報"
+    "product_disclosures": "商品の開示情報",
+    "all_categories": "All Categories"
   },
   "gift_cards": {
     "issued": {

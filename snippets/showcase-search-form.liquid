@@ -1,0 +1,144 @@
+{% doc %}
+  Renders the header search field (pill input with a magnifier on the right edge)
+  plus the optional "Search by photo" pill button. Rendered twice by the header —
+  inline on desktop and inside the mobile disclosure — so the markup lives here.
+
+  @param {object} section - The header section, for placeholder and photo-search settings.
+  @param {string} id_suffix - Unique suffix so the input ids don't collide across the two renders.
+
+  @example
+  {% render 'showcase-search-form', section: section, id_suffix: 'desktop' %}
+{% enddoc %}
+
+<div class="showcase-search">
+  <form
+    action="{{ routes.search_url }}"
+    method="get"
+    role="search"
+    class="showcase-search__form"
+  >
+    <label
+      for="showcase-search-{{ id_suffix }}"
+      class="visually-hidden"
+    >
+      {{ section.settings.search_placeholder | default: 'Search' }}
+    </label>
+    <input
+      type="text"
+      id="showcase-search-{{ id_suffix }}"
+      name="q"
+      class="showcase-search__input"
+      placeholder="{{ section.settings.search_placeholder | escape }}"
+      autocomplete="off"
+    >
+    <input
+      type="hidden"
+      name="options[prefix]"
+      value="last"
+    >
+    <button
+      type="submit"
+      class="showcase-search__submit"
+      aria-label="{{ section.settings.search_submit_label | default: 'Search' | escape }}"
+    >
+      <span class="svg-wrapper" aria-hidden="true">
+        {{- 'icon-search.svg' | inline_asset_content -}}
+      </span>
+    </button>
+  </form>
+
+  {% if section.settings.show_photo_search %}
+    <a
+      href="{{ section.settings.photo_search_link | default: '#' }}"
+      class="showcase-search__photo"
+    >
+      <span class="svg-wrapper" aria-hidden="true">
+        {{- 'icon-camera.svg' | inline_asset_content -}}
+      </span>
+      <span class="showcase-search__photo-label">{{ section.settings.photo_search_label }}</span>
+    </a>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .showcase-search {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+    width: 100%;
+  }
+
+  .showcase-search__form {
+    position: relative;
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  .showcase-search__input {
+    width: 100%;
+    padding: var(--padding-sm) var(--padding-2xl) var(--padding-sm) var(--padding-md);
+    border: var(--style-border-width-inputs) solid var(--showcase-search-border, transparent);
+    border-radius: 999px;
+    background-color: var(--showcase-search-background, #f2f2f0);
+    color: var(--showcase-header-text, var(--color-foreground));
+    font-size: var(--font-size--sm);
+  }
+
+  .showcase-search__input::placeholder {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+  }
+
+  .showcase-search__submit {
+    position: absolute;
+    top: 50%;
+    right: var(--padding-2xs);
+    translate: 0 -50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--showcase-header-text, var(--color-foreground));
+    cursor: pointer;
+  }
+
+  .showcase-search__submit .svg-wrapper,
+  .showcase-search__submit svg {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
+  }
+
+  /* Photo-search pill sits alongside the input. */
+  .showcase-search__photo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-3xs);
+    flex-shrink: 0;
+    padding: var(--padding-2xs) var(--padding-md);
+    border: var(--style-border-width-inputs) solid var(--showcase-photo-border, #3b7de0);
+    border-radius: 999px;
+    color: var(--showcase-photo-text, var(--color-foreground));
+    font-size: var(--font-size--sm);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .showcase-search__photo .svg-wrapper,
+  .showcase-search__photo svg {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
+  }
+
+  @media screen and (max-width: 989px) {
+    .showcase-search__photo-label {
+      display: none;
+    }
+
+    .showcase-search__photo {
+      padding-inline: var(--padding-2xs);
+    }
+  }
+{% endstylesheet %}

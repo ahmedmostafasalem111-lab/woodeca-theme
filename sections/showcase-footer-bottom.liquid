@@ -1,0 +1,384 @@
+{% comment %}
+  Footer bottom band: payment method icons, then a row with the wordmark, circular
+  social icons, and two columns of legal/policy links.
+
+  Kept as its own section because a Shopify section has a single repeatable-block
+  region, and the link columns above already use theirs for nested content. This
+  also lets the bottom band be reordered or removed independently.
+{% endcomment %}
+
+{% liquid
+  assign payment_icons = section.blocks | where: 'type', 'payment'
+  assign social_links = section.blocks | where: 'type', 'social'
+  assign legal_links = section.blocks | where: 'type', 'legal'
+%}
+
+<div
+  class="footer-bottom"
+  style="
+    --footer-bottom-background: {{ section.settings.background_color | default: '#ffffff' }};
+    --footer-bottom-text: {{ section.settings.text_color | default: '#8a8a8a' }};
+    --footer-bottom-wordmark: {{ section.settings.wordmark_color | default: '#1c1c1c' }};
+    --footer-social-background: {{ section.settings.social_background | default: '#f2f2f0' }};
+    --footer-social-icon: {{ section.settings.social_icon_color | default: '#1c1c1c' }};
+    --footer-legal-columns: {{ section.settings.legal_columns }};
+  "
+>
+  <div class="footer-bottom__inner">
+    {% if payment_icons.size > 0 %}
+      <div class="footer-bottom__payments">
+        {% for block in payment_icons %}
+          <span
+            class="footer-bottom__payment"
+            {{ block.shopify_attributes }}
+          >
+            {% if block.settings.image != blank %}
+              {{
+                block.settings.image
+                | image_url: width: 120
+                | image_tag: loading: 'lazy', alt: block.settings.label
+              }}
+            {% else %}
+              <span class="footer-bottom__payment-fallback">{{ block.settings.label }}</span>
+            {% endif %}
+          </span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="footer-bottom__main">
+      <div class="footer-bottom__brand">
+        {% if section.settings.wordmark_image != blank %}
+          {{
+            section.settings.wordmark_image
+            | image_url: width: 400
+            | image_tag: loading: 'lazy', class: 'footer-bottom__wordmark-image', alt: section.settings.wordmark_text
+          }}
+        {% elsif section.settings.wordmark_text != blank %}
+          <span class="footer-bottom__wordmark">{{ section.settings.wordmark_text }}</span>
+        {% endif %}
+
+        {% if social_links.size > 0 %}
+          <ul class="footer-bottom__social">
+            {% for block in social_links %}
+              {% assign icon_file = 'icon-' | append: block.settings.icon | append: '.svg' %}
+              <li {{ block.shopify_attributes }}>
+                <a
+                  href="{{ block.settings.link | default: '#' }}"
+                  class="footer-bottom__social-link"
+                  aria-label="{{ block.settings.label | escape }}"
+                >
+                  <span class="svg-wrapper" aria-hidden="true">
+                    {{- icon_file | inline_asset_content -}}
+                  </span>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      {% if legal_links.size > 0 %}
+        <ul class="footer-bottom__legal">
+          {% for block in legal_links %}
+            <li {{ block.shopify_attributes }}>
+              <a
+                href="{{ block.settings.link | default: '#' }}"
+                class="footer-bottom__legal-link"
+              >
+                {{- block.settings.label -}}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    {% if section.settings.copyright != blank %}
+      <p class="footer-bottom__copyright">{{ section.settings.copyright }}</p>
+    {% endif %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .footer-bottom {
+    background-color: var(--footer-bottom-background);
+    color: var(--footer-bottom-text);
+  }
+
+  .footer-bottom__inner {
+    max-width: var(--page-width);
+    margin-inline: auto;
+    padding-inline: var(--page-margin);
+    padding-block-end: var(--padding-2xl);
+  }
+
+  .footer-bottom__payments {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-sm);
+    padding-block: var(--padding-lg);
+  }
+
+  .footer-bottom__payment img {
+    display: block;
+    width: auto;
+    height: 22px;
+  }
+
+  .footer-bottom__payment-fallback {
+    padding: 2px var(--padding-2xs);
+    border: var(--border-width-sm) solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: 4px;
+    font-size: var(--font-size--2xs);
+  }
+
+  .footer-bottom__main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--gap-xl);
+    padding-block-start: var(--padding-lg);
+    border-block-start: var(--border-width-sm) solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .footer-bottom__brand {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-md);
+  }
+
+  .footer-bottom__wordmark {
+    color: var(--footer-bottom-wordmark);
+    font-size: var(--font-size--2xl);
+    font-weight: 700;
+    letter-spacing: var(--letter-spacing-sm);
+  }
+
+  .footer-bottom__wordmark-image {
+    display: block;
+    width: auto;
+    max-height: 32px;
+  }
+
+  .footer-bottom__social {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-2xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer-bottom__social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: var(--footer-social-background);
+    color: var(--footer-social-icon);
+  }
+
+  .footer-bottom__social-link .svg-wrapper,
+  .footer-bottom__social-link svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* Legal links flow into balanced columns. */
+  .footer-bottom__legal {
+    display: grid;
+    grid-template-columns: repeat(var(--footer-legal-columns, 2), minmax(0, 1fr));
+    gap: var(--gap-2xs) var(--gap-xl);
+    margin: 0;
+    padding: 0;
+    max-width: 60%;
+    list-style: none;
+  }
+
+  .footer-bottom__legal-link {
+    color: inherit;
+    font-size: var(--font-size--xs);
+    text-decoration: none;
+  }
+
+  .footer-bottom__legal-link:hover {
+    text-decoration: underline;
+  }
+
+  .footer-bottom__copyright {
+    margin: var(--margin-lg) 0 0;
+    font-size: var(--font-size--xs);
+  }
+
+  @media screen and (max-width: 749px) {
+    .footer-bottom__main {
+      flex-direction: column;
+    }
+
+    .footer-bottom__legal {
+      grid-template-columns: 1fr;
+      max-width: 100%;
+    }
+
+    .footer-bottom__wordmark {
+      font-size: var(--font-size--xl);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Showcase footer bottom",
+  "tag": "div",
+  "class": "showcase-footer-bottom-section",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Wordmark"
+    },
+    {
+      "type": "image_picker",
+      "id": "wordmark_image",
+      "label": "Wordmark image",
+      "info": "Leave empty to use the text below."
+    },
+    {
+      "type": "text",
+      "id": "wordmark_text",
+      "label": "Wordmark text",
+      "default": "lorem.ipsum"
+    },
+    {
+      "type": "header",
+      "content": "Legal links"
+    },
+    {
+      "type": "range",
+      "id": "legal_columns",
+      "label": "Legal link columns",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "text",
+      "id": "copyright",
+      "label": "Copyright line"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#8a8a8a"
+    },
+    {
+      "type": "color",
+      "id": "wordmark_color",
+      "label": "Wordmark",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "social_background",
+      "label": "Social icon background",
+      "default": "#f2f2f0"
+    },
+    {
+      "type": "color",
+      "id": "social_icon_color",
+      "label": "Social icon",
+      "default": "#1c1c1c"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "payment",
+      "name": "Payment icon",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo image"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Name",
+          "default": "Payment method"
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "name": "Social icon",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "info": "Uses the icon files available in the theme's assets.",
+          "options": [
+            { "value": "chat", "label": "Chat" },
+            { "value": "phone", "label": "Phone" },
+            { "value": "account", "label": "Person" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "star", "label": "Star" },
+            { "value": "store", "label": "Store" },
+            { "value": "pin", "label": "Location" },
+            { "value": "camera", "label": "Camera" },
+            { "value": "external", "label": "External link" }
+          ],
+          "default": "external"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Accessible label",
+          "default": "Social network"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "legal",
+      "name": "Legal link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Privacy Policy"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -574,7 +574,11 @@
     "input_style": "입력 스타일",
     "selected_button_style": "선택한 버튼 스타일",
     "open_by_default": "기본으로 열기",
-    "title_preset": "제목 사전 설정"
+    "title_preset": "제목 사전 설정",
+    "phone_number": "Phone number",
+    "phone_label": "Call us label",
+    "search_placeholder": "Search placeholder",
+    "all_categories_label": "\"All categories\" label"
   },
   "options": {
     "apple": "Apple",
@@ -978,7 +982,10 @@
     "gift_card_products": "기프트 카드 제품",
     "disclosures": "고지 사항",
     "disclosures_metafield_content": "이 제품에 필수적인 안전 경고 및 규제 관련 고지 사항입니다.",
-    "page_text_color_contrast_info": "사용자 지정 배경 색상이 있는 섹션은 색상 대비가 충분한 경우에만 이 텍스트 색상을 사용합니다."
+    "page_text_color_contrast_info": "사용자 지정 배경 색상이 있는 섹션은 색상 대비가 충분한 경우에만 이 텍스트 색상을 사용합니다.",
+    "search_bar": "Search bar",
+    "search_bar_info": "The inline search bar with category dropdown replaces the search icon on desktop. The icon remains as the search entry point on mobile.",
+    "call_us": "Call us"
   },
   "html_defaults": {
     "share_information_about_your": "<p>고객과 브랜드에 대한 정보를 공유하세요. 제품을 설명하거나, 공지 사항을 알리거나, 스토어를 방문하는 고객을 환영할 수 있습니다.</p>",
@@ -1102,7 +1109,10 @@
     "page_text_color_default_info": "테마 섹션의 기본값",
     "actions_display_style": "모바일에서는 항상 아이콘이 사용됩니다.",
     "edit_input_field_in_theme_settings": "[테마 설정](/editor?context=theme&category=input%20fields)에서 입력 필드 편집",
-    "edit_variants_in_theme_settings": "[테마 설정](/editor?context=theme&category=variant%20pickers)에서 이형 상품 스타일 편집"
+    "edit_variants_in_theme_settings": "[테마 설정](/editor?context=theme&category=variant%20pickers)에서 이형 상품 스타일 편집",
+    "phone_number": "Shown as a tap-to-call icon in the header. Leave blank to hide it.",
+    "search_categories": "Shown in the search bar's category dropdown. Leave blank to only show \"All Categories\".",
+    "announcement_text_color": "Default for all slides. Individual slides can override this."
   },
   "categories": {
     "basic": "기본",

@@ -1,0 +1,201 @@
+{% doc %}
+  Renders the inputs for a single Shopify facet — checkbox list for `list`
+  filters, min/max number fields for `price_range`, a switch for `boolean`.
+
+  Rendered by both the popover pills and the full filter drawer so the input
+  markup and naming exist in exactly one place. Inputs use each filter's native
+  `param_name`, so a plain form submit produces a valid facet URL with no JS.
+
+  Other active filters are carried through as hidden inputs, otherwise submitting
+  one facet's form would drop every other applied facet.
+
+  @param {object} filter - A filter from `collection.filters`.
+  @param {object} collection - The current collection, for the other active filters.
+
+  @example
+  {% render 'showcase-facet-inputs', filter: filter, collection: collection %}
+{% enddoc %}
+
+{%- comment -%}
+  Preserve sort order and all other facets across this form's submission.
+{%- endcomment -%}
+{% if collection.sort_by != blank %}
+  <input
+    type="hidden"
+    name="sort_by"
+    value="{{ collection.sort_by }}"
+  >
+{% endif %}
+
+{% for other_filter in collection.filters %}
+  {% if other_filter.param_name == filter.param_name %}
+    {% continue %}
+  {% endif %}
+
+  {% case other_filter.type %}
+    {% when 'price_range' %}
+      {% if other_filter.min_value.value != null %}
+        <input
+          type="hidden"
+          name="{{ other_filter.min_value.param_name }}"
+          value="{{ other_filter.min_value.value | money_without_currency | replace: ',', '' }}"
+        >
+      {% endif %}
+      {% if other_filter.max_value.value != null %}
+        <input
+          type="hidden"
+          name="{{ other_filter.max_value.param_name }}"
+          value="{{ other_filter.max_value.value | money_without_currency | replace: ',', '' }}"
+        >
+      {% endif %}
+    {% else %}
+      {% for value in other_filter.active_values %}
+        <input
+          type="hidden"
+          name="{{ value.param_name }}"
+          value="{{ value.value | escape }}"
+        >
+      {% endfor %}
+  {% endcase %}
+{% endfor %}
+
+{% case filter.type %}
+  {% when 'price_range' %}
+    <div class="facet-range">
+      <label class="facet-range__field">
+        <span class="visually-hidden">{{ filter.label }} minimum</span>
+        <span aria-hidden="true">{{ cart.currency.symbol }}</span>
+        <input
+          type="number"
+          class="facet-range__input"
+          name="{{ filter.min_value.param_name }}"
+          inputmode="decimal"
+          min="0"
+          max="{{ filter.range_max | divided_by: 100 | ceil }}"
+          placeholder="0"
+          {% if filter.min_value.value != null %}
+            value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"
+          {% endif %}
+        >
+      </label>
+
+      <span aria-hidden="true">&ndash;</span>
+
+      <label class="facet-range__field">
+        <span class="visually-hidden">{{ filter.label }} maximum</span>
+        <span aria-hidden="true">{{ cart.currency.symbol }}</span>
+        <input
+          type="number"
+          class="facet-range__input"
+          name="{{ filter.max_value.param_name }}"
+          inputmode="decimal"
+          min="0"
+          max="{{ filter.range_max | divided_by: 100 | ceil }}"
+          placeholder="{{ filter.range_max | divided_by: 100 | ceil }}"
+          {% if filter.max_value.value != null %}
+            value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"
+          {% endif %}
+        >
+      </label>
+    </div>
+
+  {% when 'boolean' %}
+    <label class="facet-option">
+      <input
+        type="checkbox"
+        name="{{ filter.true_value.param_name }}"
+        value="{{ filter.true_value.value }}"
+        {% if filter.true_value.active %}
+          checked
+        {% endif %}
+        on:change="/applyFilter"
+      >
+      <span>{{ filter.label }}</span>
+      {% if filter.true_value.count > 0 %}
+        <span class="facet-option__count">{{ filter.true_value.count }}</span>
+      {% endif %}
+    </label>
+
+  {% else %}
+    <ul class="facet-list">
+      {% for value in filter.values %}
+        <li>
+          <label class="facet-option">
+            <input
+              type="checkbox"
+              name="{{ value.param_name }}"
+              value="{{ value.value | escape }}"
+              {% if value.active %}
+                checked
+              {% endif %}
+              {% if value.count == 0 and value.active == false %}
+                disabled
+              {% endif %}
+            >
+
+            {% if value.swatch != blank %}
+              {% render 'swatch', swatch: value.swatch, mode: 'filter', label: value.label %}
+            {% endif %}
+
+            <span>{{ value.label }}</span>
+            <span class="facet-option__count">{{ value.count }}</span>
+          </label>
+        </li>
+      {% endfor %}
+    </ul>
+{% endcase %}
+
+{% stylesheet %}
+  .facet-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-2xs);
+    max-height: 260px;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+  }
+
+  .facet-option {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    font-size: var(--font-size--sm);
+    cursor: pointer;
+  }
+
+  .facet-option:has(input:disabled) {
+    opacity: var(--opacity-50);
+    cursor: not-allowed;
+  }
+
+  .facet-option__count {
+    margin-inline-start: auto;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--xs);
+  }
+
+  .facet-range {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+  }
+
+  .facet-range__field {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .facet-range__input {
+    width: 100%;
+    min-width: 0;
+    padding: var(--padding-2xs);
+    border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: 4px;
+    font-size: var(--font-size--sm);
+  }
+{% endstylesheet %}

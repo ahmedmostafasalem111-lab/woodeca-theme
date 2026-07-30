@@ -11,7 +11,7 @@
 <div class="section-background color-custom-{{ section.id }}"></div>
 <aside
   class="announcement-bar spacing-style section section--{{ section.settings.section_width }} color-custom-{{ section.id }}"
-  style="{% render 'spacing-padding', settings: section.settings %}; --border-bottom-width: {{ section.settings.divider_width }}px;{% if section.settings.divider_color != blank %} --color-border: {{ section.settings.divider_color }};{% endif %}"
+  style="{% render 'spacing-padding', settings: section.settings %}; --border-bottom-width: {{ section.settings.divider_width }}px;{% if section.settings.divider_color != blank %} --color-border: {{ section.settings.divider_color }};{% endif %}{% if section.settings.text_color != blank %} --color: {{ section.settings.text_color }}; --color-rgb: {{ section.settings.text_color.rgb }};{% endif %}"
 >
   {% liquid
     assign autoplay = false
@@ -168,6 +168,13 @@
       "type": "color",
       "id": "background_color",
       "label": "t:settings.background_color",
+      "placeholder": "t:settings.default"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:settings.text_color",
+      "info": "t:info.announcement_text_color",
       "placeholder": "t:settings.default"
     },
     {

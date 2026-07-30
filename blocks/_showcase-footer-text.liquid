@@ -1,0 +1,26 @@
+{% doc %}
+  A plain (non-link) text line inside a footer column — used for things like call
+  centre opening hours.
+{% enddoc %}
+
+<li
+  class="footer-column__item"
+  {{ block.shopify_attributes }}
+>
+  <span class="footer-column__text">{{ block.settings.text }}</span>
+</li>
+
+{% schema %}
+{
+  "name": "Text line",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "daily from 9:00 to 22:00"
+    }
+  ]
+}
+{% endschema %}

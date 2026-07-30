@@ -11,6 +11,7 @@
   "accessibility": {
     "account": "Account",
     "active_filters": "Active filters:",
+    "call_us": "Call us",
     "cart": "Cart",
     "cart_count": "Total items in cart",
     "close_dialog": "Close dialog",
@@ -164,6 +165,7 @@
     "cancel": "Cancel",
     "discount": "Discount",
     "account_title": "Account",
+    "all_categories": "All Categories",
     "terms_and_policies": "Terms and Policies",
     "account_title_personalized": "Hi {{ first_name }}",
     "account_orders": "Orders",

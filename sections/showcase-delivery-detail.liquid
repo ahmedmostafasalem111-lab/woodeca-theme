@@ -1,0 +1,508 @@
+{% comment %}
+  Delivery & assembly detail block: a "Delivery" / "Assembly" segmented control,
+  intro copy, an address lookup input, and a pricing table built from blocks.
+
+  All copy, city names and prices are theme settings rather than hardcoded, since
+  the reference's logistics are specific to its own courier network. The address
+  lookup is a real form posting to a configurable endpoint; with no endpoint set it
+  falls back to a plain "contact us" prompt rather than pretending to calculate.
+{% endcomment %}
+
+{% liquid
+  assign price_rows = section.blocks | where: 'type', 'price_row'
+  assign assembly_rows = section.blocks | where: 'type', 'assembly_row'
+%}
+
+<div
+  id="{{ section.settings.anchor_id | default: 'delivery-and-assembly' }}"
+  class="section section--{{ section.settings.section_width }} delivery-detail spacing-style"
+  style="
+    {% render 'spacing-padding', settings: section.settings %}
+    {% if section.settings.background_color != blank %}
+      background-color: {{ section.settings.background_color }};
+    {% endif %}
+    {% if section.settings.text_color != blank %}
+      --color-foreground: {{ section.settings.text_color }};
+      --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+    {% endif %}
+    --delivery-button-background: {{ section.settings.button_background | default: '#333333' }};
+    --delivery-button-text: {{ section.settings.button_text_color | default: '#ffffff' }};
+  "
+>
+  <showcase-panel-tabs-component class="delivery-detail__wrap">
+    <div class="delivery-detail__header">
+      {% if section.settings.heading != blank %}
+        <h2 class="delivery-detail__heading">{{ section.settings.heading }}</h2>
+      {% endif %}
+
+      {% liquid
+        assign tabs_label = section.settings.heading | default: 'Delivery and assembly'
+        assign tab_delivery = section.settings.tab_delivery_label | default: 'Delivery'
+        assign tab_assembly = section.settings.tab_assembly_label | default: 'Assembly'
+      %}
+      {% render 'showcase-panel-tabs',
+        label: tabs_label,
+        tab_a_label: tab_delivery,
+        tab_b_label: tab_assembly,
+        a_key: 'delivery',
+        b_key: 'assembly'
+      %}
+    </div>
+
+    {%- comment -%} ---- Delivery panel ---- {%- endcomment -%}
+    <div
+      class="delivery-detail__panel"
+      ref="panels[]"
+      data-panel="delivery"
+      role="tabpanel"
+    >
+      {% if section.settings.delivery_intro != blank %}
+        <div class="delivery-detail__intro">{{ section.settings.delivery_intro }}</div>
+      {% endif %}
+
+      {% if section.settings.disclaimer != blank %}
+        <p class="delivery-detail__disclaimer">{{ section.settings.disclaimer }}</p>
+      {% endif %}
+
+      {%- comment -%}
+        Address lookup. Posts to a merchant-supplied endpoint when configured;
+        otherwise we show the contact prompt instead of a button that does nothing.
+      {%- endcomment -%}
+      {% if section.settings.show_calculator %}
+        {% if section.settings.calculator_action != blank %}
+          <form
+            class="delivery-detail__calc"
+            method="get"
+            action="{{ section.settings.calculator_action }}"
+          >
+            <label for="delivery-address-{{ section.id }}" class="visually-hidden">
+              {{ section.settings.calculator_placeholder }}
+            </label>
+            <input
+              type="text"
+              id="delivery-address-{{ section.id }}"
+              name="address"
+              class="delivery-detail__calc-input"
+              placeholder="{{ section.settings.calculator_placeholder | escape }}"
+              autocomplete="street-address"
+            >
+            <button type="submit" class="delivery-detail__calc-button">
+              {{- section.settings.calculator_button_label | default: 'Calculate' -}}
+            </button>
+          </form>
+        {% else %}
+          <p class="delivery-detail__contact-note">
+            {{ section.settings.calculator_fallback_text }}
+          </p>
+        {% endif %}
+      {% endif %}
+
+      {% if price_rows.size > 0 %}
+        <div class="delivery-detail__table">
+          {% for block in price_rows %}
+            <div class="delivery-detail__cell" {{ block.shopify_attributes }}>
+              <p class="delivery-detail__cell-label">{{ block.settings.label }}</p>
+              {% if block.settings.price != blank %}
+                <p class="delivery-detail__cell-price">{{ block.settings.price }}</p>
+              {% endif %}
+              {% if block.settings.note != blank %}
+                <p class="delivery-detail__cell-note">{{ block.settings.note }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if section.settings.footnote != blank %}
+        <p class="delivery-detail__footnote">{{ section.settings.footnote }}</p>
+      {% endif %}
+    </div>
+
+    {%- comment -%} ---- Assembly panel ---- {%- endcomment -%}
+    <div
+      class="delivery-detail__panel"
+      ref="panels[]"
+      data-panel="assembly"
+      role="tabpanel"
+      hidden
+    >
+      {% if section.settings.assembly_intro != blank %}
+        <div class="delivery-detail__intro">{{ section.settings.assembly_intro }}</div>
+      {% endif %}
+
+      {% if assembly_rows.size > 0 %}
+        <div class="delivery-detail__table">
+          {% for block in assembly_rows %}
+            <div class="delivery-detail__cell" {{ block.shopify_attributes }}>
+              <p class="delivery-detail__cell-label">{{ block.settings.label }}</p>
+              {% if block.settings.price != blank %}
+                <p class="delivery-detail__cell-price">{{ block.settings.price }}</p>
+              {% endif %}
+              {% if block.settings.note != blank %}
+                <p class="delivery-detail__cell-note">{{ block.settings.note }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if section.settings.assembly_footnote != blank %}
+        <p class="delivery-detail__footnote">{{ section.settings.assembly_footnote }}</p>
+      {% endif %}
+    </div>
+  </showcase-panel-tabs-component>
+</div>
+
+<script
+  src="{{ 'showcase-panel-tabs.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+{% stylesheet %}
+  .delivery-detail__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--gap-md);
+    margin-block-end: var(--margin-xl);
+  }
+
+  .delivery-detail__heading {
+    margin: 0;
+    font-size: var(--font-size--2xl);
+  }
+
+  .delivery-detail__intro {
+    max-width: 80ch;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-75));
+    font-size: var(--font-size--md);
+  }
+
+  .delivery-detail__intro > :first-child {
+    margin-block-start: 0;
+  }
+
+  .delivery-detail__disclaimer,
+  .delivery-detail__footnote,
+  .delivery-detail__contact-note {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--xs);
+  }
+
+  .delivery-detail__calc {
+    display: flex;
+    gap: var(--gap-2xs);
+    max-width: 560px;
+    margin-block: var(--margin-lg);
+  }
+
+  .delivery-detail__calc-input {
+    flex-grow: 1;
+    min-width: 0;
+    padding: var(--padding-sm) var(--padding-md);
+    border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: var(--style-border-radius-inputs, 8px);
+    font-size: var(--font-size--sm);
+  }
+
+  .delivery-detail__calc-button {
+    flex-shrink: 0;
+    padding: var(--padding-sm) var(--padding-xl);
+    border: none;
+    border-radius: var(--style-border-radius-inputs, 8px);
+    background-color: var(--delivery-button-background);
+    color: var(--delivery-button-text);
+    font-size: var(--font-size--sm);
+    cursor: pointer;
+  }
+
+  .delivery-detail__table {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--gap-lg);
+    margin-block: var(--margin-xl);
+  }
+
+  .delivery-detail__cell {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-3xs);
+    padding-block-start: var(--padding-md);
+    border-block-start: var(--border-width-md) solid rgb(var(--color-foreground-rgb) / var(--opacity-15));
+  }
+
+  .delivery-detail__cell-label {
+    margin: 0;
+    font-size: var(--font-size--sm);
+    text-wrap: balance;
+  }
+
+  .delivery-detail__cell-price {
+    margin: 0;
+    font-size: var(--font-size--xl);
+    font-weight: 700;
+  }
+
+  .delivery-detail__cell-note {
+    margin: 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-55));
+    font-size: var(--font-size--xs);
+  }
+
+  @media screen and (max-width: 749px) {
+    .delivery-detail__heading {
+      font-size: var(--font-size--xl);
+    }
+
+    .delivery-detail__intro {
+      font-size: var(--font-size--sm);
+    }
+
+    .delivery-detail__calc {
+      flex-direction: column;
+    }
+
+    .delivery-detail__table {
+      grid-template-columns: 1fr;
+      gap: var(--gap-md);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Delivery and assembly",
+  "tag": "section",
+  "class": "section-delivery-detail",
+  "enabled_on": {
+    "templates": ["product", "page"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "All copy and prices here are placeholders — replace them with your own shipping terms during the branding pass."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor id",
+      "default": "delivery-and-assembly",
+      "info": "Target of the sticky bar's \"Delivery and assembly\" link."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Delivery and assembly"
+    },
+    {
+      "type": "text",
+      "id": "tab_delivery_label",
+      "label": "First tab label",
+      "default": "Delivery"
+    },
+    {
+      "type": "text",
+      "id": "tab_assembly_label",
+      "label": "Second tab label",
+      "default": "Assembly"
+    },
+    {
+      "type": "header",
+      "content": "Delivery tab"
+    },
+    {
+      "type": "richtext",
+      "id": "delivery_intro",
+      "label": "Intro text",
+      "default": "<p>We deliver to all served areas. Enter your address below for an accurate quote, or review the standard rates.</p>"
+    },
+    {
+      "type": "text",
+      "id": "disclaimer",
+      "label": "Small print",
+      "default": "Rates shown are indicative and confirmed at checkout."
+    },
+    {
+      "type": "text",
+      "id": "footnote",
+      "label": "Footnote",
+      "default": "For multi-item orders, total delivery cost is capped per order rather than charged per item."
+    },
+    {
+      "type": "header",
+      "content": "Address lookup"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_calculator",
+      "label": "Show address lookup",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "calculator_placeholder",
+      "label": "Input placeholder",
+      "default": "City, street, house"
+    },
+    {
+      "type": "text",
+      "id": "calculator_button_label",
+      "label": "Button label",
+      "default": "Calculate"
+    },
+    {
+      "type": "url",
+      "id": "calculator_action",
+      "label": "Lookup form action URL",
+      "info": "Where the address is submitted. Leave blank to show the contact prompt instead of a non-functional button."
+    },
+    {
+      "type": "text",
+      "id": "calculator_fallback_text",
+      "label": "Fallback prompt",
+      "default": "Contact us for a delivery quote to your address."
+    },
+    {
+      "type": "header",
+      "content": "Assembly tab"
+    },
+    {
+      "type": "richtext",
+      "id": "assembly_intro",
+      "label": "Intro text",
+      "default": "<p>Our team can assemble your furniture on delivery. Assembly is charged per item and booked at checkout.</p>"
+    },
+    {
+      "type": "text",
+      "id": "assembly_footnote",
+      "label": "Footnote",
+      "default": "Assembly times vary by product complexity."
+    },
+    {
+      "type": "header",
+      "content": "Layout and colors"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "price_row",
+      "name": "Delivery price",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Within the city"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "EGP 350"
+        },
+        {
+          "type": "text",
+          "id": "note",
+          "label": "Note"
+        }
+      ]
+    },
+    {
+      "type": "assembly_row",
+      "name": "Assembly price",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Standard assembly"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "EGP 250"
+        },
+        {
+          "type": "text",
+          "id": "note",
+          "label": "Note"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Delivery and assembly",
+      "blocks": [
+        { "type": "price_row", "settings": { "label": "Within the city", "price": "EGP 350" } },
+        { "type": "price_row", "settings": { "label": "By freight elevator or to 1st floor", "price": "EGP 500" } },
+        { "type": "price_row", "settings": { "label": "Manual carry, per floor", "price": "EGP 120", "note": "Charged per floor above the first." } },
+        { "type": "assembly_row", "settings": { "label": "Standard assembly", "price": "EGP 250" } },
+        { "type": "assembly_row", "settings": { "label": "Complex assembly", "price": "EGP 450", "note": "Wardrobes and modular units." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

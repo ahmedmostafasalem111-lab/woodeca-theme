@@ -1,0 +1,473 @@
+{% comment %}
+  Collections grid with pill filter tabs. Three cards per row on desktop; on mobile
+  the grid becomes a horizontal scroller showing one card plus a peek of the next.
+  Cards carry filter keys so the tabs actually filter rather than just decorate.
+{% endcomment %}
+
+{% liquid
+  assign tab_blocks = section.blocks | where: 'type', 'tab'
+  assign card_blocks = section.blocks | where: 'type', 'card'
+%}
+
+<div
+  class="section-background"
+  {% if section.settings.background_color != blank %}
+    style="background-color: {{ section.settings.background_color }};"
+  {% endif %}
+></div>
+
+<showcase-tabs-component
+  class="section section--{{ section.settings.section_width }} showcase-collections spacing-style"
+  style="
+    {% render 'spacing-padding', settings: section.settings %}
+    {% if section.settings.text_color != blank %}
+      --color-foreground: {{ section.settings.text_color }};
+      --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+    {% endif %}
+    --collections-columns: {{ section.settings.columns }};
+    --collections-heading-size: {{ section.settings.heading_size }};
+    --collections-badge-background: {{ section.settings.badge_background | default: '#ffffff' }};
+    --collections-badge-text: {{ section.settings.badge_text_color | default: '#1c1c1c' }};
+    --collections-footer-background: {{ section.settings.card_footer_background | default: '#f2f2f0' }};
+    --collections-arrow-background: {{ section.settings.arrow_background | default: '#1c1c1c' }};
+    --collections-arrow-icon: {{ section.settings.arrow_icon_color | default: '#ffffff' }};
+  "
+>
+  {% if section.settings.heading != blank %}
+    <h2 class="showcase-collections__heading">{{ section.settings.heading }}</h2>
+  {% endif %}
+
+  {% if tab_blocks.size > 0 %}
+    <div
+      class="showcase-collections__tabs"
+      role="group"
+      aria-label="{{ section.settings.tabs_label | default: 'Filter collections' | escape }}"
+    >
+      {% for block in tab_blocks %}
+        <button
+          type="button"
+          class="showcase-tab{% if forloop.first %} showcase-tab--active{% endif %}"
+          ref="tabs[]"
+          data-filter-key="{{ block.settings.filter_key | escape }}"
+          on:click="/filter?index={{ forloop.index0 }}"
+          aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+          {{ block.shopify_attributes }}
+        >
+          {{- block.settings.label -}}
+        </button>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="showcase-collections__grid">
+    {% for block in card_blocks %}
+      <a
+        href="{{ block.settings.link | default: '#' }}"
+        class="collection-card"
+        ref="cards[]"
+        data-filter-keys="{{ block.settings.filter_keys | escape }}"
+        {{ block.shopify_attributes }}
+      >
+        <span class="collection-card__media">
+          {% if block.settings.image != blank %}
+            {{
+              block.settings.image
+              | image_url: width: 900
+              | image_tag: loading: 'lazy', class: 'collection-card__image', alt: block.settings.title
+            }}
+          {% else %}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'collection-card__image collection-card__image--placeholder' }}
+          {% endif %}
+
+          {% if block.settings.show_badge and block.settings.badge != blank %}
+            <span class="collection-card__badge">{{ block.settings.badge }}</span>
+          {% endif %}
+        </span>
+
+        <span class="collection-card__footer">
+          <span class="collection-card__text">
+            {% if block.settings.title != blank %}
+              <span class="collection-card__title">{{ block.settings.title }}</span>
+            {% endif %}
+            {% if block.settings.subtitle != blank %}
+              <span class="collection-card__subtitle">{{ block.settings.subtitle }}</span>
+            {% endif %}
+          </span>
+
+          <span class="collection-card__arrow" aria-hidden="true">
+            <span class="svg-wrapper">
+              {{- 'icon-arrow.svg' | inline_asset_content -}}
+            </span>
+          </span>
+        </span>
+      </a>
+    {% endfor %}
+  </div>
+</showcase-tabs-component>
+
+<script
+  src="{{ 'showcase-tabs.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+{% stylesheet %}
+  .showcase-collections__heading {
+    margin: 0 0 var(--margin-lg);
+    font-size: var(--collections-heading-size, var(--font-size--3xl));
+    line-height: var(--line-height--heading-tight);
+  }
+
+  .showcase-collections__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-2xs);
+    margin-block-end: var(--margin-xl);
+  }
+
+  .showcase-tab {
+    padding: var(--padding-2xs) var(--padding-md);
+    border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    cursor: pointer;
+    transition: background-color var(--animation-speed) var(--animation-easing),
+      color var(--animation-speed) var(--animation-easing);
+  }
+
+  .showcase-tab--active {
+    border-color: var(--color-foreground);
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+
+  .showcase-collections__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--collections-columns, 3), minmax(0, 1fr));
+    gap: var(--gap-lg);
+  }
+
+  .collection-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--style-border-radius-inputs, 8px);
+    color: var(--color-foreground);
+    text-decoration: none;
+    overflow: hidden;
+  }
+
+  .collection-card__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 5;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+    overflow: hidden;
+  }
+
+  .collection-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: scale var(--animation-speed-slow) var(--animation-easing);
+  }
+
+  .collection-card:hover .collection-card__image {
+    scale: 1.03;
+  }
+
+  .collection-card__image--placeholder {
+    fill: rgb(var(--color-foreground-rgb) / var(--opacity-20));
+  }
+
+  .collection-card__badge {
+    position: absolute;
+    top: var(--padding-sm);
+    left: var(--padding-sm);
+    padding: 3px var(--padding-2xs);
+    border-radius: 999px;
+    background-color: var(--collections-badge-background);
+    color: var(--collections-badge-text);
+    font-size: var(--font-size--2xs);
+  }
+
+  .collection-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-sm);
+    padding: var(--padding-md);
+    background-color: var(--collections-footer-background);
+  }
+
+  .collection-card__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .collection-card__title {
+    font-size: var(--font-size--md);
+    font-weight: 600;
+  }
+
+  .collection-card__subtitle {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+  }
+
+  .collection-card__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--collections-arrow-background);
+    color: var(--collections-arrow-icon);
+  }
+
+  .collection-card__arrow .svg-wrapper,
+  .collection-card__arrow svg {
+    width: var(--icon-size-xs);
+    height: var(--icon-size-xs);
+  }
+
+  /* Mobile: the grid becomes a swipeable row with the next card peeking. */
+  @media screen and (max-width: 749px) {
+    .showcase-collections__heading {
+      font-size: var(--font-size--xl);
+    }
+
+    .showcase-collections__grid {
+      display: flex;
+      gap: var(--gap-md);
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .showcase-collections__grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .collection-card {
+      flex: 0 0 auto;
+      width: 82%;
+      scroll-snap-align: start;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collections grid",
+  "tag": "section",
+  "class": "section-showcase-collections",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Collections and co-creation"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        { "value": "var(--font-size--2xl)", "label": "Medium" },
+        { "value": "var(--font-size--3xl)", "label": "Large" },
+        { "value": "var(--font-size--4xl)", "label": "Extra large" }
+      ],
+      "default": "var(--font-size--3xl)"
+    },
+    {
+      "type": "text",
+      "id": "tabs_label",
+      "label": "Accessible label for the tab group",
+      "default": "Filter collections"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Cards per row on desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "card_footer_background",
+      "label": "Card footer background",
+      "default": "#f2f2f0"
+    },
+    {
+      "type": "color",
+      "id": "badge_background",
+      "label": "Badge background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge text",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "arrow_background",
+      "label": "Card arrow background",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "arrow_icon_color",
+      "label": "Card arrow icon",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Filter tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "All"
+        },
+        {
+          "type": "text",
+          "id": "filter_key",
+          "label": "Filter key",
+          "info": "Cards whose keys include this value stay visible. Leave blank to show every card (use for an \"All\" tab)."
+        }
+      ]
+    },
+    {
+      "type": "card",
+      "name": "Collection card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Lorem ipsum dolor. SIT."
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle",
+          "default": "Consectetur adipiscing elit"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_badge",
+          "label": "Show badge",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge text",
+          "default": "New product"
+        },
+        {
+          "type": "text",
+          "id": "filter_keys",
+          "label": "Filter keys",
+          "info": "Comma-separated keys matching your tabs, e.g. collections, co-creation",
+          "default": "collections"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collections grid",
+      "blocks": [
+        { "type": "tab", "settings": { "label": "All", "filter_key": "" } },
+        { "type": "tab", "settings": { "label": "Collections", "filter_key": "collections" } },
+        { "type": "tab", "settings": { "label": "Co-creation", "filter_key": "co-creation" } },
+        { "type": "card", "settings": { "title": "Lorem ipsum. SIT.", "subtitle": "Collection for teenagers", "filter_keys": "collections" } },
+        { "type": "card", "settings": { "title": "Dolor sit x AMET", "subtitle": "Children's poufs and pillows", "filter_keys": "co-creation" } },
+        { "type": "card", "settings": { "title": "Consectetur", "subtitle": "Bright furniture for home and garden", "filter_keys": "collections, co-creation" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

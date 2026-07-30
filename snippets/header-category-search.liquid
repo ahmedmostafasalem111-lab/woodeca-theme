@@ -1,0 +1,269 @@
+{% doc %}
+  Renders a category-filtered search bar: an "All Categories"-style dropdown
+  (populated from the header section's collection list setting) next to a
+  plain search input. Reused inline in the desktop header row and inside the
+  mobile search overlay.
+
+  @param {object} section - The header section, used to read search settings.
+  @param {string} layout - 'inline' (desktop header row) or 'modal' (mobile overlay).
+  @param {string} id_suffix - Unique suffix so ids don't collide when rendered twice on one page.
+
+  @example
+  {% render 'header-category-search', section: section, layout: 'inline', id_suffix: 'inline' %}
+{% enddoc %}
+
+{% liquid
+  assign categories = section.settings.search_categories
+  assign all_categories_label = section.settings.all_categories_label
+  if all_categories_label == blank
+    assign all_categories_label = 'content.all_categories' | t
+  endif
+
+  assign placeholder = section.settings.search_placeholder
+  if placeholder == blank
+    assign placeholder = 'content.search_input_placeholder' | t
+  endif
+
+  assign panel_id = 'header-category-search-panel-' | append: id_suffix
+  assign input_id = 'header-category-search-input-' | append: id_suffix
+
+  assign font_setting = section.settings.search_bar_font | default: 'body'
+  assign bar_style = '--header-search-font: var(--font-' | append: font_setting | append: '--family); '
+  assign bar_style = bar_style | append: '--header-search-font-weight: var(--font-' | append: font_setting | append: '--weight); '
+
+  if section.settings.search_bar_font_size != blank
+    assign bar_style = bar_style | append: '--header-search-font-size: ' | append: section.settings.search_bar_font_size | append: '; '
+  endif
+
+  if section.settings.search_bar_text_color != blank
+    assign bar_style = bar_style | append: '--header-search-text-color: ' | append: section.settings.search_bar_text_color | append: '; '
+  endif
+
+  if section.settings.search_bar_background_color != blank
+    assign bar_style = bar_style | append: '--header-search-background: ' | append: section.settings.search_bar_background_color | append: '; '
+  endif
+
+  if section.settings.search_bar_border_color != blank
+    assign bar_style = bar_style | append: '--header-search-border-color: ' | append: section.settings.search_bar_border_color | append: '; '
+  endif
+%}
+
+<header-category-search-component
+  class="header-category-search header-category-search--{{ layout }}"
+  style="{{ bar_style }}"
+  data-testid="header-category-search-{{ layout }}"
+>
+  <form
+    ref="form"
+    action="{{ routes.search_url }}"
+    method="get"
+    role="search"
+    class="header-category-search__form"
+    on:submit="/onSubmit"
+  >
+    <div class="header-category-search__category">
+      <button
+        type="button"
+        ref="button"
+        class="header-category-search__toggle button-unstyled"
+        aria-expanded="false"
+        aria-haspopup="listbox"
+        aria-controls="{{ panel_id }}"
+        on:click="/togglePanel"
+      >
+        <span
+          ref="label"
+          class="header-category-search__label"
+        >{{ all_categories_label }}</span>
+        <span
+          class="svg-wrapper header-category-search__caret"
+          aria-hidden="true"
+        >{{ 'icon-caret.svg' | inline_asset_content }}</span>
+      </button>
+
+      <ul
+        ref="panel"
+        id="{{ panel_id }}"
+        class="header-category-search__panel color-custom-popover"
+        role="listbox"
+        hidden
+        on:keydown="/onPanelKeyDown"
+      >
+        <li
+          ref="options[]"
+          role="option"
+          tabindex="-1"
+          aria-selected="true"
+          data-value=""
+          data-title="{{ all_categories_label }}"
+          class="header-category-search__option"
+          on:click="/selectCategory"
+        >{{ all_categories_label }}</li>
+
+        {% for collection in categories %}
+          <li
+            ref="options[]"
+            role="option"
+            tabindex="-1"
+            aria-selected="false"
+            data-value="{{ collection.handle }}"
+            data-title="{{ collection.title | escape }}"
+            class="header-category-search__option"
+            on:click="/selectCategory"
+          >{{ collection.title }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <label
+      for="{{ input_id }}"
+      class="visually-hidden"
+    >{{ 'content.search_input_label' | t }}</label>
+    <input
+      ref="searchInput"
+      id="{{ input_id }}"
+      type="text"
+      name="q"
+      class="header-category-search__input"
+      placeholder="{{ placeholder }}"
+      autocomplete="off"
+    >
+    <input
+      type="hidden"
+      name="options[prefix]"
+      value="last"
+    >
+    <input
+      type="hidden"
+      name="type"
+      value="product"
+    >
+
+    <button
+      type="submit"
+      class="header-category-search__submit button-unstyled"
+      aria-label="{{ 'content.search' | t }}"
+    >
+      <span
+        class="svg-wrapper"
+        aria-hidden="true"
+      >{{ 'icon-search.svg' | inline_asset_content }}</span>
+    </button>
+  </form>
+</header-category-search-component>
+
+<script
+  src="{{ 'header-category-search.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+{% stylesheet %}
+  .header-category-search {
+    --header-search-border-radius: var(--style-border-radius-inputs);
+
+    display: flex;
+    width: 100%;
+    font-family: var(--header-search-font, var(--font-body--family));
+    font-weight: var(--header-search-font-weight, var(--font-body--weight));
+    font-size: var(--header-search-font-size, 0.875rem);
+  }
+
+  .header-category-search__form {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    border: var(--style-border-width-inputs) solid var(--header-search-border-color, var(--color-border));
+    border-radius: var(--header-search-border-radius);
+    background: var(--header-search-background, var(--color-input-background));
+    color: var(--header-search-text-color, var(--color-foreground));
+    overflow: hidden;
+  }
+
+  .header-category-search__category {
+    position: relative;
+    flex-shrink: 0;
+    border-inline-end: var(--style-border-width-inputs) solid var(--header-search-border-color, var(--color-border));
+  }
+
+  .header-category-search__toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    height: 100%;
+    padding-inline: var(--padding-sm);
+    white-space: nowrap;
+    color: inherit;
+  }
+
+  .header-category-search__caret {
+    width: var(--icon-size-xs);
+    height: var(--icon-size-xs);
+    transition: transform var(--animation-speed) var(--animation-easing);
+  }
+
+  .header-category-search__toggle[aria-expanded='true'] .header-category-search__caret {
+    transform: rotate(180deg);
+  }
+
+  .header-category-search__panel {
+    position: absolute;
+    z-index: var(--layer-raised);
+    top: calc(100% + var(--margin-2xs));
+    left: 0;
+    min-width: 100%;
+    max-height: 20rem;
+    overflow-y: auto;
+    margin: 0;
+    padding: var(--padding-2xs) 0;
+    list-style: none;
+    border-radius: var(--style-border-radius-popover);
+    box-shadow: var(--shadow-popover);
+    background-color: var(--color-background);
+  }
+
+  .header-category-search__option {
+    padding: var(--padding-2xs) var(--padding-sm);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .header-category-search__option:hover,
+  .header-category-search__option[aria-selected='true'] {
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+  }
+
+  .header-category-search__input {
+    flex-grow: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    padding-inline: var(--padding-sm);
+    outline: none;
+  }
+
+  .header-category-search__input::placeholder {
+    color: rgb(var(--color-rgb, var(--color-foreground-rgb)) / var(--opacity-muted-text));
+  }
+
+  .header-category-search__submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--minimum-touch-target);
+    color: inherit;
+  }
+
+  .header-category-search--modal {
+    margin-block-end: var(--margin-md);
+  }
+
+  @media screen and (max-width: 749px) {
+    .header-category-search--inline {
+      display: none;
+    }
+  }
+{% endstylesheet %}

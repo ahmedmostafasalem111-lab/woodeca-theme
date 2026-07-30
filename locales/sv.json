@@ -74,7 +74,8 @@
     "search_suggestions_available": "Sökförslag tillgängliga för \"{{ query }}\"",
     "price_filter_low": "Lågt pris",
     "price_filter_high": "Högt pris",
-    "view_disclosure_information_for_product": "Visa produktupplysningar för {{ product_title }}"
+    "view_disclosure_information_for_product": "Visa produktupplysningar för {{ product_title }}",
+    "call_us": "Call us"
   },
   "actions": {
     "add_to_cart": "Lägg till i varukorgen",
@@ -274,7 +275,8 @@
     },
     "item_count_cutoff": "Fler än {{ count }} artiklar",
     "quick_order_list": "Snabborderlista",
-    "product_disclosures": "Produktupplysningar"
+    "product_disclosures": "Produktupplysningar",
+    "all_categories": "All Categories"
   },
   "gift_cards": {
     "issued": {

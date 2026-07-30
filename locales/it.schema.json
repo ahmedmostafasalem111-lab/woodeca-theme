@@ -574,7 +574,11 @@
     "input_style": "Stile campo",
     "selected_button_style": "Stile pulsante selezionato",
     "open_by_default": "Aperto per impostazione predefinita",
-    "title_preset": "Preimpostazione titolo"
+    "title_preset": "Preimpostazione titolo",
+    "phone_number": "Phone number",
+    "phone_label": "Call us label",
+    "search_placeholder": "Search placeholder",
+    "all_categories_label": "\"All categories\" label"
   },
   "options": {
     "apple": "Mela",
@@ -978,7 +982,10 @@
     "gift_card_products": "Prodotti buono regalo",
     "disclosures": "Informative",
     "disclosures_metafield_content": "Avvertenze di sicurezza e informative normative obbligatorie per questo prodotto.",
-    "page_text_color_contrast_info": "Le sezioni con un colore di sfondo personalizzato useranno questo colore del testo solo se il contrasto cromatico è sufficiente."
+    "page_text_color_contrast_info": "Le sezioni con un colore di sfondo personalizzato useranno questo colore del testo solo se il contrasto cromatico è sufficiente.",
+    "search_bar": "Search bar",
+    "search_bar_info": "The inline search bar with category dropdown replaces the search icon on desktop. The icon remains as the search entry point on mobile.",
+    "call_us": "Call us"
   },
   "html_defaults": {
     "share_information_about_your": "<p>Condividi informazioni sul tuo brand con i clienti. Descrivi un prodotto, fai annunci o dai il benvenuto ai clienti nel tuo negozio.</p>",
@@ -1102,7 +1109,10 @@
     "page_text_color_default_info": "Predefinito per le sezioni del tema",
     "actions_display_style": "Le icone vengono sempre usate sui dispositivi mobili",
     "edit_input_field_in_theme_settings": "Modifica il campo di inserimento nelle [impostazioni del tema](/editor?context=theme&category=input%20fields)",
-    "edit_variants_in_theme_settings": "Modifica lo stile delle varianti nelle [impostazioni del tema](/editor?context=theme&category=variant%20pickers)"
+    "edit_variants_in_theme_settings": "Modifica lo stile delle varianti nelle [impostazioni del tema](/editor?context=theme&category=variant%20pickers)",
+    "phone_number": "Shown as a tap-to-call icon in the header. Leave blank to hide it.",
+    "search_categories": "Shown in the search bar's category dropdown. Leave blank to only show \"All Categories\".",
+    "announcement_text_color": "Default for all slides. Individual slides can override this."
   },
   "categories": {
     "product_list": "Collezione in evidenza",

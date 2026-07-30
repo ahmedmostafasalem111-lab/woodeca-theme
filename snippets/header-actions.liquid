@@ -113,6 +113,25 @@
     </div>
   {% endif %}
 
+  {% if section.settings.phone_number != blank %}
+    <a
+      href="tel:{{ section.settings.phone_number | strip }}"
+      class="header-actions__action action__call{% if display_style == 'text' %} header-actions__text-style{% endif %}"
+      aria-label="{{ 'accessibility.call_us' | t }}"
+    >
+      <span class="{% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}">
+        {{ section.settings.phone_label }}
+      </span>
+
+      <span
+        class="svg-wrapper {% if display_style != 'icon' %}desktop:hidden{% endif %}"
+        aria-hidden="true"
+      >
+        {{ 'icon-phone.svg' | inline_asset_content }}
+      </span>
+    </a>
+  {% endif %}
+
   {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
     <button
       class="header-actions__action button-unstyled{% if display_style == 'text' %} header-actions__text-style{% endif %}"

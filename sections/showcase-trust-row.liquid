@@ -1,0 +1,382 @@
+{% comment %}
+  Trust-badge row plus a shipping-coverage banner. Generic enough to drop onto any
+  template, not just the product page.
+{% endcomment %}
+
+{% liquid
+  assign badges = section.blocks | where: 'type', 'badge'
+%}
+
+<div
+  class="section section--{{ section.settings.section_width }} trust-row spacing-style"
+  style="
+    {% render 'spacing-padding', settings: section.settings %}
+    {% if section.settings.text_color != blank %}
+      --color-foreground: {{ section.settings.text_color }};
+      --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+    {% endif %}
+    --trust-columns: {{ section.settings.columns }};
+    --trust-banner-background: {{ section.settings.banner_background | default: '#f2f2f0' }};
+  "
+>
+  {% if section.settings.heading != blank %}
+    <h2 class="trust-row__heading">{{ section.settings.heading }}</h2>
+  {% endif %}
+
+  {% if badges.size > 0 %}
+    <div class="trust-row__grid">
+      {% for block in badges %}
+        {% assign icon_file = 'icon-' | append: block.settings.icon | append: '.svg' %}
+        <div class="trust-badge" {{ block.shopify_attributes }}>
+          <span class="svg-wrapper trust-badge__icon" aria-hidden="true">
+            {% if block.settings.icon_image != blank %}
+              {{ block.settings.icon_image | image_url: width: 96 | image_tag: loading: 'lazy', alt: '' }}
+            {% else %}
+              {{- icon_file | inline_asset_content -}}
+            {% endif %}
+          </span>
+
+          <p class="trust-badge__title">{{ block.settings.title }}</p>
+          {% if block.settings.text != blank %}
+            <p class="trust-badge__text">{{ block.settings.text }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_banner and section.settings.banner_heading != blank %}
+    <div class="trust-row__banner">
+      <div class="trust-row__banner-text">
+        <h3 class="trust-row__banner-heading">{{ section.settings.banner_heading }}</h3>
+
+        {% if section.settings.banner_body != blank or section.settings.banner_phone != blank %}
+          <p class="trust-row__banner-body">
+            {{- section.settings.banner_body }}
+            {% if section.settings.banner_phone != blank %}
+              <a
+                href="tel:{{ section.settings.banner_phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}"
+                class="trust-row__banner-phone"
+              >
+                {{- section.settings.banner_phone -}}
+              </a>
+            {% endif %}
+          </p>
+        {% endif %}
+
+        {% if section.settings.banner_link_text != blank %}
+          <a
+            href="{{ section.settings.banner_link | default: '#' }}"
+            class="trust-row__banner-link"
+          >
+            {{- section.settings.banner_link_text -}}
+          </a>
+        {% endif %}
+      </div>
+
+      {% if section.settings.banner_image != blank %}
+        <div class="trust-row__banner-art">
+          {{
+            section.settings.banner_image
+            | image_url: width: 700
+            | image_tag: loading: 'lazy', alt: ''
+          }}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .trust-row__heading {
+    margin: 0 0 var(--margin-2xl);
+    font-size: var(--font-size--2xl);
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .trust-row__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--trust-columns, 4), minmax(0, 1fr));
+    gap: var(--gap-xl);
+  }
+
+  .trust-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap-2xs);
+    text-align: center;
+  }
+
+  .trust-badge__icon,
+  .trust-badge__icon svg,
+  .trust-badge__icon img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    color: var(--color-foreground);
+  }
+
+  .trust-badge__title {
+    margin: 0;
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  .trust-badge__text {
+    margin: 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+    text-wrap: balance;
+  }
+
+  .trust-row__banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-xl);
+    margin-block-start: var(--margin-3xl);
+    padding: var(--padding-2xl);
+    border-radius: var(--style-border-radius-inputs, 12px);
+    background-color: var(--trust-banner-background);
+  }
+
+  .trust-row__banner-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--gap-2xs);
+  }
+
+  .trust-row__banner-heading {
+    margin: 0;
+    font-size: var(--font-size--2xl);
+    line-height: var(--line-height--heading-tight);
+  }
+
+  .trust-row__banner-body {
+    margin: 0;
+    font-size: var(--font-size--sm);
+  }
+
+  .trust-row__banner-phone {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .trust-row__banner-link {
+    color: inherit;
+    font-size: var(--font-size--sm);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .trust-row__banner-art img {
+    display: block;
+    width: auto;
+    max-height: 120px;
+  }
+
+  @media screen and (max-width: 989px) {
+    .trust-row__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .trust-row__heading,
+    .trust-row__banner-heading {
+      font-size: var(--font-size--lg);
+    }
+
+    .trust-row__banner {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: var(--padding-xl);
+    }
+
+    .trust-row__banner-art {
+      align-self: flex-end;
+    }
+
+    .trust-row__banner-art img {
+      max-height: 80px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Trust badges",
+  "tag": "section",
+  "class": "section-trust-row",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop in comfort at Woodeca"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Badges per row",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Shipping banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner",
+      "label": "Show banner",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "banner_heading",
+      "label": "Banner heading",
+      "default": "Delivery nationwide"
+    },
+    {
+      "type": "text",
+      "id": "banner_body",
+      "label": "Banner body",
+      "default": "To place an order, contact our team by phone."
+    },
+    {
+      "type": "text",
+      "id": "banner_phone",
+      "label": "Phone number",
+      "default": "+20 100 000 0000"
+    },
+    {
+      "type": "text",
+      "id": "banner_link_text",
+      "label": "Banner link text",
+      "default": "Read more"
+    },
+    {
+      "type": "url",
+      "id": "banner_link",
+      "label": "Banner link"
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner illustration"
+    },
+    {
+      "type": "header",
+      "content": "Layout and colors"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "banner_background",
+      "label": "Banner background",
+      "default": "#f2f2f0"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Trust badge",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "shield", "label": "Shield (warranty)" },
+            { "value": "card", "label": "Card (payment)" },
+            { "value": "return", "label": "Return (exchange)" },
+            { "value": "truck", "label": "Truck (delivery)" },
+            { "value": "store", "label": "Store" },
+            { "value": "phone", "label": "Phone" },
+            { "value": "chat", "label": "Chat" },
+            { "value": "checkmark", "label": "Checkmark" }
+          ],
+          "default": "shield"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Custom icon image",
+          "info": "Overrides the icon above when set."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "2-year warranty"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "On every piece we make"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Trust badges",
+      "blocks": [
+        { "type": "badge", "settings": { "icon": "shield", "title": "2-year warranty", "text": "On every piece we make" } },
+        { "type": "badge", "settings": { "icon": "card", "title": "Flexible payment", "text": "Cards, cash on delivery, instalments" } },
+        { "type": "badge", "settings": { "icon": "return", "title": "14-day returns", "text": "Easy exchange or refund" } },
+        { "type": "badge", "settings": { "icon": "truck", "title": "Delivery and assembly", "text": "Booked at checkout" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

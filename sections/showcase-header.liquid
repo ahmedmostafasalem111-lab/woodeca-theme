@@ -1,0 +1,1223 @@
+{% comment %}
+  Three-row site header.
+
+  Row 1 — utility bar: location + contact dropdowns on the left, audience links on
+          the right.
+  Row 2 — main row: logo, Catalog mega-menu pill, nav links, search, photo search,
+          and the account / wishlist / cart icons. This row is the one that stays
+          pinned while the page scrolls.
+  Row 3 — promo category link bar.
+
+  On mobile all three collapse into a single condensed icon row, with search
+  revealed by a disclosure rather than a separate overlay.
+
+  Dropdown contents come from Shopify navigation menus (link_list settings) so
+  merchants manage those links in Navigation rather than as nested blocks.
+{% endcomment %}
+
+{% liquid
+  assign utility_left = section.blocks | where: 'type', 'utility_left'
+  assign utility_right = section.blocks | where: 'type', 'utility_right'
+  assign nav_links = section.blocks | where: 'type', 'nav_link'
+  assign promo_links = section.blocks | where: 'type', 'promo_link'
+%}
+
+<div
+  class="showcase-header"
+  style="
+    --showcase-header-background: {{ section.settings.background_color | default: '#ffffff' }};
+    --showcase-header-text: {{ section.settings.text_color | default: '#1c1c1c' }};
+    --showcase-utility-background: {{ section.settings.utility_background_color | default: '#fafafa' }};
+    --showcase-utility-text: {{ section.settings.utility_text_color | default: '#5c5c5c' }};
+    --showcase-utility-size: {{ section.settings.utility_font_size }};
+    --showcase-promo-text: {{ section.settings.promo_text_color | default: '#1c1c1c' }};
+    --showcase-promo-size: {{ section.settings.promo_font_size }};
+    --showcase-nav-size: {{ section.settings.nav_font_size }};
+    --showcase-search-background: {{ section.settings.search_background_color | default: '#f2f2f0' }};
+    --showcase-photo-border: {{ section.settings.photo_search_border_color | default: '#3b7de0' }};
+    --showcase-photo-text: {{ section.settings.photo_search_text_color | default: '#1c1c1c' }};
+    --showcase-logo-size: {{ section.settings.logo_font_size }};
+    --showcase-cart-bubble-background: {{ section.settings.cart_bubble_background | default: '#e8705a' }};
+    --showcase-cart-bubble-text: {{ section.settings.cart_bubble_text | default: '#ffffff' }};
+  "
+>
+  {%- comment -%} ---------- Row 1: utility bar ---------- {%- endcomment -%}
+  {% if section.settings.show_utility_bar %}
+    <div class="showcase-header__utility">
+      <div class="showcase-header__inner showcase-header__utility-inner">
+        <div class="showcase-header__utility-group">
+          {% if section.settings.show_location %}
+            <details class="showcase-dropdown">
+              <summary class="showcase-dropdown__summary">
+                <span class="svg-wrapper showcase-dropdown__leading-icon" aria-hidden="true">
+                  {{- 'icon-pin.svg' | inline_asset_content -}}
+                </span>
+                <span>{{ section.settings.location_label }}</span>
+                <span class="svg-wrapper showcase-dropdown__caret" aria-hidden="true">
+                  {{- 'icon-caret.svg' | inline_asset_content -}}
+                </span>
+              </summary>
+              <div class="showcase-dropdown__panel">
+                {% if section.settings.location_menu != blank %}
+                  <ul class="showcase-dropdown__list">
+                    {% for link in section.settings.location_menu.links %}
+                      <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <p class="showcase-dropdown__empty">{{ section.settings.dropdown_empty_text }}</p>
+                {% endif %}
+              </div>
+            </details>
+          {% endif %}
+
+          {% for block in utility_left %}
+            {% if block.settings.menu != blank %}
+              <details
+                class="showcase-dropdown"
+                {{ block.shopify_attributes }}
+              >
+                <summary class="showcase-dropdown__summary">
+                  <span>{{ block.settings.label }}</span>
+                  <span class="svg-wrapper showcase-dropdown__caret" aria-hidden="true">
+                    {{- 'icon-caret.svg' | inline_asset_content -}}
+                  </span>
+                </summary>
+                <div class="showcase-dropdown__panel">
+                  <ul class="showcase-dropdown__list">
+                    {% for link in block.settings.menu.links %}
+                      <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </details>
+            {% else %}
+              <a
+                href="{{ block.settings.link | default: '#' }}"
+                class="showcase-header__utility-link"
+                {{ block.shopify_attributes }}
+              >
+                {{- block.settings.label -}}
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <div class="showcase-header__utility-group showcase-header__utility-group--end">
+          {% for block in utility_right %}
+            {% if block.settings.menu != blank %}
+              <details
+                class="showcase-dropdown"
+                {{ block.shopify_attributes }}
+              >
+                <summary class="showcase-dropdown__summary">
+                  <span>{{ block.settings.label }}</span>
+                  <span class="svg-wrapper showcase-dropdown__caret" aria-hidden="true">
+                    {{- 'icon-caret.svg' | inline_asset_content -}}
+                  </span>
+                </summary>
+                <div class="showcase-dropdown__panel showcase-dropdown__panel--end">
+                  <ul class="showcase-dropdown__list">
+                    {% for link in block.settings.menu.links %}
+                      <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </details>
+            {% else %}
+              <a
+                href="{{ block.settings.link | default: '#' }}"
+                class="showcase-header__utility-link"
+                {{ block.shopify_attributes }}
+              >
+                {{- block.settings.label -}}
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {%- comment -%} ---------- Row 2: main row (sticky) ---------- {%- endcomment -%}
+  <div class="showcase-header__main{% if section.settings.sticky_main_row %} showcase-header__main--sticky{% endif %}">
+    <div class="showcase-header__inner showcase-header__main-inner">
+      {%- comment -%} Mobile-only: menu drawer trigger {%- endcomment -%}
+      <details class="showcase-header__mobile-menu">
+        <summary
+          class="showcase-header__icon-button"
+          aria-label="{{ section.settings.menu_label | default: 'Menu' | escape }}"
+        >
+          <span class="svg-wrapper" aria-hidden="true">
+            {{- 'icon-menu.svg' | inline_asset_content -}}
+          </span>
+        </summary>
+        <div class="showcase-header__mobile-panel">
+          {% if section.settings.catalog_menu != blank %}
+            <ul class="showcase-dropdown__list">
+              {% for link in section.settings.catalog_menu.links %}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+
+          {% if nav_links.size > 0 or promo_links.size > 0 %}
+            <ul class="showcase-dropdown__list">
+              {% for block in nav_links %}
+                <li><a href="{{ block.settings.link | default: '#' }}">{{ block.settings.label }}</a></li>
+              {% endfor %}
+              {% for block in promo_links %}
+                <li><a href="{{ block.settings.link | default: '#' }}">{{ block.settings.label }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      </details>
+
+      {%- comment -%} Mobile-only: search disclosure {%- endcomment -%}
+      <details class="showcase-header__mobile-search">
+        <summary
+          class="showcase-header__icon-button"
+          aria-label="{{ section.settings.search_submit_label | default: 'Search' | escape }}"
+        >
+          <span class="svg-wrapper" aria-hidden="true">
+            {{- 'icon-search.svg' | inline_asset_content -}}
+          </span>
+        </summary>
+        <div class="showcase-header__mobile-search-panel">
+          {% render 'showcase-search-form', section: section, id_suffix: 'mobile' %}
+        </div>
+      </details>
+
+      <a
+        href="{{ routes.root_url }}"
+        class="showcase-header__logo"
+      >
+        {% if section.settings.logo_image != blank %}
+          {{
+            section.settings.logo_image
+            | image_url: width: 400
+            | image_tag: class: 'showcase-header__logo-image', alt: section.settings.logo_text
+          }}
+        {% else %}
+          <span class="showcase-header__logo-text">{{ section.settings.logo_text }}</span>
+        {% endif %}
+      </a>
+
+      {%- comment -%} Catalog mega-menu pill {%- endcomment -%}
+      {% if section.settings.show_catalog_button %}
+        <details class="showcase-catalog">
+          <summary class="showcase-catalog__summary">
+            <span class="svg-wrapper" aria-hidden="true">
+              {{- 'icon-menu.svg' | inline_asset_content -}}
+            </span>
+            <span>{{ section.settings.catalog_label }}</span>
+            <span class="svg-wrapper showcase-dropdown__caret" aria-hidden="true">
+              {{- 'icon-caret.svg' | inline_asset_content -}}
+            </span>
+          </summary>
+          <div class="showcase-catalog__panel">
+            {% if section.settings.catalog_menu != blank %}
+              <ul class="showcase-catalog__grid">
+                {% for link in section.settings.catalog_menu.links %}
+                  <li class="showcase-catalog__column">
+                    <a
+                      href="{{ link.url }}"
+                      class="showcase-catalog__column-title"
+                    >
+                      {{- link.title -}}
+                    </a>
+
+                    {% if link.links.size > 0 %}
+                      <ul class="showcase-catalog__sublist">
+                        {% for child in link.links %}
+                          <li><a href="{{ child.url }}">{{ child.title }}</a></li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="showcase-dropdown__empty">{{ section.settings.dropdown_empty_text }}</p>
+            {% endif %}
+          </div>
+        </details>
+      {% endif %}
+
+      {%- comment -%} Desktop nav links {%- endcomment -%}
+      {% if nav_links.size > 0 %}
+        <nav
+          class="showcase-header__nav"
+          aria-label="{{ section.settings.nav_label | default: 'Main navigation' | escape }}"
+        >
+          {% for block in nav_links %}
+            <a
+              href="{{ block.settings.link | default: '#' }}"
+              class="showcase-header__nav-link"
+              {{ block.shopify_attributes }}
+            >
+              {{- block.settings.label -}}
+            </a>
+          {% endfor %}
+        </nav>
+      {% endif %}
+
+      {%- comment -%} Desktop search {%- endcomment -%}
+      <div class="showcase-header__search-slot">
+        {% render 'showcase-search-form', section: section, id_suffix: 'desktop' %}
+      </div>
+
+      {%- comment -%} Right-hand action icons {%- endcomment -%}
+      <div class="showcase-header__actions">
+        {% if section.settings.show_account %}
+          <a
+            href="{% if shop.customer_accounts_enabled %}{{ routes.account_url }}{% else %}{{ section.settings.account_link | default: '#' }}{% endif %}"
+            class="showcase-header__icon-button showcase-header__icon-button--desktop"
+            aria-label="{{ section.settings.account_label | default: 'Account' | escape }}"
+          >
+            <span class="svg-wrapper" aria-hidden="true">
+              {{- 'icon-account.svg' | inline_asset_content -}}
+            </span>
+          </a>
+        {% endif %}
+
+        {% if section.settings.show_wishlist %}
+          <a
+            href="{{ section.settings.wishlist_link | default: '#' }}"
+            class="showcase-header__icon-button showcase-header__icon-button--desktop"
+            aria-label="{{ section.settings.wishlist_label | default: 'Wishlist' | escape }}"
+          >
+            <span class="svg-wrapper" aria-hidden="true">
+              {{- 'icon-heart.svg' | inline_asset_content -}}
+            </span>
+          </a>
+        {% endif %}
+
+        {%- comment -%} Mobile-only chat + location icons, per the condensed layout {%- endcomment -%}
+        {% if section.settings.show_mobile_chat %}
+          <a
+            href="{{ section.settings.mobile_chat_link | default: '#' }}"
+            class="showcase-header__icon-button showcase-header__icon-button--mobile"
+            aria-label="{{ section.settings.mobile_chat_label | default: 'Chat' | escape }}"
+          >
+            <span class="svg-wrapper" aria-hidden="true">
+              {{- 'icon-chat.svg' | inline_asset_content -}}
+            </span>
+          </a>
+        {% endif %}
+
+        {% if section.settings.show_mobile_location %}
+          <a
+            href="{{ section.settings.mobile_location_link | default: '#' }}"
+            class="showcase-header__icon-button showcase-header__icon-button--mobile"
+            aria-label="{{ section.settings.location_label | escape }}"
+          >
+            <span class="svg-wrapper" aria-hidden="true">
+              {{- 'icon-pin.svg' | inline_asset_content -}}
+            </span>
+          </a>
+        {% endif %}
+
+        <a
+          href="{{ routes.cart_url }}"
+          class="showcase-header__icon-button showcase-header__cart"
+          aria-label="{{ section.settings.cart_label | default: 'Cart' | escape }}"
+        >
+          <span class="svg-wrapper" aria-hidden="true">
+            {{- 'icon-cart.svg' | inline_asset_content -}}
+          </span>
+
+          {% if section.settings.show_cart_count and cart.item_count > 0 %}
+            <span class="showcase-header__cart-count">{{ cart.item_count }}</span>
+          {% endif %}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} ---------- Row 3: promo link bar ---------- {%- endcomment -%}
+  {% if promo_links.size > 0 %}
+    <div class="showcase-header__promo">
+      <div class="showcase-header__inner showcase-header__promo-inner">
+        {% for block in promo_links %}
+          <a
+            href="{{ block.settings.link | default: '#' }}"
+            class="showcase-header__promo-link"
+            {% if block.settings.highlight %}
+              data-highlight="true"
+            {% endif %}
+            {% if block.settings.highlight and section.settings.promo_highlight_color != blank %}
+              style="color: {{ section.settings.promo_highlight_color }};"
+            {% endif %}
+            {{ block.shopify_attributes }}
+          >
+            {{- block.settings.label -}}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .showcase-header {
+    background-color: var(--showcase-header-background);
+    color: var(--showcase-header-text);
+  }
+
+  .showcase-header__inner {
+    max-width: var(--page-width);
+    margin-inline: auto;
+    padding-inline: var(--page-margin);
+  }
+
+  /* ---------- Row 1: utility ---------- */
+  .showcase-header__utility {
+    background-color: var(--showcase-utility-background);
+    color: var(--showcase-utility-text);
+    font-size: var(--showcase-utility-size, var(--font-size--xs));
+  }
+
+  .showcase-header__utility-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-md);
+    min-height: 36px;
+  }
+
+  .showcase-header__utility-group {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-md);
+  }
+
+  .showcase-header__utility-group--end {
+    justify-content: flex-end;
+  }
+
+  .showcase-header__utility-link {
+    color: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .showcase-header__utility-link:hover {
+    text-decoration: underline;
+  }
+
+  /* ---------- Shared disclosure dropdown ---------- */
+  .showcase-dropdown {
+    position: relative;
+  }
+
+  .showcase-dropdown__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-3xs);
+    color: inherit;
+    cursor: pointer;
+    list-style: none;
+    white-space: nowrap;
+  }
+
+  .showcase-dropdown__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .showcase-dropdown__caret {
+    width: var(--icon-size-2xs);
+    height: var(--icon-size-2xs);
+    transition: rotate var(--animation-speed) var(--animation-easing);
+  }
+
+  .showcase-dropdown[open] > .showcase-dropdown__summary .showcase-dropdown__caret {
+    rotate: 180deg;
+  }
+
+  .showcase-dropdown__leading-icon {
+    width: var(--icon-size-xs);
+    height: var(--icon-size-xs);
+  }
+
+  .showcase-dropdown__panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: var(--layer-raised);
+    min-width: 200px;
+    padding: var(--padding-2xs);
+    border-radius: var(--style-border-radius-popover, 8px);
+    background-color: var(--color-background, #fff);
+    box-shadow: var(--shadow-popover);
+  }
+
+  .showcase-dropdown__panel--end {
+    left: auto;
+    right: 0;
+  }
+
+  .showcase-dropdown__list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .showcase-dropdown__list a {
+    display: block;
+    padding: var(--padding-2xs) var(--padding-xs);
+    border-radius: 4px;
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    text-decoration: none;
+  }
+
+  .showcase-dropdown__list a:hover {
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+  }
+
+  .showcase-dropdown__empty {
+    margin: 0;
+    padding: var(--padding-xs);
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+  }
+
+  /* ---------- Row 2: main ---------- */
+  .showcase-header__main {
+    background-color: var(--showcase-header-background);
+    border-block-end: var(--border-width-sm) solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .showcase-header__main--sticky {
+    position: sticky;
+    top: 0;
+    z-index: var(--layer-sticky, 20);
+  }
+
+  .showcase-header__main-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-lg);
+    min-height: 72px;
+  }
+
+  .showcase-header__logo {
+    flex-shrink: 0;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .showcase-header__logo-text {
+    font-size: var(--showcase-logo-size, var(--font-size--2xl));
+    font-weight: 700;
+    letter-spacing: var(--letter-spacing-sm);
+  }
+
+  .showcase-header__logo-image {
+    display: block;
+    width: auto;
+    max-height: 40px;
+  }
+
+  /* Catalog pill */
+  .showcase-catalog {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .showcase-catalog__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    padding: var(--padding-2xs) var(--padding-md);
+    border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-25));
+    border-radius: 999px;
+    color: inherit;
+    font-size: var(--font-size--sm);
+    font-weight: 500;
+    cursor: pointer;
+    list-style: none;
+    white-space: nowrap;
+  }
+
+  .showcase-catalog__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .showcase-catalog__summary .svg-wrapper,
+  .showcase-catalog__summary svg {
+    width: var(--icon-size-xs);
+    height: var(--icon-size-xs);
+  }
+
+  /* Full-width mega-menu panel. */
+  .showcase-catalog__panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    z-index: var(--layer-raised);
+    width: min(90vw, 900px);
+    padding: var(--padding-lg);
+    border-radius: var(--style-border-radius-popover, 8px);
+    background-color: var(--color-background, #fff);
+    box-shadow: var(--shadow-popover);
+  }
+
+  .showcase-catalog__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--gap-lg);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .showcase-catalog__column-title {
+    display: block;
+    margin-block-end: var(--margin-2xs);
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .showcase-catalog__sublist {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-3xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .showcase-catalog__sublist a {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+    font-size: var(--font-size--xs);
+    text-decoration: none;
+  }
+
+  .showcase-catalog__sublist a:hover {
+    color: var(--color-foreground);
+    text-decoration: underline;
+  }
+
+  .showcase-header__nav {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-lg);
+    flex-shrink: 0;
+  }
+
+  .showcase-header__nav-link {
+    color: inherit;
+    font-size: var(--showcase-nav-size, var(--font-size--md));
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .showcase-header__nav-link:hover {
+    text-decoration: underline;
+  }
+
+  .showcase-header__search-slot {
+    flex-grow: 1;
+    min-width: 0;
+  }
+
+  .showcase-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    flex-shrink: 0;
+  }
+
+  .showcase-header__icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .showcase-header__icon-button::-webkit-details-marker {
+    display: none;
+  }
+
+  .showcase-header__icon-button .svg-wrapper,
+  .showcase-header__icon-button svg {
+    width: var(--icon-size-md);
+    height: var(--icon-size-md);
+  }
+
+  .showcase-header__cart {
+    position: relative;
+  }
+
+  .showcase-header__cart-count {
+    position: absolute;
+    top: 2px;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding-inline: 4px;
+    border-radius: 999px;
+    background-color: var(--showcase-cart-bubble-background);
+    color: var(--showcase-cart-bubble-text);
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  /* ---------- Row 3: promo bar ---------- */
+  .showcase-header__promo-inner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-lg);
+    min-height: 48px;
+    padding-block: var(--padding-2xs);
+  }
+
+  .showcase-header__promo-link {
+    color: var(--showcase-promo-text);
+    font-size: var(--showcase-promo-size, var(--font-size--sm));
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .showcase-header__promo-link:hover {
+    text-decoration: underline;
+  }
+
+  /* ---------- Mobile-only pieces, hidden on desktop ---------- */
+  .showcase-header__mobile-menu,
+  .showcase-header__mobile-search,
+  .showcase-header__icon-button--mobile {
+    display: none;
+  }
+
+  @media screen and (max-width: 989px) {
+    .showcase-header__utility,
+    .showcase-header__promo,
+    .showcase-header__nav,
+    .showcase-catalog,
+    .showcase-header__search-slot,
+    .showcase-header__icon-button--desktop {
+      display: none;
+    }
+
+    .showcase-header__mobile-menu,
+    .showcase-header__mobile-search {
+      display: block;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .showcase-header__icon-button--mobile {
+      display: flex;
+    }
+
+    .showcase-header__main-inner {
+      gap: var(--gap-2xs);
+      min-height: 56px;
+    }
+
+    /* Logo centres itself between the two icon clusters. */
+    .showcase-header__logo {
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .showcase-header__logo-text {
+      font-size: var(--font-size--lg);
+    }
+
+    .showcase-header__logo-image {
+      margin-inline: auto;
+      max-height: 28px;
+    }
+
+    .showcase-header__actions {
+      gap: 0;
+    }
+
+    .showcase-header__icon-button {
+      width: 36px;
+      height: 36px;
+    }
+
+    /* Search expands into a full-width strip below the condensed row. */
+    .showcase-header__mobile-search-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: var(--layer-raised);
+      width: min(92vw, 520px);
+      padding: var(--padding-sm);
+      border-radius: var(--style-border-radius-popover, 8px);
+      background-color: var(--color-background, #fff);
+      box-shadow: var(--shadow-popover);
+    }
+
+    .showcase-header__mobile-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: var(--layer-raised);
+      width: min(88vw, 380px);
+      max-height: 70vh;
+      padding: var(--padding-sm);
+      border-radius: var(--style-border-radius-popover, 8px);
+      background-color: var(--color-background, #fff);
+      box-shadow: var(--shadow-popover);
+      overflow-y: auto;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Showcase header",
+  "tag": "header",
+  "class": "showcase-header-section",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo image",
+      "info": "Leave empty to use the text logo below."
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Text logo",
+      "default": "lorem.ipsum"
+    },
+    {
+      "type": "select",
+      "id": "logo_font_size",
+      "label": "Text logo size",
+      "options": [
+        { "value": "var(--font-size--xl)", "label": "Small" },
+        { "value": "var(--font-size--2xl)", "label": "Medium" },
+        { "value": "var(--font-size--3xl)", "label": "Large" }
+      ],
+      "default": "var(--font-size--2xl)"
+    },
+    {
+      "type": "header",
+      "content": "Utility bar (row 1)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_utility_bar",
+      "label": "Show utility bar",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_location",
+      "label": "Show location selector",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "location_label",
+      "label": "Location name",
+      "default": "Lorem City"
+    },
+    {
+      "type": "link_list",
+      "id": "location_menu",
+      "label": "Location dropdown menu"
+    },
+    {
+      "type": "text",
+      "id": "dropdown_empty_text",
+      "label": "Empty dropdown message",
+      "default": "Pick a navigation menu for this dropdown."
+    },
+    {
+      "type": "select",
+      "id": "utility_font_size",
+      "label": "Utility bar text size",
+      "options": [
+        { "value": "var(--font-size--2xs)", "label": "Extra small" },
+        { "value": "var(--font-size--xs)", "label": "Small" },
+        { "value": "var(--font-size--sm)", "label": "Medium" }
+      ],
+      "default": "var(--font-size--xs)"
+    },
+    {
+      "type": "header",
+      "content": "Catalog menu (row 2)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_catalog_button",
+      "label": "Show Catalog button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "catalog_label",
+      "label": "Catalog button label",
+      "default": "Catalog"
+    },
+    {
+      "type": "link_list",
+      "id": "catalog_menu",
+      "label": "Catalog mega-menu",
+      "info": "Top-level links become columns; their child links fill each column.",
+      "default": "main-menu"
+    },
+    {
+      "type": "select",
+      "id": "nav_font_size",
+      "label": "Nav link size",
+      "options": [
+        { "value": "var(--font-size--sm)", "label": "Small" },
+        { "value": "var(--font-size--md)", "label": "Medium" },
+        { "value": "var(--font-size--lg)", "label": "Large" }
+      ],
+      "default": "var(--font-size--md)"
+    },
+    {
+      "type": "text",
+      "id": "nav_label",
+      "label": "Accessible nav label",
+      "default": "Main navigation"
+    },
+    {
+      "type": "text",
+      "id": "menu_label",
+      "label": "Mobile menu button label",
+      "default": "Menu"
+    },
+    {
+      "type": "header",
+      "content": "Search"
+    },
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Search placeholder",
+      "default": "Enter your query"
+    },
+    {
+      "type": "text",
+      "id": "search_submit_label",
+      "label": "Search button accessible label",
+      "default": "Search"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_photo_search",
+      "label": "Show \"Search by photo\" button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "photo_search_label",
+      "label": "Photo search label",
+      "default": "Search by photo"
+    },
+    {
+      "type": "url",
+      "id": "photo_search_link",
+      "label": "Photo search link"
+    },
+    {
+      "type": "header",
+      "content": "Action icons"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account icon",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "account_label",
+      "label": "Account accessible label",
+      "default": "Account"
+    },
+    {
+      "type": "url",
+      "id": "account_link",
+      "label": "Account link",
+      "info": "Used only when customer accounts are disabled."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "label": "Show wishlist icon",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "wishlist_label",
+      "label": "Wishlist accessible label",
+      "default": "Wishlist"
+    },
+    {
+      "type": "url",
+      "id": "wishlist_link",
+      "label": "Wishlist link"
+    },
+    {
+      "type": "text",
+      "id": "cart_label",
+      "label": "Cart accessible label",
+      "default": "Cart"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart_count",
+      "label": "Show cart count bubble",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Mobile icons"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mobile_chat",
+      "label": "Show chat icon on mobile",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "mobile_chat_label",
+      "label": "Chat accessible label",
+      "default": "Chat"
+    },
+    {
+      "type": "url",
+      "id": "mobile_chat_link",
+      "label": "Chat link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mobile_location",
+      "label": "Show location icon on mobile",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "mobile_location_link",
+      "label": "Location link"
+    },
+    {
+      "type": "header",
+      "content": "Behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_main_row",
+      "label": "Keep main row pinned on scroll",
+      "default": true,
+      "info": "Matches the reference, where rows 1 and 3 scroll away and the main row stays."
+    },
+    {
+      "type": "header",
+      "content": "Promo link bar (row 3)"
+    },
+    {
+      "type": "select",
+      "id": "promo_font_size",
+      "label": "Promo link size",
+      "options": [
+        { "value": "var(--font-size--xs)", "label": "Small" },
+        { "value": "var(--font-size--sm)", "label": "Medium" },
+        { "value": "var(--font-size--md)", "label": "Large" }
+      ],
+      "default": "var(--font-size--sm)"
+    },
+    {
+      "type": "color",
+      "id": "promo_highlight_color",
+      "label": "Highlighted promo link color",
+      "default": "#e8342a"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Header background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Header text",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "utility_background_color",
+      "label": "Utility bar background",
+      "default": "#fafafa"
+    },
+    {
+      "type": "color",
+      "id": "utility_text_color",
+      "label": "Utility bar text",
+      "default": "#5c5c5c"
+    },
+    {
+      "type": "color",
+      "id": "promo_text_color",
+      "label": "Promo bar text",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "search_background_color",
+      "label": "Search field background",
+      "default": "#f2f2f0"
+    },
+    {
+      "type": "color",
+      "id": "photo_search_border_color",
+      "label": "Photo search border",
+      "default": "#3b7de0"
+    },
+    {
+      "type": "color",
+      "id": "photo_search_text_color",
+      "label": "Photo search text",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "cart_bubble_background",
+      "label": "Cart count background",
+      "default": "#e8705a"
+    },
+    {
+      "type": "color",
+      "id": "cart_bubble_text",
+      "label": "Cart count text",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "utility_left",
+      "name": "Utility item (left)",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Contact us"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Dropdown menu",
+          "info": "Set a menu to render this as a dropdown; leave empty for a plain link."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Used when no dropdown menu is set."
+        }
+      ]
+    },
+    {
+      "type": "utility_right",
+      "name": "Utility item (right)",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "For buyers"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Dropdown menu",
+          "info": "Set a menu to render this as a dropdown; leave empty for a plain link."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Used when no dropdown menu is set."
+        }
+      ]
+    },
+    {
+      "type": "nav_link",
+      "name": "Nav link (row 2)",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Stock"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "promo_link",
+      "name": "Promo link (row 3)",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Express design"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "checkbox",
+          "id": "highlight",
+          "label": "Highlight this link",
+          "default": false
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

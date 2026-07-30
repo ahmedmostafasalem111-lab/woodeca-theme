@@ -1,0 +1,526 @@
+{% comment %}
+  Tabbed specifications block: a segmented "Overall dimensions" / "Additional"
+  control swapping two diagram panels in place, a full spec list beneath it, and a
+  downloadable files list.
+
+  Every value is read from product metafields and each row is omitted when its
+  metafield is empty, so the block only ever shows real data. The whole section
+  hides itself when nothing at all is populated.
+
+  Spec rows are declared as blocks, so which specs appear (and in what order) is
+  editable per store without touching Liquid.
+{% endcomment %}
+
+{% liquid
+  assign ns = section.settings.metafield_namespace | default: 'custom'
+
+  assign dimensions_diagram = product.metafields[ns]['dimensions_diagram']
+  assign additional_diagram = product.metafields[ns]['additional_diagram']
+  assign dimensions_summary = product.metafields[ns]['dimensions_summary'].value
+  assign floor_clearance = product.metafields[ns]['floor_clearance'].value
+  assign delivery_option = product.metafields[ns]['delivery_option'].value
+  assign spec_files = product.metafields[ns]['spec_files'].value
+
+  # Decide whether there is anything worth rendering at all.
+  assign has_diagram = false
+  if dimensions_diagram != blank or additional_diagram != blank
+    assign has_diagram = true
+  endif
+
+  assign has_captions = false
+  if dimensions_summary != blank or floor_clearance != blank or delivery_option != blank
+    assign has_captions = true
+  endif
+
+  assign populated_rows = 0
+  for block in section.blocks
+    if block.type == 'spec'
+      assign row_value = product.metafields[ns][block.settings.metafield_key].value
+      if row_value != blank
+        assign populated_rows = populated_rows | plus: 1
+      endif
+    endif
+  endfor
+
+  assign has_files = false
+  if spec_files != blank and spec_files.size > 0
+    assign has_files = true
+  endif
+
+  assign render_section = false
+  if has_diagram or has_captions or populated_rows > 0 or has_files
+    assign render_section = true
+  endif
+%}
+
+{% if render_section %}
+  <div
+    id="{{ section.settings.anchor_id | default: 'specifications' }}"
+    class="section section--{{ section.settings.section_width }} product-specs spacing-style"
+    style="
+      {% render 'spacing-padding', settings: section.settings %}
+      {% if section.settings.text_color != blank %}
+        --color-foreground: {{ section.settings.text_color }};
+        --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+      {% endif %}
+      --specs-columns: {{ section.settings.columns }};
+    "
+  >
+    {% if section.settings.heading != blank %}
+      <h2 class="product-specs__heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    {% if has_diagram %}
+      <showcase-panel-tabs-component class="product-specs__tabs">
+        {% liquid
+          assign tabs_label = section.settings.tabs_label | default: 'Specification views'
+          assign tab_overall = section.settings.tab_overall_label | default: 'Overall dimensions'
+          assign tab_additional = section.settings.tab_additional_label | default: 'Additional'
+
+          assign show_additional_tab = false
+          if additional_diagram != blank
+            assign show_additional_tab = true
+          endif
+        %}
+        {% render 'showcase-panel-tabs',
+          label: tabs_label,
+          tab_a_label: tab_overall,
+          tab_b_label: tab_additional,
+          show_b: show_additional_tab,
+          a_key: 'overall',
+          b_key: 'additional'
+        %}
+
+        <div
+          class="product-specs__panel"
+          ref="panels[]"
+          data-panel="overall"
+          role="tabpanel"
+        >
+          {% if dimensions_diagram != blank %}
+            <div class="product-specs__diagram">
+              {{
+                dimensions_diagram
+                | image_url: width: 1200
+                | image_tag: loading: 'lazy', alt: section.settings.tab_overall_label
+              }}
+            </div>
+          {% endif %}
+        </div>
+
+        {% if additional_diagram != blank %}
+          <div
+            class="product-specs__panel"
+            ref="panels[]"
+            data-panel="additional"
+            role="tabpanel"
+            hidden
+          >
+            <div class="product-specs__diagram">
+              {{
+                additional_diagram
+                | image_url: width: 1200
+                | image_tag: loading: 'lazy', alt: section.settings.tab_additional_label
+              }}
+            </div>
+          </div>
+        {% endif %}
+      </showcase-panel-tabs-component>
+    {% endif %}
+
+    {%- comment -%} Caption stats sit below the diagram and are not tabbed. {%- endcomment -%}
+    {% if has_captions %}
+      <div class="product-specs__captions">
+        {% if dimensions_summary != blank %}
+          <p class="product-specs__caption">
+            <span class="product-specs__caption-label">
+              {{- section.settings.dimensions_caption_label | default: 'Dimensions' -}}:
+            </span>
+            <span>{{ dimensions_summary }}</span>
+          </p>
+        {% endif %}
+        {% if floor_clearance != blank %}
+          <p class="product-specs__caption">
+            <span class="product-specs__caption-label">
+              {{- section.settings.clearance_caption_label | default: 'Clearance from the floor' -}}:
+            </span>
+            <span>{{ floor_clearance }}</span>
+          </p>
+        {% endif %}
+        {% if delivery_option != blank %}
+          <p class="product-specs__caption">
+            <span class="product-specs__caption-label">
+              {{- section.settings.delivery_caption_label | default: 'Delivery option' -}}:
+            </span>
+            <span>{{ delivery_option }}</span>
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {%- comment -%} Full spec list, one row per configured block that has a value. {%- endcomment -%}
+    {% if populated_rows > 0 %}
+      <dl class="product-specs__list">
+        {% for block in section.blocks %}
+          {% if block.type != 'spec' %}
+            {% continue %}
+          {% endif %}
+
+          {% assign row_value = product.metafields[ns][block.settings.metafield_key].value %}
+          {% if row_value == blank %}
+            {% continue %}
+          {% endif %}
+
+          <div
+            class="product-specs__row"
+            {{ block.shopify_attributes }}
+          >
+            <dt class="product-specs__term">{{ block.settings.label }}</dt>
+            <dd class="product-specs__value">
+              {% if block.settings.is_link and block.settings.link_url != blank %}
+                <a href="{{ block.settings.link_url }}">{{ row_value }}</a>
+              {% else %}
+                {{ row_value }}
+              {% endif %}
+            </dd>
+          </div>
+        {% endfor %}
+      </dl>
+    {% endif %}
+
+    {%- comment -%} Downloadable files, from a file-list metafield. {%- endcomment -%}
+    {% if has_files %}
+      <div class="product-specs__files">
+        {% if section.settings.files_heading != blank %}
+          <h3 class="product-specs__files-heading">{{ section.settings.files_heading }}</h3>
+        {% endif %}
+
+        <ul class="product-specs__file-list">
+          {% for file in spec_files %}
+            <li>
+              <a
+                href="{{ file | file_url }}"
+                class="product-specs__file"
+                download
+              >
+                <span class="svg-wrapper product-specs__file-icon" aria-hidden="true">
+                  {{- 'icon-file.svg' | inline_asset_content -}}
+                </span>
+                <span class="product-specs__file-name">
+                  {{- file.alt | default: file | default: section.settings.file_fallback_label -}}
+                </span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+<script
+  src="{{ 'showcase-panel-tabs.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+{% stylesheet %}
+  .product-specs__heading {
+    margin: 0 0 var(--margin-xl);
+    font-size: var(--font-size--2xl);
+  }
+
+  .product-specs__panel {
+    padding-block-start: var(--padding-2xl);
+  }
+
+  .product-specs__diagram {
+    display: flex;
+    justify-content: center;
+  }
+
+  .product-specs__diagram img {
+    max-width: min(100%, 720px);
+    height: auto;
+  }
+
+  .product-specs__captions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap-lg);
+    padding-block: var(--padding-2xl);
+  }
+
+  .product-specs__caption {
+    margin: 0;
+    font-size: var(--font-size--sm);
+  }
+
+  .product-specs__caption-label {
+    font-weight: 600;
+  }
+
+  /* Spec list flows into columns with a dotted leader per row. */
+  .product-specs__list {
+    display: grid;
+    grid-template-columns: repeat(var(--specs-columns, 2), minmax(0, 1fr));
+    gap: var(--gap-2xs) var(--gap-3xl);
+    margin: 0;
+    padding-block-start: var(--padding-lg);
+    border-block-start: var(--border-width-sm) solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .product-specs__row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-2xs);
+    padding-block: var(--padding-2xs);
+  }
+
+  .product-specs__term {
+    flex-shrink: 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--sm);
+  }
+
+  .product-specs__value {
+    margin: 0;
+    margin-inline-start: auto;
+    font-size: var(--font-size--sm);
+    text-align: right;
+  }
+
+  .product-specs__value a {
+    color: var(--product-link-accent, #b8813f);
+  }
+
+  .product-specs__files {
+    padding-block-start: var(--padding-2xl);
+  }
+
+  .product-specs__files-heading {
+    margin: 0 0 var(--margin-md);
+    font-size: var(--font-size--lg);
+  }
+
+  .product-specs__file-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-2xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .product-specs__file {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    color: var(--product-link-accent, #3b7de0);
+    font-size: var(--font-size--sm);
+    text-decoration: none;
+  }
+
+  .product-specs__file:hover {
+    text-decoration: underline;
+  }
+
+  .product-specs__file-icon,
+  .product-specs__file-icon svg {
+    width: var(--icon-size-sm);
+    height: var(--icon-size-sm);
+    flex-shrink: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-specs__heading {
+      font-size: var(--font-size--xl);
+    }
+
+    .product-specs__captions,
+    .product-specs__list {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product specs",
+  "tag": "section",
+  "class": "section-product-specs",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Reads product metafields. Rows without a value are hidden, and the whole section disappears when nothing is populated."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor id",
+      "default": "specifications",
+      "info": "Target of the sticky bar's \"Characteristics\" link."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "metafield_namespace",
+      "label": "Metafield namespace",
+      "default": "custom"
+    },
+    {
+      "type": "header",
+      "content": "Diagram tabs"
+    },
+    {
+      "type": "text",
+      "id": "tabs_label",
+      "label": "Tab group accessible label",
+      "default": "Specification views"
+    },
+    {
+      "type": "text",
+      "id": "tab_overall_label",
+      "label": "First tab label",
+      "default": "Overall dimensions"
+    },
+    {
+      "type": "text",
+      "id": "tab_additional_label",
+      "label": "Second tab label",
+      "default": "Additional"
+    },
+    {
+      "type": "header",
+      "content": "Caption stats"
+    },
+    {
+      "type": "text",
+      "id": "dimensions_caption_label",
+      "label": "Dimensions label",
+      "default": "Dimensions (L x W x H)"
+    },
+    {
+      "type": "text",
+      "id": "clearance_caption_label",
+      "label": "Clearance label",
+      "default": "Clearance from the floor"
+    },
+    {
+      "type": "text",
+      "id": "delivery_caption_label",
+      "label": "Delivery option label",
+      "default": "Delivery option"
+    },
+    {
+      "type": "header",
+      "content": "Files"
+    },
+    {
+      "type": "text",
+      "id": "files_heading",
+      "label": "Files heading",
+      "default": "Useful files"
+    },
+    {
+      "type": "text",
+      "id": "file_fallback_label",
+      "label": "Fallback file name",
+      "default": "Download"
+    },
+    {
+      "type": "header",
+      "content": "Layout and colors"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Spec list columns",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "placeholder": "Default"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "spec",
+      "name": "Spec row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Body material"
+        },
+        {
+          "type": "text",
+          "id": "metafield_key",
+          "label": "Metafield key",
+          "default": "body_material",
+          "info": "Key within the namespace above. The row hides if this metafield is empty."
+        },
+        {
+          "type": "checkbox",
+          "id": "is_link",
+          "label": "Render value as a link",
+          "default": false
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Link URL",
+          "visible_if": "{{ block.settings.is_link }}"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

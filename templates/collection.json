@@ -1,236 +1,121 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "sections": {
-    "section": {
-      "type": "section",
+    "collection": {
+      "type": "showcase-collection",
       "blocks": {
-        "text_tqQTNE": {
-          "type": "text",
-          "name": "t:names.title",
+        "toggle_1": {
+          "type": "quick_toggle",
           "settings": {
-            "text": "<h1>{{ closest.collection.title }}</h1>",
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "h2",
-            "font": "var(--font-body--family)",
-            "font_size": "",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
+            "label": "We will deliver quickly",
+            "param_name": "filter.v.availability",
+            "value": "1"
+          }
         },
-        "text_twGGkJ": {
-          "type": "text",
-          "name": "t:names.description",
+        "toggle_2": {
+          "type": "quick_toggle",
           "settings": {
-            "text": "{{ closest.collection.description }}",
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "rte",
-            "font": "var(--font-body--family)",
-            "font_size": "",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
+            "label": "At a discount",
+            "param_name": "filter.p.m.custom.on_sale",
+            "value": "true"
+          }
+        },
+        "toggle_3": {
+          "type": "quick_toggle",
+          "settings": {
+            "label": "Stylish and inexpensive",
+            "param_name": "filter.p.m.custom.featured",
+            "value": "true"
+          }
+        },
+        "sub_1": {
+          "type": "subcategory",
+          "settings": { "label": "Shelves", "count": "184" }
+        },
+        "sub_2": {
+          "type": "subcategory",
+          "settings": { "label": "Hinged wardrobes", "count": "524" }
+        },
+        "sub_3": {
+          "type": "subcategory",
+          "settings": { "label": "Sliding wardrobes", "count": "68" }
+        },
+        "sub_4": {
+          "type": "subcategory",
+          "settings": { "label": "Bookcases", "count": "404" }
+        },
+        "sub_5": {
+          "type": "subcategory",
+          "settings": { "label": "Children's shelving", "count": "58" }
+        },
+        "sub_6": {
+          "type": "subcategory",
+          "settings": { "label": "Children's wardrobes", "count": "135" }
+        },
+        "sub_7": {
+          "type": "subcategory",
+          "settings": { "label": "Modular living rooms", "count": "198" }
+        },
+        "sub_8": {
+          "type": "subcategory",
+          "settings": { "label": "Hallways", "count": "23" }
+        },
+        "sub_9": {
+          "type": "subcategory",
+          "settings": { "label": "Corner cabinets", "count": "109" }
         }
       },
       "block_order": [
-        "text_tqQTNE",
-        "text_twGGkJ"
+        "toggle_1",
+        "toggle_2",
+        "toggle_3",
+        "sub_1",
+        "sub_2",
+        "sub_3",
+        "sub_4",
+        "sub_5",
+        "sub_6",
+        "sub_7",
+        "sub_8",
+        "sub_9"
       ],
-      "name": "t:names.heading",
       "settings": {
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "flex-start",
-        "vertical_alignment": "center",
-        "align_baseline": false,
-        "horizontal_alignment_flex_direction_column": "flex-start",
-        "vertical_alignment_flex_direction_column": "center",
-        "gap": 12,
-        "section_width": "page-width",
-        "section_height": "",
-        "section_height_custom": 50,
-        "background_media": "none",
-        "video_position": "cover",
-        "background_image_position": "cover",
-        "toggle_overlay": false,
-        "overlay_color": "#00000026",
-        "overlay_style": "solid",
-        "gradient_direction": "to top",
-        "border": "none",
-        "border_width": 1,
-        "border_opacity": 100,
-        "border_radius": 0,
-        "padding-block-start": 48,
-        "padding-block-end": 48
-      }
-    },
-    "main": {
-      "type": "main-collection",
-      "blocks": {
-        "filters": {
-          "type": "filters",
-          "static": true,
-          "settings": {
-            "enable_filtering": true,
-            "filter_style": "horizontal",
-            "filter_width": "centered",
-            "text_label_case": "default",
-            "show_swatch_label": false,
-            "show_filter_label": false,
-            "enable_sorting": true,
-            "enable_grid_density": true,
-            "padding-block-start": 8,
-            "padding-block-end": 8,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0,
-            "facets_margin_bottom": 8,
-            "facets_margin_right": 20
-          },
-          "blocks": {}
-        },
-        "product-card": {
-          "type": "_product-card",
-          "static": true,
-          "settings": {
-            "product_card_gap": 4,
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "card-gallery": {
-              "type": "_product-card-gallery",
-              "settings": {
-                "image_ratio": "adapt",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_title_4nY4eT": {
-              "type": "product-title",
-              "name": "t:names.product_title",
-              "settings": {
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "paragraph",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 4,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "price_EzJzMm": {
-              "type": "price",
-              "settings": {
-                "show_sale_price_first": true,
-                "show_installments": false,
-                "show_tax_info": false,
-                "type_preset": "h6",
-                "width": "100%",
-                "alignment": "left",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "swatches": {
-              "type": "swatches",
-              "name": "t:names.swatches",
-              "settings": {
-                "product_swatches_alignment": "flex-start",
-                "product_swatches_padding_top": 4,
-                "product_swatches_padding_bottom": 0,
-                "product_swatches_padding_left": 0,
-                "product_swatches_padding_right": 0
-              }
-            }
-          },
-          "block_order": [
-            "card-gallery",
-            "product_title_4nY4eT",
-            "price_EzJzMm",
-            "swatches"
-          ]
-        }
-      },
-      "settings": {
-        "layout_type": "grid",
-        "product_card_size": "medium",
-        "mobile_product_card_size": "small",
-        "product_grid_width": "centered",
-        "full_width_on_mobile": true,
-        "columns_gap_horizontal": 16,
-        "columns_gap_vertical": 24,
-        "padding-inline-start": 0,
-        "padding-inline-end": 0,
-        "padding-block-start": 0,
-        "padding-block-end": 32
+        "show_breadcrumbs": true,
+        "breadcrumb_home_label": "Online store",
+        "title_size": "var(--font-size--4xl)",
+        "show_count": true,
+        "count_label": "found",
+        "show_editorial": true,
+        "editorial_text": "Spacious Lorem wardrobe with a choice of options.",
+        "editorial_link_text": "Read more",
+        "show_banner": true,
+        "banner_height": 380,
+        "sort_default_label": "The most popular",
+        "filters_label": "Filters",
+        "columns": 4,
+        "columns_mobile": 2,
+        "products_per_page": 24,
+        "show_wishlist": true,
+        "show_quick_add": true,
+        "show_swatches": true,
+        "swatch_option_name": "Color",
+        "swatch_limit": 5,
+        "show_variant_button": true,
+        "variant_button_label": "Change color and options",
+        "show_reviews": true,
+        "show_dimensions": true,
+        "dimensions_label": "Dimensions (L x W x H), cm",
+        "dimensions_namespace": "custom",
+        "dimensions_key": "dimensions",
+        "show_promo": true,
+        "promo_after_products": 8,
+        "promo_span": 2,
+        "promo_heading": "The first step to productivity",
+        "promo_subtext": "Comfortable furniture for work and study with a discount of up to 20%",
+        "promo_link_text": "Buy",
+        "show_more_label": "Show more",
+        "section_width": "page-width"
       }
     }
   },
-  "order": [
-    "section",
-    "main"
-  ]
+  "order": ["collection"]
 }

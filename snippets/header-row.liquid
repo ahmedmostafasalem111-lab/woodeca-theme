@@ -12,6 +12,7 @@
   @param {string} [localization] - Captured HTML for language/country selector
   @param {string} [search] - Captured HTML for search input
   @param {string} [drawer_search] - Captured HTML for drawer-based search
+  @param {string} [search_bar] - Captured HTML for the inline category-search bar
 {% enddoc %}
 
 {%- liquid
@@ -84,6 +85,8 @@
               {{ search }}
             {% when 'drawer_search' %}
               {{ drawer_search }}
+            {% when 'search_bar' %}
+              {{ search_bar }}
             {% when 'actions' %}
               {{ actions }}
           {% endcase %}

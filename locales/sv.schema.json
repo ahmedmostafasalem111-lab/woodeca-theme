@@ -574,7 +574,11 @@
     "input_style": "Inmatningsstil",
     "selected_button_style": "Stil för vald knapp",
     "open_by_default": "Öppen som standard",
-    "title_preset": "Förinställning för rubrik"
+    "title_preset": "Förinställning för rubrik",
+    "phone_number": "Phone number",
+    "phone_label": "Call us label",
+    "search_placeholder": "Search placeholder",
+    "all_categories_label": "\"All categories\" label"
   },
   "options": {
     "apple": "Apple",
@@ -978,7 +982,10 @@
     "gift_card_products": "Presentkortsprodukter",
     "disclosures": "Upplysningar",
     "disclosures_metafield_content": "Obligatoriska säkerhetsvarningar och lagstadgad information för denna produkt.",
-    "page_text_color_contrast_info": "Sektioner med anpassad bakgrundsfärg använder endast den här textfärgen när färgkontrasten är tillräcklig."
+    "page_text_color_contrast_info": "Sektioner med anpassad bakgrundsfärg använder endast den här textfärgen när färgkontrasten är tillräcklig.",
+    "search_bar": "Search bar",
+    "search_bar_info": "The inline search bar with category dropdown replaces the search icon on desktop. The icon remains as the search entry point on mobile.",
+    "call_us": "Call us"
   },
   "html_defaults": {
     "share_information_about_your": "<p>Dela information om ditt varumärke med dina kunder. Beskriv en produkt, gör tillkännagivanden eller välkomna kunder till din butik.</p>",
@@ -1102,7 +1109,10 @@
     "page_text_color_default_info": "Standard för temasektioner",
     "actions_display_style": "Ikoner används alltid på mobilen",
     "edit_input_field_in_theme_settings": "Redigera inmatningsfält i [temainställningar](/editor?context=theme&category=input%20fields)",
-    "edit_variants_in_theme_settings": "Redigera variantutformning i [temainställningar](/editor?context=theme&category=variant%20pickers)"
+    "edit_variants_in_theme_settings": "Redigera variantutformning i [temainställningar](/editor?context=theme&category=variant%20pickers)",
+    "phone_number": "Shown as a tap-to-call icon in the header. Leave blank to hide it.",
+    "search_categories": "Shown in the search bar's category dropdown. Leave blank to only show \"All Categories\".",
+    "announcement_text_color": "Default for all slides. Individual slides can override this."
   },
   "categories": {
     "basic": "Grundläggande",

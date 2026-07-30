@@ -1,0 +1,438 @@
+{% comment %}
+  Related-products carousel, used three times on the product page:
+    - "You may be interested in" — two tabs (other colourways / similar products)
+    - "Products in this collection" — plain carousel
+    - "It will suit you" — plain cross-sell carousel
+
+  Reuses the shared product card and scroll-row components, so card anatomy and the
+  swipe/arrow/progress mechanic are identical to the homepage and collection grid.
+
+  Sources, per panel:
+    variants      — other variants of this product, rendered as cards
+    recommendations — Shopify's product-recommendations API (server-rendered)
+    collection    — a picked collection
+    metafield     — a product_list metafield on the product
+{% endcomment %}
+
+{% liquid
+  assign ns = section.settings.metafield_namespace | default: 'custom'
+  assign use_tabs = section.settings.enable_tabs
+%}
+
+{%- comment -%}
+  Builds the card list for one panel source. Captured so both the tabbed and
+  untabbed layouts share exactly one implementation.
+{%- endcomment -%}
+{% capture panel_a %}
+  {% liquid
+    case section.settings.source_a
+      when 'variants'
+        assign source_products = null
+      when 'collection'
+        assign source_products = section.settings.collection_a.products
+      when 'metafield'
+        assign source_products = product.metafields[ns][section.settings.metafield_key_a].value
+      else
+        # `recommendations` is only populated when the section is rendered through
+        # Shopify's recommendations endpoint. On a normal page load it is empty, so
+        # fall back to the product's own collection rather than showing nothing.
+        if recommendations.performed and recommendations.products_count > 0
+          assign source_products = recommendations.products
+        else
+          assign source_products = product.collections.first.products
+        endif
+    endcase
+  %}
+
+  {% if section.settings.source_a == 'variants' %}
+    {% for variant in product.variants %}
+      {% if variant.id == product.selected_or_first_available_variant.id %}
+        {% continue %}
+      {% endif %}
+      {%- comment -%} Filters aren't allowed on render arguments, so format first. {%- endcomment -%}
+      {% assign variant_price = variant.price | money %}
+      <div>
+        {% render 'showcase-product-card',
+          title: variant.title,
+          price: variant_price,
+          image: variant.featured_image,
+          url: variant.url,
+          stock_text: section.settings.card_stock_text,
+          show_wishlist: true,
+          show_quick_add: true
+        %}
+      </div>
+    {% endfor %}
+  {% else %}
+    {% for related in source_products limit: section.settings.products_limit %}
+      {% if related.id == product.id %}
+        {% continue %}
+      {% endif %}
+      <div>
+        {% render 'showcase-product-card',
+          product: related,
+          show_wishlist: true,
+          show_quick_add: true,
+          show_swatches: section.settings.show_swatches,
+          show_reviews: section.settings.show_reviews
+        %}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endcapture %}
+
+{% capture panel_b %}
+  {% liquid
+    case section.settings.source_b
+      when 'collection'
+        assign source_products_b = section.settings.collection_b.products
+      when 'metafield'
+        assign source_products_b = product.metafields[ns][section.settings.metafield_key_b].value
+      else
+        if recommendations.performed and recommendations.products_count > 0
+          assign source_products_b = recommendations.products
+        else
+          assign source_products_b = product.collections.first.products
+        endif
+    endcase
+  %}
+
+  {% for related in source_products_b limit: section.settings.products_limit %}
+    {% if related.id == product.id %}
+      {% continue %}
+    {% endif %}
+    <div>
+      {% render 'showcase-product-card',
+        product: related,
+        show_wishlist: true,
+        show_quick_add: true,
+        show_swatches: section.settings.show_swatches,
+        show_reviews: section.settings.show_reviews
+      %}
+    </div>
+  {% endfor %}
+{% endcapture %}
+
+{% liquid
+  # Filters aren't allowed inside an `if` condition, so strip into a variable first.
+  assign panel_a_content = panel_a | strip
+  assign panel_b_content = panel_b | strip
+
+  assign has_a = false
+  if panel_a_content != blank
+    assign has_a = true
+  endif
+
+  assign has_b = false
+  if panel_b_content != blank
+    assign has_b = true
+  endif
+%}
+
+{% if has_a or has_b %}
+  <div
+    class="section section--{{ section.settings.section_width }} product-related spacing-style"
+    style="
+      {% render 'spacing-padding', settings: section.settings %}
+      {% if section.settings.background_color != blank %}
+        background-color: {{ section.settings.background_color }};
+      {% endif %}
+      {% if section.settings.text_color != blank %}
+        --color-foreground: {{ section.settings.text_color }};
+        --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+      {% endif %}
+    "
+  >
+    {% if section.settings.heading != blank %}
+      <h2 class="product-related__heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    {% if use_tabs and has_b %}
+      <showcase-panel-tabs-component class="product-related__tabs">
+        {% liquid
+          assign tablist_label = section.settings.heading | default: 'Related products'
+          assign tab_a = section.settings.tab_a_label | default: 'In a different color'
+          assign tab_b = section.settings.tab_b_label | default: 'Similar products'
+        %}
+        {% render 'showcase-panel-tabs',
+          label: tablist_label,
+          tab_a_label: tab_a,
+          tab_b_label: tab_b,
+          class: 'product-related__tablist'
+        %}
+
+        <div
+          class="product-related__panel"
+          ref="panels[]"
+          data-panel="a"
+          role="tabpanel"
+        >
+          {% render 'scroll-row',
+            content: panel_a,
+            columns: section.settings.columns,
+            columns_mobile: section.settings.columns_mobile,
+            gap: 'var(--gap-lg)',
+            prev_label: 'Previous products',
+            next_label: 'Next products'
+          %}
+        </div>
+
+        <div
+          class="product-related__panel"
+          ref="panels[]"
+          data-panel="b"
+          role="tabpanel"
+          hidden
+        >
+          {% render 'scroll-row',
+            content: panel_b,
+            columns: section.settings.columns,
+            columns_mobile: section.settings.columns_mobile,
+            gap: 'var(--gap-lg)',
+            prev_label: 'Previous products',
+            next_label: 'Next products'
+          %}
+        </div>
+      </showcase-panel-tabs-component>
+    {% else %}
+      {% render 'scroll-row',
+        content: panel_a,
+        columns: section.settings.columns,
+        columns_mobile: section.settings.columns_mobile,
+        gap: 'var(--gap-lg)',
+        prev_label: 'Previous products',
+        next_label: 'Next products'
+      %}
+    {% endif %}
+  </div>
+{% endif %}
+
+<script
+  src="{{ 'showcase-panel-tabs.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+{% stylesheet %}
+  .product-related__heading {
+    margin: 0 0 var(--margin-lg);
+    font-size: var(--font-size--2xl);
+    line-height: var(--line-height--heading-tight);
+  }
+
+  .product-related__tablist {
+    margin-block-end: var(--margin-xl);
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-related__heading {
+      font-size: var(--font-size--xl);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product related",
+  "tag": "section",
+  "class": "section-product-related",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "You may be interested in"
+    },
+    {
+      "type": "text",
+      "id": "metafield_namespace",
+      "label": "Metafield namespace",
+      "default": "custom"
+    },
+    {
+      "type": "header",
+      "content": "Tabs"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_tabs",
+      "label": "Show two tabs",
+      "default": false,
+      "info": "Turn on for the \"You may be interested in\" instance."
+    },
+    {
+      "type": "text",
+      "id": "tab_a_label",
+      "label": "First tab label",
+      "default": "In a different color",
+      "visible_if": "{{ section.settings.enable_tabs }}"
+    },
+    {
+      "type": "text",
+      "id": "tab_b_label",
+      "label": "Second tab label",
+      "default": "Similar products",
+      "visible_if": "{{ section.settings.enable_tabs }}"
+    },
+    {
+      "type": "header",
+      "content": "First panel source"
+    },
+    {
+      "type": "select",
+      "id": "source_a",
+      "label": "Source",
+      "options": [
+        { "value": "recommendations", "label": "Shopify recommendations" },
+        { "value": "variants", "label": "Other variants of this product" },
+        { "value": "collection", "label": "A collection" },
+        { "value": "metafield", "label": "Product list metafield" }
+      ],
+      "default": "recommendations"
+    },
+    {
+      "type": "collection",
+      "id": "collection_a",
+      "label": "Collection",
+      "info": "Used when the source above is set to \"A collection\"."
+    },
+    {
+      "type": "text",
+      "id": "metafield_key_a",
+      "label": "Metafield key",
+      "default": "related_products",
+      "visible_if": "{{ section.settings.source_a == 'metafield' }}"
+    },
+    {
+      "type": "header",
+      "content": "Second panel source"
+    },
+    {
+      "type": "select",
+      "id": "source_b",
+      "label": "Source",
+      "options": [
+        { "value": "recommendations", "label": "Shopify recommendations" },
+        { "value": "collection", "label": "A collection" },
+        { "value": "metafield", "label": "Product list metafield" }
+      ],
+      "default": "recommendations"
+    },
+    {
+      "type": "collection",
+      "id": "collection_b",
+      "label": "Collection",
+      "info": "Used when the source above is set to \"A collection\"."
+    },
+    {
+      "type": "text",
+      "id": "metafield_key_b",
+      "label": "Metafield key",
+      "default": "similar_products",
+      "visible_if": "{{ section.settings.source_b == 'metafield' }}"
+    },
+    {
+      "type": "header",
+      "content": "Cards"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Maximum products",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Cards visible on desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "label": "Cards visible on mobile",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show colour swatches on cards",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reviews",
+      "label": "Show review counts on cards",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "card_stock_text",
+      "label": "Stock text for variant cards",
+      "info": "Used only when the source is \"Other variants of this product\"."
+    },
+    {
+      "type": "header",
+      "content": "Layout and colors"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "placeholder": "Default"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ]
+}
+{% endschema %}

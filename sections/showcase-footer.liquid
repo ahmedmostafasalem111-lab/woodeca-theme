@@ -1,0 +1,266 @@
+{% comment %}
+  Footer top band (heading, phone line, "Read more" link, optional line-art
+  illustration) followed by the link columns.
+
+  Columns are theme blocks so each one can hold its own freely-ordered mix of
+  links, plain text lines, sub-headings and rating links.
+{% endcomment %}
+
+<div
+  class="showcase-footer"
+  style="
+    --footer-background: {{ section.settings.background_color | default: '#ffffff' }};
+    --footer-text: {{ section.settings.text_color | default: '#1c1c1c' }};
+    --footer-band-background: {{ section.settings.band_background_color | default: '#f2f2f0' }};
+    --footer-rating-color: {{ section.settings.rating_color | default: '#f2b03d' }};
+    --footer-columns: {{ section.settings.columns }};
+  "
+>
+  {% if section.settings.show_top_band %}
+    <div class="showcase-footer__band">
+      <div class="showcase-footer__inner showcase-footer__band-inner">
+        <div class="showcase-footer__band-text">
+          {% if section.settings.band_heading != blank %}
+            <h2 class="showcase-footer__band-heading">{{ section.settings.band_heading }}</h2>
+          {% endif %}
+
+          {% if section.settings.band_body != blank or section.settings.phone_number != blank %}
+            <p class="showcase-footer__band-body">
+              {{- section.settings.band_body }}
+              {% if section.settings.phone_number != blank %}
+                <a
+                  href="tel:{{ section.settings.phone_number | remove: ' ' | remove: '(' | remove: ')' | remove: '-' }}"
+                  class="showcase-footer__phone"
+                >
+                  {{- section.settings.phone_number -}}
+                </a>
+              {% endif %}
+            </p>
+          {% endif %}
+
+          {% if section.settings.band_link_text != blank %}
+            <a
+              href="{{ section.settings.band_link | default: '#' }}"
+              class="showcase-footer__band-link"
+            >
+              {{- section.settings.band_link_text -}}
+            </a>
+          {% endif %}
+        </div>
+
+        {% if section.settings.band_image != blank %}
+          <div class="showcase-footer__band-image">
+            {{
+              section.settings.band_image
+              | image_url: width: 700
+              | image_tag: loading: 'lazy', alt: ''
+            }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="showcase-footer__inner showcase-footer__columns">
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .showcase-footer {
+    background-color: var(--footer-background);
+    color: var(--footer-text);
+  }
+
+  .showcase-footer__inner {
+    max-width: var(--page-width);
+    margin-inline: auto;
+    padding-inline: var(--page-margin);
+  }
+
+  .showcase-footer__band {
+    background-color: var(--footer-band-background);
+  }
+
+  .showcase-footer__band-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-xl);
+    padding-block: var(--padding-2xl);
+  }
+
+  .showcase-footer__band-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--gap-2xs);
+  }
+
+  .showcase-footer__band-heading {
+    margin: 0;
+    font-size: var(--font-size--2xl);
+    line-height: var(--line-height--heading-tight);
+  }
+
+  .showcase-footer__band-body {
+    margin: 0;
+    font-size: var(--font-size--sm);
+  }
+
+  .showcase-footer__phone {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .showcase-footer__band-link {
+    color: inherit;
+    font-size: var(--font-size--sm);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .showcase-footer__band-image img {
+    display: block;
+    width: auto;
+    max-height: 110px;
+  }
+
+  .showcase-footer__columns {
+    display: grid;
+    grid-template-columns: repeat(var(--footer-columns, 5), minmax(0, 1fr));
+    gap: var(--gap-xl);
+    padding-block: var(--padding-2xl);
+  }
+
+  @media screen and (max-width: 989px) {
+    .showcase-footer__columns {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .showcase-footer__band-inner {
+      flex-direction: column;
+      align-items: flex-start;
+      padding-block: var(--padding-xl);
+    }
+
+    .showcase-footer__band-heading {
+      font-size: var(--font-size--lg);
+    }
+
+    .showcase-footer__band-image {
+      align-self: flex-end;
+    }
+
+    .showcase-footer__band-image img {
+      max-height: 72px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Showcase footer",
+  "tag": "div",
+  "class": "showcase-footer-section",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Top band"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_top_band",
+      "label": "Show top band",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "band_heading",
+      "label": "Heading",
+      "default": "Delivery throughout Lorem"
+    },
+    {
+      "type": "text",
+      "id": "band_body",
+      "label": "Body text",
+      "default": "To order a product in the store, please contact our manager by phone."
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "Phone number",
+      "default": "+1 (555) 207-29-24",
+      "info": "Rendered as a tap-to-call link at the end of the body text."
+    },
+    {
+      "type": "text",
+      "id": "band_link_text",
+      "label": "Link text",
+      "default": "Read more"
+    },
+    {
+      "type": "url",
+      "id": "band_link",
+      "label": "Link"
+    },
+    {
+      "type": "image_picker",
+      "id": "band_image",
+      "label": "Illustration",
+      "info": "Optional line-art graphic shown on the right, e.g. a delivery van."
+    },
+    {
+      "type": "header",
+      "content": "Columns"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns per row on desktop",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Footer background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Footer text",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "band_background_color",
+      "label": "Top band background",
+      "default": "#f2f2f0"
+    },
+    {
+      "type": "color",
+      "id": "rating_color",
+      "label": "Star rating color",
+      "default": "#f2b03d"
+    }
+  ],
+  "blocks": [
+    { "type": "_showcase-footer-column" }
+  ]
+}
+{% endschema %}

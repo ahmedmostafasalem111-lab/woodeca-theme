@@ -1,0 +1,94 @@
+{% doc %}
+  Renders a two-option segmented tab strip and owns its styling, so the specs,
+  delivery and related-products sections all share one definition.
+
+  Must be placed inside a `<showcase-panel-tabs-component>`; the component wires
+  the buttons to the sibling panels that carry matching `data-panel` keys.
+
+  @param {string} label - Accessible label for the tablist.
+  @param {string} tab_a_label - First tab's text.
+  @param {string} [tab_b_label] - Second tab's text.
+  @param {boolean} [show_b] - Render the second tab. Default true.
+  @param {string} [a_key] - data-panel key for the first tab. Default 'a'.
+  @param {string} [b_key] - data-panel key for the second tab. Default 'b'.
+  @param {string} [class] - Extra classes for the tablist.
+
+  @example
+  {% render 'showcase-panel-tabs', label: 'Views', tab_a_label: 'Overall', tab_b_label: 'Additional' %}
+{% enddoc %}
+
+{% liquid
+  assign a_key = a_key | default: 'a'
+  assign b_key = b_key | default: 'b'
+  if show_b == nil
+    assign show_b = true
+  endif
+%}
+
+<div
+  class="panel-tabs{% if class != blank %} {{ class | strip }}{% endif %}"
+  role="tablist"
+  aria-label="{{ label | escape }}"
+  on:keydown="/onKeyDown"
+>
+  <button
+    type="button"
+    class="panel-tab panel-tab--active"
+    ref="tabs[]"
+    data-panel="{{ a_key }}"
+    role="tab"
+    aria-selected="true"
+    on:click="/select"
+  >
+    {{- tab_a_label -}}
+  </button>
+
+  {% if show_b and tab_b_label != blank %}
+    <button
+      type="button"
+      class="panel-tab"
+      ref="tabs[]"
+      data-panel="{{ b_key }}"
+      role="tab"
+      aria-selected="false"
+      tabindex="-1"
+      on:click="/select"
+    >
+      {{- tab_b_label -}}
+    </button>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .panel-tabs {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 999px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+  }
+
+  .panel-tab {
+    padding: var(--padding-2xs) var(--padding-xl);
+    border: none;
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color var(--animation-speed) var(--animation-easing);
+  }
+
+  .panel-tab--active {
+    background-color: var(--color-background);
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgb(0 0 0 / var(--opacity-10));
+  }
+
+  @media screen and (max-width: 749px) {
+    .panel-tab {
+      padding-inline: var(--padding-md);
+    }
+  }
+{% endstylesheet %}

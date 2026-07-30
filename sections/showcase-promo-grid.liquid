@@ -1,0 +1,498 @@
+{% comment %}
+  Promo banner with a category discount grid. The heading is split into two text
+  fields so an inline icon can sit between them (e.g. "We will deliver quickly
+  [truck] from 1 day"). Six tiles per row on desktop; the grid becomes a
+  horizontal scroller on mobile.
+{% endcomment %}
+
+{% liquid
+  assign icon_file = 'icon-' | append: section.settings.heading_icon | append: '.svg'
+%}
+
+<div
+  class="section-background"
+  style="background-color: {{ section.settings.background_color | default: '#dfe7dd' }};"
+></div>
+
+<div
+  class="section section--{{ section.settings.section_width }} showcase-promo spacing-style"
+  style="
+    {% render 'spacing-padding', settings: section.settings %}
+    {% if section.settings.text_color != blank %}
+      --color-foreground: {{ section.settings.text_color }};
+      --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+    {% endif %}
+    --promo-columns: {{ section.settings.columns }};
+    --promo-heading-size: {{ section.settings.heading_size }};
+    --promo-tile-background: {{ section.settings.tile_background | default: '#ffffff' }};
+    --promo-badge-background: {{ section.settings.badge_background | default: '#f3c98b' }};
+    --promo-badge-text: {{ section.settings.badge_text_color | default: '#1c1c1c' }};
+    --promo-button-background: {{ section.settings.button_background | default: '#333333' }};
+    --promo-button-text: {{ section.settings.button_text_color | default: '#ffffff' }};
+  "
+>
+  <div class="showcase-promo__header">
+    <div class="showcase-promo__intro">
+      {% if section.settings.heading != blank or section.settings.heading_suffix != blank %}
+        <h2 class="showcase-promo__heading">
+          {%- if section.settings.heading != blank -%}
+            <span>{{ section.settings.heading }}</span>
+          {%- endif -%}
+
+          {%- if section.settings.show_heading_icon -%}
+            <span class="showcase-promo__heading-icon" aria-hidden="true">
+              {%- if section.settings.heading_icon_image != blank -%}
+                {{
+                  section.settings.heading_icon_image
+                  | image_url: width: 96
+                  | image_tag: loading: 'lazy', alt: ''
+                }}
+              {%- else -%}
+                {{- icon_file | inline_asset_content -}}
+              {%- endif -%}
+            </span>
+          {%- endif -%}
+
+          {%- if section.settings.heading_suffix != blank -%}
+            <span>{{ section.settings.heading_suffix }}</span>
+          {%- endif -%}
+        </h2>
+      {% endif %}
+
+      {% if section.settings.subtext != blank %}
+        <p class="showcase-promo__subtext">{{ section.settings.subtext }}</p>
+      {% endif %}
+    </div>
+
+    {% if section.settings.button_label != blank %}
+      <a
+        href="{{ section.settings.button_link | default: '#' }}"
+        class="showcase-promo__button"
+      >
+        {{- section.settings.button_label -}}
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="showcase-promo__grid">
+    {% for block in section.blocks %}
+      <a
+        href="{{ block.settings.link | default: '#' }}"
+        class="promo-tile"
+        {{ block.shopify_attributes }}
+      >
+        <span class="promo-tile__top">
+          {% if block.settings.name != blank %}
+            <span class="promo-tile__name">{{ block.settings.name }}</span>
+          {% endif %}
+
+          {% if block.settings.discount != blank %}
+            <span class="promo-tile__discount">{{ block.settings.discount }}</span>
+          {% endif %}
+        </span>
+
+        <span class="promo-tile__media">
+          {% if block.settings.image != blank %}
+            {{
+              block.settings.image
+              | image_url: width: 500
+              | image_tag: loading: 'lazy', class: 'promo-tile__image', alt: block.settings.name
+            }}
+          {% else %}
+            {{ 'product-apparel-2' | placeholder_svg_tag: 'promo-tile__image promo-tile__image--placeholder' }}
+          {% endif %}
+        </span>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .showcase-promo__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--gap-lg);
+    margin-block-end: var(--margin-xl);
+  }
+
+  .showcase-promo__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-2xs);
+  }
+
+  .showcase-promo__heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-2xs);
+    margin: 0;
+    font-size: var(--promo-heading-size, var(--font-size--3xl));
+    line-height: var(--line-height--heading-tight);
+  }
+
+  .showcase-promo__heading-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .showcase-promo__heading-icon svg,
+  .showcase-promo__heading-icon img {
+    width: 1.4em;
+    height: 1.4em;
+    object-fit: contain;
+  }
+
+  .showcase-promo__subtext {
+    margin: 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+    font-size: var(--font-size--md);
+  }
+
+  .showcase-promo__button {
+    flex-shrink: 0;
+    padding: var(--padding-sm) var(--padding-xl);
+    border-radius: var(--style-border-radius-buttons-primary, 4px);
+    background-color: var(--promo-button-background);
+    color: var(--promo-button-text);
+    font-size: var(--font-size--sm);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .showcase-promo__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--promo-columns, 6), minmax(0, 1fr));
+    gap: var(--gap-md);
+  }
+
+  .promo-tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-2xs);
+    padding: var(--padding-sm);
+    border-radius: var(--style-border-radius-inputs, 8px);
+    background-color: var(--promo-tile-background);
+    color: var(--color-foreground);
+    text-decoration: none;
+  }
+
+  .promo-tile__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--gap-2xs);
+  }
+
+  .promo-tile__name {
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  .promo-tile__discount {
+    flex-shrink: 0;
+    padding: 1px var(--padding-3xs);
+    border-radius: 4px;
+    background-color: var(--promo-badge-background);
+    color: var(--promo-badge-text);
+    font-size: var(--font-size--2xs);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .promo-tile__media {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    flex-grow: 1;
+    min-height: 120px;
+  }
+
+  .promo-tile__image {
+    width: 100%;
+    max-height: 180px;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  .promo-tile__image--placeholder {
+    fill: rgb(var(--color-foreground-rgb) / var(--opacity-20));
+  }
+
+  @media screen and (max-width: 989px) {
+    .showcase-promo__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .showcase-promo__header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .showcase-promo__heading {
+      font-size: var(--font-size--xl);
+    }
+
+    .showcase-promo__subtext {
+      font-size: var(--font-size--sm);
+    }
+
+    /* Button becomes full width and sits below the copy. */
+    .showcase-promo__button {
+      text-align: center;
+    }
+
+    .showcase-promo__grid {
+      display: flex;
+      gap: var(--gap-sm);
+      overflow-x: auto;
+      scroll-snap-type: x proximity;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .showcase-promo__grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .promo-tile {
+      flex: 0 0 auto;
+      width: 44%;
+      scroll-snap-align: start;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Promo category grid",
+  "tag": "section",
+  "class": "section-showcase-promo",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading (before icon)",
+      "default": "We will deliver quickly"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_heading_icon",
+      "label": "Show inline heading icon",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "heading_icon",
+      "label": "Inline icon",
+      "options": [
+        { "value": "truck", "label": "Truck" },
+        { "value": "pin", "label": "Location pin" },
+        { "value": "store", "label": "Store" },
+        { "value": "cart", "label": "Cart" },
+        { "value": "phone", "label": "Phone" },
+        { "value": "heart", "label": "Heart" },
+        { "value": "star", "label": "Star" },
+        { "value": "discount", "label": "Discount" }
+      ],
+      "default": "truck",
+      "visible_if": "{{ section.settings.show_heading_icon }}"
+    },
+    {
+      "type": "image_picker",
+      "id": "heading_icon_image",
+      "label": "Custom icon image",
+      "info": "Overrides the icon above when set.",
+      "visible_if": "{{ section.settings.show_heading_icon }}"
+    },
+    {
+      "type": "text",
+      "id": "heading_suffix",
+      "label": "Heading (after icon)",
+      "default": "from 1 day"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        { "value": "var(--font-size--2xl)", "label": "Medium" },
+        { "value": "var(--font-size--3xl)", "label": "Large" },
+        { "value": "var(--font-size--4xl)", "label": "Extra large" }
+      ],
+      "default": "var(--font-size--3xl)"
+    },
+    {
+      "type": "text",
+      "id": "subtext",
+      "label": "Subtext",
+      "default": "Lorem ipsum dolor sit amet you don't have to wait for"
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Label",
+      "default": "See all"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Tiles per row on desktop",
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section background",
+      "default": "#dfe7dd"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "placeholder": "Default"
+    },
+    {
+      "type": "color",
+      "id": "tile_background",
+      "label": "Tile background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "badge_background",
+      "label": "Discount badge background",
+      "default": "#f3c98b"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Discount badge text",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Category tile",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Category name",
+          "default": "Lorem ipsum"
+        },
+        {
+          "type": "text",
+          "id": "discount",
+          "label": "Discount badge",
+          "default": "-40%"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Promo category grid",
+      "blocks": [
+        { "type": "tile", "settings": { "name": "Sofas", "discount": "-40%" } },
+        { "type": "tile", "settings": { "name": "Cabinets and shelving", "discount": "-50%" } },
+        { "type": "tile", "settings": { "name": "Chests of drawers", "discount": "-60%" } },
+        { "type": "tile", "settings": { "name": "Carpets and textiles", "discount": "-60%" } },
+        { "type": "tile", "settings": { "name": "Tables and chairs", "discount": "-50%" } },
+        { "type": "tile", "settings": { "name": "Armchairs", "discount": "-40%" } },
+        { "type": "tile", "settings": { "name": "Beds and mattresses", "discount": "-55%" } },
+        { "type": "tile", "settings": { "name": "Bed sheets", "discount": "-45%" } },
+        { "type": "tile", "settings": { "name": "Lighting", "discount": "-45%" } },
+        { "type": "tile", "settings": { "name": "Dolor sit amet", "discount": "-30%" } },
+        { "type": "tile", "settings": { "name": "Consectetur", "discount": "-35%" } },
+        { "type": "tile", "settings": { "name": "Adipiscing elit", "discount": "-25%" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

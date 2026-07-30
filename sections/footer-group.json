@@ -1,238 +1,348 @@
-/*
- * ------------------------------------------------------------
- * IMPORTANT: The contents of this file are auto-generated.
- *
- * This file may be updated by the Shopify admin theme editor
- * or related systems. Please exercise caution as any changes
- * made to this file may be overwritten.
- * ------------------------------------------------------------
- */
 {
   "type": "footer",
   "name": "t:names.footer",
   "sections": {
-    "footer": {
-      "type": "footer",
+    "showcase_footer": {
+      "type": "showcase-footer",
       "blocks": {
-        "group_wErUQf": {
-          "type": "group",
+        "col_contact": {
+          "type": "_showcase-footer-column",
           "settings": {
-            "content_direction": "column",
-            "vertical_on_mobile": true,
-            "horizontal_alignment": "flex-start",
-            "vertical_alignment": "center",
-            "align_baseline": false,
-            "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
-            "gap": 12,
-            "width": "fill",
-            "custom_width": 100,
-            "width_mobile": "fill",
-            "custom_width_mobile": 100,
-            "height": "fit",
-            "custom_height": 100,
-            "background_media": "none",
-            "video_position": "cover",
-            "background_image_position": "cover",
-            "toggle_overlay": false,
-            "overlay_color": "#00000026",
-            "overlay_style": "solid",
-            "gradient_direction": "to top",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "link": "",
-            "open_in_new_tab": false,
-            "placeholder": "",
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
+            "heading": "Contact us"
           },
           "blocks": {
-            "text_pF6rVi": {
-              "type": "text",
-              "name": "t:names.heading",
-              "settings": {
-                "text": "<h2>Join our email list</h2>",
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "h3",
-                "font": "var(--font-body--family)",
-                "font_size": "",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
+            "c_phone": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "+1 (555) 207-29-24" }
             },
-            "text_HafH7P": {
-              "type": "text",
-              "name": "t:names.text",
-              "settings": {
-                "text": "<p>Get exclusive deals and early access to new products.</p>",
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
+            "c_video": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Video consultation with a specialist" }
             },
-            "email-signup_HafH7P": {
-              "type": "email-signup",
-              "name": "t:names.email_signup",
-              "settings": {
-                "width": "fill",
-                "custom_width": 100,
-                "heading": "",
-                "heading_preset": "h3",
-                "border_style": "all",
-                "input_style": "custom",
-                "border_width": 1,
-                "border_radius": 100,
-                "input_background_color": "{{ settings.color_palette.color1 }}",
-                "input_border_color": "",
-                "input_type_preset": "paragraph",
-                "style_class": "button-secondary",
-                "custom_button_background": "{{ settings.color_palette.foreground }}",
-                "custom_button_text": "{{ settings.color_palette.background }}",
-                "custom_button_border": "{{ settings.color_palette.background }}",
-                "display_type": "text",
-                "label": "Sign up",
-                "integrated_button": false,
-                "button_type_preset": "paragraph",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
+            "c_contacts": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Contacts" }
+            },
+            "c_quality": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Contacting the Quality Department" }
+            },
+            "c_management": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Write to management" }
+            },
+            "c_partners_heading": {
+              "type": "_showcase-footer-subheading",
+              "settings": { "text": "Partners" }
+            },
+            "c_business": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "For business" }
+            },
+            "c_designers": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "For designers" }
+            },
+            "c_franchising": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Franchising" }
             }
           },
           "block_order": [
-            "text_pF6rVi",
-            "text_HafH7P",
-            "email-signup_HafH7P"
+            "c_phone",
+            "c_video",
+            "c_contacts",
+            "c_quality",
+            "c_management",
+            "c_partners_heading",
+            "c_business",
+            "c_designers",
+            "c_franchising"
           ]
         },
-        "menu_footer": {
-          "type": "menu",
+        "col_hours": {
+          "type": "_showcase-footer-column",
           "settings": {
-            "menu": "footer",
-            "heading": "",
-            "menu_spacing": 12,
-            "show_as_accordion": false,
-            "accordion_icon": "plus",
-            "accordion_dividers": false,
-            "heading_preset": "paragraph",
-            "link_preset": "paragraph",
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          }
+            "heading": "Call center operating hours"
+          },
+          "blocks": {
+            "h_daily": {
+              "type": "_showcase-footer-text",
+              "settings": { "text": "daily from 9:00 to 22:00" }
+            },
+            "h_orders_heading": {
+              "type": "_showcase-footer-subheading",
+              "settings": { "text": "Delivery of orders" }
+            },
+            "h_orders": {
+              "type": "_showcase-footer-text",
+              "settings": { "text": "from 10:00 to 22:00" }
+            }
+          },
+          "block_order": ["h_daily", "h_orders_heading", "h_orders"]
         },
-        "menu_main": {
-          "type": "menu",
+        "col_buyers": {
+          "type": "_showcase-footer-column",
           "settings": {
-            "menu": "main-menu",
-            "heading": "",
-            "menu_spacing": 12,
-            "show_as_accordion": false,
-            "accordion_icon": "plus",
-            "accordion_dividers": false,
-            "heading_preset": "paragraph",
-            "link_preset": "paragraph",
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          }
+            "heading": "Information for buyers"
+          },
+          "blocks": {
+            "b_about": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "About the company" }
+            },
+            "b_addresses": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Store addresses" }
+            },
+            "b_delivery": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Delivery and payment" }
+            },
+            "b_warranty": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Warranty, exchange and return" }
+            },
+            "b_club": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Lorem club" }
+            },
+            "b_career": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Career" }
+            },
+            "b_sitemap": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Sitemap" }
+            },
+            "b_gift": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Gift certificates" }
+            },
+            "b_press": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "We are in the press" }
+            }
+          },
+          "block_order": [
+            "b_about",
+            "b_addresses",
+            "b_delivery",
+            "b_warranty",
+            "b_club",
+            "b_career",
+            "b_sitemap",
+            "b_gift",
+            "b_press"
+          ]
+        },
+        "col_catalog": {
+          "type": "_showcase-footer-column",
+          "settings": {
+            "heading": "Catalog"
+          },
+          "blocks": {
+            "k_upholstered": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Upholstered furniture" }
+            },
+            "k_cabinet": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Cabinet furniture" }
+            },
+            "k_frameless": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Frameless furniture" }
+            },
+            "k_modular": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Modular furniture" }
+            },
+            "k_tables": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Tables and chairs" }
+            },
+            "k_services_heading": {
+              "type": "_showcase-footer-subheading",
+              "settings": { "text": "Services" }
+            },
+            "k_express": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Express design" }
+            }
+          },
+          "block_order": [
+            "k_upholstered",
+            "k_cabinet",
+            "k_frameless",
+            "k_modular",
+            "k_tables",
+            "k_services_heading",
+            "k_express"
+          ]
+        },
+        "col_reviews": {
+          "type": "_showcase-footer-column",
+          "settings": {
+            "heading": "Read reviews"
+          },
+          "blocks": {
+            "r_platform": {
+              "type": "_showcase-footer-rating",
+              "settings": { "label": "Lorem Market", "rating": 4.5 }
+            },
+            "r_winner_heading": {
+              "type": "_showcase-footer-subheading",
+              "settings": { "text": "Winner" }
+            },
+            "r_award1": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Ipsum Dot Award" }
+            },
+            "r_award2": {
+              "type": "_showcase-footer-link",
+              "settings": { "label": "Dolor rating" }
+            }
+          },
+          "block_order": ["r_platform", "r_winner_heading", "r_award1", "r_award2"]
         }
       },
-      "block_order": [
-        "group_wErUQf",
-        "menu_footer",
-        "menu_main"
-      ],
-      "name": "t:names.footer",
+      "block_order": ["col_contact", "col_hours", "col_buyers", "col_catalog", "col_reviews"],
       "settings": {
-        "section_width": "page-width",
-        "gap": 40,
-        "background_color": "{{ settings.color_palette.color1 }}",
-        "padding-block-start": 36,
-        "padding-block-end": 36
+        "show_top_band": true,
+        "band_heading": "Delivery throughout Lorem",
+        "band_body": "To order a product in the store, please contact our manager by phone.",
+        "phone_number": "+1 (555) 207-29-24",
+        "band_link_text": "Read more",
+        "columns": 5
       }
     },
-    "utilities": {
-      "type": "footer-utilities",
+    "showcase_footer_bottom": {
+      "type": "showcase-footer-bottom",
       "blocks": {
-        "copyright": {
-          "type": "footer-copyright",
-          "settings": {
-            "show_powered_by": true,
-            "font_size": "0.75rem",
-            "case": "none"
-          }
+        "pay_1": {
+          "type": "payment",
+          "settings": { "label": "Mastercard" }
         },
-        "policy_list": {
-          "type": "footer-policy-list",
-          "settings": {
-            "font_size": "0.75rem",
-            "case": "none"
-          }
+        "pay_2": {
+          "type": "payment",
+          "settings": { "label": "Visa" }
         },
-        "social_icons": {
-          "type": "social-links",
-          "settings": {
-            "facebook_url": "https://www.facebook.com",
-            "instagram_url": "https://www.instagram.com",
-            "youtube_url": "https://www.youtube.com",
-            "tiktok_url": "https://www.tiktok.com",
-            "twitter_url": "https://www.twitter.com"
-          }
+        "pay_3": {
+          "type": "payment",
+          "settings": { "label": "Amex" }
+        },
+        "soc_1": {
+          "type": "social",
+          "settings": { "icon": "external", "label": "YouTube" }
+        },
+        "soc_2": {
+          "type": "social",
+          "settings": { "icon": "chat", "label": "Telegram" }
+        },
+        "soc_3": {
+          "type": "social",
+          "settings": { "icon": "camera", "label": "Instagram" }
+        },
+        "soc_4": {
+          "type": "social",
+          "settings": { "icon": "star", "label": "Pinterest" }
+        },
+        "soc_5": {
+          "type": "social",
+          "settings": { "icon": "account", "label": "TikTok" }
+        },
+        "legal_1": {
+          "type": "legal",
+          "settings": { "label": "Offer for individuals" }
+        },
+        "legal_2": {
+          "type": "legal",
+          "settings": { "label": "Offer for legal entities" }
+        },
+        "legal_3": {
+          "type": "legal",
+          "settings": { "label": "List of partners" }
+        },
+        "legal_4": {
+          "type": "legal",
+          "settings": { "label": "Privacy Policy" }
+        },
+        "legal_5": {
+          "type": "legal",
+          "settings": { "label": "Terms of the promotions" }
+        },
+        "legal_6": {
+          "type": "legal",
+          "settings": { "label": "Payment security" }
+        },
+        "legal_7": {
+          "type": "legal",
+          "settings": { "label": "Consent to the processing of personal data" }
         }
       },
       "block_order": [
-        "copyright",
-        "policy_list",
-        "social_icons"
+        "pay_1",
+        "pay_2",
+        "pay_3",
+        "soc_1",
+        "soc_2",
+        "soc_3",
+        "soc_4",
+        "soc_5",
+        "legal_1",
+        "legal_2",
+        "legal_3",
+        "legal_4",
+        "legal_5",
+        "legal_6",
+        "legal_7"
       ],
       "settings": {
-        "section_width": "page-width",
-        "gap": 24,
-        "background_color": "{{ settings.color_palette.color1 }}",
-        "divider_thickness": 1,
-        "padding-block-start": 12,
-        "padding-block-end": 16
+        "wordmark_text": "lorem.ipsum",
+        "legal_columns": 2
+      }
+    },
+    "showcase_mobile_tab_bar": {
+      "type": "showcase-mobile-tab-bar",
+      "blocks": {
+        "tab_catalog": {
+          "type": "tab",
+          "settings": { "icon": "grid-default", "label": "Catalog" }
+        },
+        "tab_favorites": {
+          "type": "tab",
+          "settings": { "icon": "heart", "label": "Favorites" }
+        },
+        "tab_basket": {
+          "type": "tab",
+          "settings": { "icon": "cart", "label": "Basket" }
+        },
+        "tab_login": {
+          "type": "tab",
+          "settings": { "icon": "account", "label": "Login" }
+        },
+        "tab_showrooms": {
+          "type": "tab",
+          "settings": { "icon": "store", "label": "Showrooms" }
+        }
+      },
+      "block_order": ["tab_catalog", "tab_favorites", "tab_basket", "tab_login", "tab_showrooms"],
+      "settings": {}
+    },
+    "showcase_floating_widgets": {
+      "type": "showcase-floating-widgets",
+      "settings": {
+        "show_chat_bubble": true,
+        "show_feedback_tab": true,
+        "feedback_label": "Site feedback"
       }
     }
   },
   "order": [
-    "footer",
-    "utilities"
+    "showcase_footer",
+    "showcase_footer_bottom",
+    "showcase_mobile_tab_bar",
+    "showcase_floating_widgets"
   ]
 }
