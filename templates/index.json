@@ -831,28 +831,114 @@
           }
         }
       },
-      "block_order": ["f1", "f2", "f3", "f4"],
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
       "settings": {
         "heading": "Why Woodeca?",
+        "heading_size": "var(--font-size--3xl)",
         "columns": 4,
         "icon_size": 64,
         "show_mission": true,
-        "band_background": "#f5f5f5"
+        "mission": "<p>Our mission is to make it easy to create a home you'll love with modern, thoughtfully designed furniture built to last.</p>",
+        "mission_size": "var(--font-size--2xl)",
+        "section_width": "page-width",
+        "band_background": "#f5f5f5",
+        "text_color": "",
+        "padding-block-start": 0,
+        "padding-block-end": 0
       }
     },
     "s7c_payments": {
       "type": "showcase-logo-marquee",
       "blocks": {
-        "l1": { "type": "logo", "settings": { "alt": "Visa" } },
-        "l2": { "type": "logo", "settings": { "alt": "Mastercard" } },
-        "l3": { "type": "logo", "settings": { "alt": "American Express" } },
-        "l4": { "type": "logo", "settings": { "alt": "Meeza" } },
-        "l5": { "type": "logo", "settings": { "alt": "Fawry" } },
-        "l6": { "type": "logo", "settings": { "alt": "ValU" } },
-        "l7": { "type": "logo", "settings": { "alt": "Cash on delivery" } },
-        "l8": { "type": "logo", "settings": { "alt": "Instalments" } }
+        "l2": {
+          "type": "logo",
+          "name": "CIB",
+          "settings": {
+            "image": "shopify://shop_images/1_cd93dae2-6cee-443b-9eee-47dfaabc43d1.jpg",
+            "alt": "CIB"
+          }
+        },
+        "l4": {
+          "type": "logo",
+          "name": "HALAN",
+          "settings": {
+            "image": "shopify://shop_images/2_d66d0721-2b91-4bf6-91fe-a61adef096c5.jpg",
+            "alt": "HALAN"
+          }
+        },
+        "l5": {
+          "type": "logo",
+          "name": "NBE",
+          "settings": {
+            "image": "shopify://shop_images/4_226c11b2-ff0f-4fbe-ac93-f3f851c04d19.jpg",
+            "alt": "NBE"
+          }
+        },
+        "l6": {
+          "type": "logo",
+          "name": "ValU",
+          "settings": {
+            "image": "shopify://shop_images/6_b1a83810-3c8c-48c7-b23f-e8cebb19080a.jpg",
+            "alt": "ValU"
+          }
+        },
+        "logo_McFnwF": {
+          "type": "logo",
+          "name": "MASHREQ",
+          "settings": {
+            "image": "shopify://shop_images/7_906bd77b-2e1b-44eb-a12e-7fb4022b48e5.jpg",
+            "alt": "MASHREQ"
+          }
+        },
+        "logo_MQF3mF": {
+          "type": "logo",
+          "name": "SYMPL",
+          "settings": {
+            "image": "shopify://shop_images/5_32e07fd4-458b-4b59-9674-d7efdc5ec2b5.jpg",
+            "alt": "SYMPL"
+          }
+        },
+        "logo_BztjPA": {
+          "type": "logo",
+          "name": "Emirates",
+          "settings": {
+            "image": "shopify://shop_images/3_ff336816-8f8c-4ccd-bc75-5397ad0cd338.jpg",
+            "alt": "Emirates"
+          }
+        },
+        "l7": {
+          "type": "logo",
+          "name": "Bank Du Caire",
+          "settings": {
+            "image": "shopify://shop_images/9_6a18ff8b-ee5f-48b7-a043-c6c1cbda02d1.jpg",
+            "alt": "Bank Du Caire"
+          }
+        },
+        "l8": {
+          "type": "logo",
+          "name": "Banque Misr",
+          "settings": {
+            "image": "shopify://shop_images/8_b0cc21e3-7805-4e6d-a3dd-8d234529da87.jpg",
+            "alt": "Banque Misr"
+          }
+        }
       },
-      "block_order": ["l1", "l2", "l3", "l4", "l5", "l6", "l7", "l8"],
+      "block_order": [
+        "l2",
+        "l4",
+        "l5",
+        "l6",
+        "logo_McFnwF",
+        "logo_MQF3mF",
+        "logo_BztjPA",
+        "l7",
+        "l8"
+      ],
       "settings": {
         "show_heading": true,
         "heading": "Payment Partners",
@@ -860,7 +946,11 @@
         "direction": "left",
         "logo_height": 44,
         "logo_max_width": 124,
-        "grayscale": false
+        "grayscale": false,
+        "section_width": "page-width",
+        "text_color": "",
+        "padding-block-start": 24,
+        "padding-block-end": 24
       }
     },
     "s8_carousel_new": {
