@@ -37,6 +37,8 @@
     --showcase-photo-border: {{ section.settings.photo_search_border_color | default: '#3b7de0' }};
     --showcase-photo-text: {{ section.settings.photo_search_text_color | default: '#1c1c1c' }};
     --showcase-logo-size: {{ section.settings.logo_font_size }};
+    --showcase-call-background: {{ section.settings.call_background | default: '#e8262d' }};
+    --showcase-call-text: {{ section.settings.call_text_color | default: '#ffffff' }};
     --showcase-cart-bubble-background: {{ section.settings.cart_bubble_background | default: '#e8705a' }};
     --showcase-cart-bubble-text: {{ section.settings.cart_bubble_text | default: '#ffffff' }};
   "
@@ -46,29 +48,21 @@
     <div class="showcase-header__utility">
       <div class="showcase-header__inner showcase-header__utility-inner">
         <div class="showcase-header__utility-group">
-          {% if section.settings.show_location %}
-            <details class="showcase-dropdown">
-              <summary class="showcase-dropdown__summary">
-                <span class="svg-wrapper showcase-dropdown__leading-icon" aria-hidden="true">
-                  {{- 'icon-pin.svg' | inline_asset_content -}}
-                </span>
-                <span>{{ section.settings.location_label }}</span>
-                <span class="svg-wrapper showcase-dropdown__caret" aria-hidden="true">
-                  {{- 'icon-caret.svg' | inline_asset_content -}}
-                </span>
-              </summary>
-              <div class="showcase-dropdown__panel">
-                {% if section.settings.location_menu != blank %}
-                  <ul class="showcase-dropdown__list">
-                    {% for link in section.settings.location_menu.links %}
-                      <li><a href="{{ link.url }}">{{ link.title }}</a></li>
-                    {% endfor %}
-                  </ul>
-                {% else %}
-                  <p class="showcase-dropdown__empty">{{ section.settings.dropdown_empty_text }}</p>
-                {% endif %}
-              </div>
-            </details>
+          {%- comment -%}
+            Call-us pill sits in the far-left utility slot. Hidden entirely when no
+            phone number is set, so it never renders as a dead link.
+          {%- endcomment -%}
+          {% if section.settings.show_call_button and section.settings.phone_number != blank %}
+            {% assign call_href = section.settings.phone_number | remove: ' ' | remove: '(' | remove: ')' | remove: '-' %}
+            <a
+              href="tel:{{ call_href }}"
+              class="showcase-header__call"
+            >
+              <span class="svg-wrapper" aria-hidden="true">
+                {{- 'icon-phone-waves.svg' | inline_asset_content -}}
+              </span>
+              <span>{{ section.settings.call_label | default: 'Call Us' }}</span>
+            </a>
           {% endif %}
 
           {% for block in utility_left %}
@@ -282,14 +276,19 @@
           </a>
         {% endif %}
 
-        {% if section.settings.show_wishlist %}
+        {%- comment -%}
+          Phone sits between account and cart. Only the header icon changed here —
+          wishlist itself still lives on product cards and the mobile tab bar.
+        {%- endcomment -%}
+        {% if section.settings.show_phone and section.settings.phone_number != blank %}
+          {% assign icon_call_href = section.settings.phone_number | remove: ' ' | remove: '(' | remove: ')' | remove: '-' %}
           <a
-            href="{{ section.settings.wishlist_link | default: '#' }}"
+            href="tel:{{ icon_call_href }}"
             class="showcase-header__icon-button showcase-header__icon-button--desktop"
-            aria-label="{{ section.settings.wishlist_label | default: 'Wishlist' | escape }}"
+            aria-label="{{ section.settings.call_label | default: 'Call Us' | escape }}"
           >
             <span class="svg-wrapper" aria-hidden="true">
-              {{- 'icon-heart.svg' | inline_asset_content -}}
+              {{- 'icon-phone-waves.svg' | inline_asset_content -}}
             </span>
           </a>
         {% endif %}
@@ -405,6 +404,31 @@
 
   .showcase-header__utility-link:hover {
     text-decoration: underline;
+  }
+
+  /* Solid brand pill in the far-left utility slot, replacing the old location picker. */
+  .showcase-header__call {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    padding: 6px var(--padding-sm);
+    border-radius: 999px;
+    background-color: var(--showcase-call-background);
+    color: var(--showcase-call-text);
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .showcase-header__call:hover {
+    opacity: var(--opacity-90);
+  }
+
+  .showcase-header__call .svg-wrapper,
+  .showcase-header__call svg {
+    width: var(--icon-size-xs);
+    height: var(--icon-size-xs);
+    color: var(--showcase-call-text);
   }
 
   /* ---------- Shared disclosure dropdown ---------- */
@@ -837,15 +861,50 @@
       "default": true
     },
     {
+      "type": "header",
+      "content": "Call us"
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "Phone number",
+      "default": "+20 100 000 0000",
+      "info": "Shared by the Call Us pill and the header phone icon. Both hide when blank."
+    },
+    {
+      "type": "text",
+      "id": "call_label",
+      "label": "Call button label",
+      "default": "Call Us"
+    },
+    {
       "type": "checkbox",
-      "id": "show_location",
-      "label": "Show location selector",
+      "id": "show_call_button",
+      "label": "Show Call Us pill in the utility bar",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_phone",
+      "label": "Show phone icon in the header icon row",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "call_background",
+      "label": "Call Us pill background",
+      "default": "#e8262d"
+    },
+    {
+      "type": "color",
+      "id": "call_text_color",
+      "label": "Call Us pill text",
+      "default": "#ffffff"
     },
     {
       "type": "text",
       "id": "location_label",
-      "label": "Location name",
+      "label": "Location name (mobile pin)",
       "default": "Lorem City"
     },
     {
@@ -970,12 +1029,6 @@
       "id": "account_link",
       "label": "Account link",
       "info": "Used only when customer accounts are disabled."
-    },
-    {
-      "type": "checkbox",
-      "id": "show_wishlist",
-      "label": "Show wishlist icon",
-      "default": true
     },
     {
       "type": "text",

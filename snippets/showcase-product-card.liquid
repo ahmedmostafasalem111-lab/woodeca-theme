@@ -166,20 +166,14 @@
       </button>
     {% endif %}
 
-    {% if show_quick_add %}
-      <button
-        type="button"
-        class="showcase-card__quick-add"
-        aria-label="Add {{ card_title | escape }} to cart"
-      >
-        <span class="svg-wrapper" aria-hidden="true">
-          {{- 'icon-cart.svg' | inline_asset_content -}}
-        </span>
-      </button>
-    {% endif %}
   </div>
 
+  {%- comment -%}
+    The cart button lives in the text row, not the image box, so the media panel
+    holds only the photo and the wishlist heart.
+  {%- endcomment -%}
   <div class="showcase-card__info">
+    <div class="showcase-card__info-text">
     <div class="showcase-card__price-row">
       <span class="showcase-card__price">{{ card_price }}</span>
 
@@ -257,6 +251,19 @@
         {{ variant_button_label | default: 'Change color and options' }}
       </a>
     {% endif %}
+    </div>
+
+    {% if show_quick_add %}
+      <button
+        type="button"
+        class="showcase-card__quick-add"
+        aria-label="Add {{ card_title | escape }} to cart"
+      >
+        <span class="svg-wrapper" aria-hidden="true">
+          {{- 'icon-cart.svg' | inline_asset_content -}}
+        </span>
+      </button>
+    {% endif %}
   </div>
 </div>
 
@@ -285,17 +292,20 @@
     height: 100%;
   }
 
-  /* Product photo is inset so it reads as a catalogue shot rather than a bleed image. */
+  /*
+    Product photo is inset so it reads as a catalogue shot rather than a bleed image.
+    92% is 15% larger than the previous 80%; the media box itself is unchanged.
+  */
   .showcase-card__image {
-    width: 80%;
-    height: 80%;
+    width: 92%;
+    height: 92%;
     object-fit: contain;
     mix-blend-mode: multiply;
   }
 
   .showcase-card__image--placeholder {
-    width: 80%;
-    height: 80%;
+    width: 92%;
+    height: 92%;
     fill: rgb(var(--color-foreground-rgb) / var(--opacity-20));
   }
 
@@ -335,9 +345,7 @@
   }
 
   .showcase-card__quick-add {
-    position: absolute;
-    right: var(--padding-xs);
-    bottom: var(--padding-xs);
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -362,11 +370,25 @@
     height: var(--icon-size-sm);
   }
 
+  /*
+    Text row: name/price block on the left, circular cart button right-aligned and
+    centred against it. Matches the reference, where the button sits outside the
+    image box rather than overlapping the photo.
+  */
   .showcase-card__info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-xs);
+    padding-block-start: var(--padding-sm);
+  }
+
+  .showcase-card__info-text {
     display: flex;
     flex-direction: column;
     gap: var(--gap-3xs);
-    padding-block-start: var(--padding-sm);
+    min-width: 0;
   }
 
   .showcase-card__price-row {

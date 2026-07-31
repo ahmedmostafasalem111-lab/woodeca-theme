@@ -795,6 +795,74 @@
         "padding-block-end": 56
       }
     },
+    "s7b_why": {
+      "type": "showcase-why",
+      "blocks": {
+        "f1": {
+          "type": "feature",
+          "settings": {
+            "icon": "store",
+            "title": "Made by Woodeca",
+            "description": "Designed and built in our own workshop, not resold."
+          }
+        },
+        "f2": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Built to last",
+            "description": "Solid materials and a warranty on every piece."
+          }
+        },
+        "f3": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Nationwide delivery",
+            "description": "Delivered and assembled across the country."
+          }
+        },
+        "f4": {
+          "type": "feature",
+          "settings": {
+            "icon": "chat",
+            "title": "Local support",
+            "description": "A local team on hand before and after you buy."
+          }
+        }
+      },
+      "block_order": ["f1", "f2", "f3", "f4"],
+      "settings": {
+        "heading": "Why Woodeca?",
+        "columns": 4,
+        "icon_size": 64,
+        "show_mission": true,
+        "band_background": "#f5f5f5"
+      }
+    },
+    "s7c_payments": {
+      "type": "showcase-logo-marquee",
+      "blocks": {
+        "l1": { "type": "logo", "settings": { "alt": "Visa" } },
+        "l2": { "type": "logo", "settings": { "alt": "Mastercard" } },
+        "l3": { "type": "logo", "settings": { "alt": "American Express" } },
+        "l4": { "type": "logo", "settings": { "alt": "Meeza" } },
+        "l5": { "type": "logo", "settings": { "alt": "Fawry" } },
+        "l6": { "type": "logo", "settings": { "alt": "ValU" } },
+        "l7": { "type": "logo", "settings": { "alt": "Cash on delivery" } },
+        "l8": { "type": "logo", "settings": { "alt": "Instalments" } }
+      },
+      "block_order": ["l1", "l2", "l3", "l4", "l5", "l6", "l7", "l8"],
+      "settings": {
+        "show_heading": true,
+        "heading": "Payment Partners",
+        "scroll_speed": 30,
+        "direction": "left",
+        "logo_height": 44,
+        "logo_max_width": 124,
+        "grayscale": false
+      }
+    },
     "s8_carousel_new": {
       "type": "showcase-product-carousel",
       "blocks": {
@@ -1115,6 +1183,8 @@
     "s5_collections",
     "s6_carousel_hits",
     "s7_promo",
+    "s7b_why",
+    "s7c_payments",
     "s8_carousel_new",
     "s9_info",
     "s10_map",

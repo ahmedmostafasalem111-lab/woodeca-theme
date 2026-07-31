@@ -97,8 +97,11 @@
     justify-content: center;
     width: 100%;
     aspect-ratio: 1 / 1;
-    /* Generous inset so the product photo floats inside the tile. */
-    padding: 14%;
+    /*
+      Inset sized so the image fills 79.2% of the box — 10% larger than the previous
+      72% (padding 14%). The box itself is untouched; only the inner padding shrinks.
+    */
+    padding: 10.4%;
   }
 
   .category-tile__image {

@@ -1,0 +1,363 @@
+{% comment %}
+  "Why Woodeca" — a tinted band holding a centred heading plus a row of icon/title/
+  description features, followed by a centred mission statement on the page
+  background below it.
+
+  The band background is placed in the same grid row as its content but spanning
+  every column, so it bleeds edge to edge while the content stays inside the shared
+  page container. Same trick base.css uses for `.section-background`.
+{% endcomment %}
+
+{% liquid
+  assign features = section.blocks | where: 'type', 'feature'
+%}
+
+<div
+  class="section section--{{ section.settings.section_width }} showcase-why spacing-style"
+  style="
+    {% render 'spacing-padding', settings: section.settings %}
+    {% if section.settings.text_color != blank %}
+      --color-foreground: {{ section.settings.text_color }};
+      --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+    {% endif %}
+    --why-band-background: {{ section.settings.band_background | default: '#f5f5f5' }};
+    --why-columns: {{ section.settings.columns }};
+    --why-icon-size: {{ section.settings.icon_size }}px;
+    --why-heading-size: {{ section.settings.heading_size }};
+    --why-mission-size: {{ section.settings.mission_size }};
+  "
+>
+  {% if section.settings.heading != blank or features.size > 0 %}
+    <div class="showcase-why__band-background" aria-hidden="true"></div>
+
+    <div class="showcase-why__band">
+      {% if section.settings.heading != blank %}
+        <h2 class="showcase-why__heading">{{ section.settings.heading }}</h2>
+      {% endif %}
+
+      {% if features.size > 0 %}
+        <div class="showcase-why__grid">
+          {% for block in features %}
+            <div class="why-feature" {{ block.shopify_attributes }}>
+              <span class="svg-wrapper why-feature__icon" aria-hidden="true">
+                {% if block.settings.icon_image != blank %}
+                  {{ block.settings.icon_image | image_url: width: 200 | image_tag: loading: 'lazy', alt: '' }}
+                {% else %}
+                  {% assign icon_file = 'icon-' | append: block.settings.icon | append: '.svg' %}
+                  {{- icon_file | inline_asset_content -}}
+                {% endif %}
+              </span>
+
+              {% if block.settings.title != blank %}
+                <p class="why-feature__title">{{ block.settings.title }}</p>
+              {% endif %}
+
+              {% if block.settings.description != blank %}
+                <p class="why-feature__text">{{ block.settings.description }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if section.settings.show_mission and section.settings.mission != blank %}
+    <div class="showcase-why__mission">{{ section.settings.mission }}</div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .showcase-why {
+    row-gap: 0;
+  }
+
+  /* Spans every grid column so the tint bleeds to the viewport edges. */
+  .showcase-why__band-background {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    background-color: var(--why-band-background);
+  }
+
+  /* Sits in the same row, but inside the page container. */
+  .showcase-why__band {
+    grid-column: 2;
+    grid-row: 1;
+    padding-block: var(--padding-4xl);
+  }
+
+  .showcase-why__heading {
+    margin: 0 0 var(--margin-3xl);
+    font-size: var(--why-heading-size, var(--font-size--3xl));
+    font-weight: 400;
+    line-height: var(--line-height--heading-tight);
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .showcase-why__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--why-columns, 4), minmax(0, 1fr));
+    gap: var(--gap-xl);
+  }
+
+  .why-feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap-xs);
+    text-align: center;
+  }
+
+  .why-feature__icon,
+  .why-feature__icon svg,
+  .why-feature__icon img {
+    width: var(--why-icon-size, 64px);
+    height: var(--why-icon-size, 64px);
+    object-fit: contain;
+    color: var(--color-foreground);
+    /* Thin stroke to match the line-art reference. */
+    --icon-stroke-width: 1;
+  }
+
+  .why-feature__title {
+    margin: 0;
+    font-size: var(--font-size--md);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  .why-feature__text {
+    margin: 0;
+    max-width: 34ch;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--sm);
+    text-wrap: balance;
+  }
+
+  /* Mission sits on the page background, below the tinted band. */
+  .showcase-why__mission {
+    grid-column: 2;
+    grid-row: 2;
+    padding-block: var(--padding-4xl);
+    font-size: var(--why-mission-size, var(--font-size--2xl));
+    line-height: var(--line-height--heading-tight);
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .showcase-why__mission > :first-child {
+    margin-block-start: 0;
+  }
+
+  .showcase-why__mission > :last-child {
+    margin-block-end: 0;
+  }
+
+  @media screen and (max-width: 989px) {
+    .showcase-why__grid {
+      /* Two per row on tablet and phone, same stacking order. */
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--gap-lg);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .showcase-why__band,
+    .showcase-why__mission {
+      padding-block: var(--padding-2xl);
+    }
+
+    .showcase-why__heading {
+      margin-block-end: var(--margin-xl);
+      font-size: var(--font-size--xl);
+    }
+
+    .showcase-why__mission {
+      font-size: var(--font-size--lg);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Why Woodeca",
+  "tag": "section",
+  "class": "section-showcase-why",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Why Woodeca?"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        { "value": "var(--font-size--2xl)", "label": "Medium" },
+        { "value": "var(--font-size--3xl)", "label": "Large" },
+        { "value": "var(--font-size--4xl)", "label": "Extra large" }
+      ],
+      "default": "var(--font-size--3xl)"
+    },
+    {
+      "type": "header",
+      "content": "Features"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Features per row on desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon size",
+      "min": 40,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Mission statement"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mission",
+      "label": "Show mission statement",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "mission",
+      "label": "Mission statement",
+      "default": "<p>Our mission is to make it easy to create a home you'll love with modern, thoughtfully designed furniture built to last.</p>"
+    },
+    {
+      "type": "select",
+      "id": "mission_size",
+      "label": "Mission statement size",
+      "options": [
+        { "value": "var(--font-size--xl)", "label": "Medium" },
+        { "value": "var(--font-size--2xl)", "label": "Large" },
+        { "value": "var(--font-size--3xl)", "label": "Extra large" }
+      ],
+      "default": "var(--font-size--2xl)"
+    },
+    {
+      "type": "header",
+      "content": "Layout and colors"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "band_background",
+      "label": "Feature band background",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "placeholder": "Default"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "shield", "label": "Shield" },
+            { "value": "truck", "label": "Truck" },
+            { "value": "chat", "label": "Chat" },
+            { "value": "store", "label": "Store" },
+            { "value": "card", "label": "Card" },
+            { "value": "return", "label": "Return" },
+            { "value": "star", "label": "Star" },
+            { "value": "pin", "label": "Pin" }
+          ],
+          "default": "shield"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Custom icon",
+          "info": "Overrides the icon above. Use a line-art image on a transparent background."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Feature title"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "One or two lines of supporting copy for this feature."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Why Woodeca",
+      "blocks": [
+        { "type": "feature", "settings": { "icon": "store", "title": "Made by Woodeca" } },
+        { "type": "feature", "settings": { "icon": "shield", "title": "Built to last" } },
+        { "type": "feature", "settings": { "icon": "truck", "title": "Nationwide delivery" } },
+        { "type": "feature", "settings": { "icon": "chat", "title": "Local support" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
