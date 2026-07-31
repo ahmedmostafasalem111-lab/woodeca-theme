@@ -60,6 +60,7 @@
         "autoplay_speed": 6,
         "show_arrows": true,
         "show_dots": true,
+        "section_width": "page-width",
         "text_color": "#ffffff",
         "overlay_color": "#000000",
         "overlay_opacity": 45
@@ -73,7 +74,7 @@
           "settings": {
             "image": "shopify://shop_images/Untitled_design_da91e8b6-82e6-49d1-80f3-20bdf9c6c7f6.png",
             "label": "Drawer Units",
-            "link": ""
+            "link": "shopify://collections/drawer-units"
           }
         },
         "cat_2": {
@@ -81,7 +82,7 @@
           "settings": {
             "image": "shopify://shop_images/2_08d8f7e8-92d5-4a5f-9297-803e4c39b766.jpg",
             "label": "Wardrobes",
-            "link": ""
+            "link": "shopify://collections/wardrobes"
           }
         },
         "cat_3": {
@@ -89,7 +90,7 @@
           "settings": {
             "image": "shopify://shop_images/3_2bcfb792-19b5-4db0-91d4-4e1553862718.jpg",
             "label": "Beds",
-            "link": ""
+            "link": "shopify://collections/beds-1"
           }
         },
         "cat_4": {

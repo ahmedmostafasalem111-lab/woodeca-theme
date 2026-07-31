@@ -11,29 +11,46 @@
   "type": "header",
   "name": "t:names.header",
   "sections": {
+    "header_announcements_pGrRgG": {
+      "type": "header-announcements",
+      "blocks": {
+        "announcement_iyAfVX": {
+          "type": "_announcement",
+          "settings": {
+            "text": "Factory-Direct • Made by Woodeca",
+            "link": "",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "weight": "100",
+            "letter_spacing": "normal",
+            "case": "none",
+            "text_color": ""
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "announcement_iyAfVX"
+      ],
+      "name": "t:names.announcement_bar",
+      "settings": {
+        "speed": 5,
+        "section_width": "page-width",
+        "background_color": "#CBDDE3",
+        "text_color": "",
+        "divider_width": 0,
+        "divider_color": "",
+        "padding-block-start": 12,
+        "padding-block-end": 12
+      }
+    },
     "showcase_header": {
       "type": "showcase-header",
       "blocks": {
-        "utility_contact": {
-          "type": "utility_left",
-          "settings": {
-            "label": "Contact us",
-            "menu": "",
-            "link": ""
-          }
-        },
         "utility_buyers": {
           "type": "utility_right",
           "settings": {
-            "label": "For buyers",
-            "menu": "",
-            "link": ""
-          }
-        },
-        "utility_bonuses": {
-          "type": "utility_right",
-          "settings": {
-            "label": "Lorem Club bonuses",
+            "label": "For Bussiness",
             "menu": "",
             "link": ""
           }
@@ -41,44 +58,15 @@
         "utility_business": {
           "type": "utility_right",
           "settings": {
-            "label": "For business",
+            "label": "For Designers",
             "menu": "",
-            "link": ""
-          }
-        },
-        "utility_designers": {
-          "type": "utility_right",
-          "settings": {
-            "label": "For designers",
-            "menu": "",
-            "link": ""
-          }
-        },
-        "nav_stock": {
-          "type": "nav_link",
-          "settings": {
-            "label": "Stock",
-            "link": ""
-          }
-        },
-        "nav_magazine": {
-          "type": "nav_link",
-          "settings": {
-            "label": "Magazine",
-            "link": ""
-          }
-        },
-        "nav_showrooms": {
-          "type": "nav_link",
-          "settings": {
-            "label": "Showrooms",
             "link": ""
           }
         },
         "promo_express": {
           "type": "promo_link",
           "settings": {
-            "label": "Express design",
+            "label": "Ready To Ship",
             "link": "",
             "highlight": false
           }
@@ -86,7 +74,7 @@
         "promo_children": {
           "type": "promo_link",
           "settings": {
-            "label": "Children's furniture",
+            "label": "Bedroom furniture",
             "link": "",
             "highlight": false
           }
@@ -94,7 +82,7 @@
         "promo_office": {
           "type": "promo_link",
           "settings": {
-            "label": "Office furniture",
+            "label": "Kids furniture",
             "link": "",
             "highlight": false
           }
@@ -102,7 +90,7 @@
         "promo_decor": {
           "type": "promo_link",
           "settings": {
-            "label": "Decor and textiles",
+            "label": "Living Room furniture",
             "link": "",
             "highlight": false
           }
@@ -110,7 +98,7 @@
         "promo_sale": {
           "type": "promo_link",
           "settings": {
-            "label": "Up to 50% off home and garden furniture",
+            "label": "Dining Room furniture",
             "link": "",
             "highlight": false
           }
@@ -133,14 +121,8 @@
         }
       },
       "block_order": [
-        "utility_contact",
         "utility_buyers",
-        "utility_bonuses",
         "utility_business",
-        "utility_designers",
-        "nav_stock",
-        "nav_magazine",
-        "nav_showrooms",
         "promo_express",
         "promo_children",
         "promo_office",
@@ -165,7 +147,7 @@
         "nav_font_size": "var(--font-size--md)",
         "nav_label": "Main navigation",
         "menu_label": "Menu",
-        "search_placeholder": "Enter your query",
+        "search_placeholder": "Search Home",
         "search_submit_label": "Search",
         "show_photo_search": true,
         "photo_search_label": "Search by photo",
@@ -178,7 +160,7 @@
         "wishlist_link": "",
         "cart_label": "Cart",
         "show_cart_count": true,
-        "show_mobile_chat": true,
+        "show_mobile_chat": false,
         "mobile_chat_label": "Chat",
         "mobile_chat_link": "",
         "show_mobile_location": true,
@@ -200,6 +182,7 @@
     }
   },
   "order": [
+    "header_announcements_pGrRgG",
     "showcase_header"
   ]
 }
