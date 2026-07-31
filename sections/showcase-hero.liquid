@@ -1,11 +1,15 @@
 {% comment %}
-  Full-bleed hero carousel. Each slide carries its own image, eyebrow line,
-  heading, subheading and underlined text link. Content sits centre-left and a
-  little below the vertical centre, matching the reference layout.
+  Hero carousel. Each slide carries its own image, eyebrow line, heading,
+  subheading and underlined text link. Content sits centre-left and a little
+  below the vertical centre, matching the reference layout.
+
+  Width follows the same page container as every other section, so the banner
+  lines up with the tiles and carousels below it. Switch to Full in the editor
+  for an edge-to-edge banner.
 {% endcomment %}
 
 <showcase-hero-component
-  class="showcase-hero section section--full-width"
+  class="showcase-hero section section--{{ section.settings.section_width }}"
   {% if section.settings.autoplay %}
     autoplay="{{ section.settings.autoplay_speed }}"
   {% endif %}
@@ -406,6 +410,17 @@
       "id": "show_dots",
       "label": "Show dot indicators",
       "default": true
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width",
+      "info": "Page keeps the banner aligned with the sections below it."
     },
     {
       "type": "header",
