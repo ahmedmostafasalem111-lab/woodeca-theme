@@ -122,7 +122,13 @@
     min-width: 0;
     overflow: hidden;
     user-select: none;
-    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    /*
+      Narrow fade. At 5% of a ~1600px strip the ramp is 80px wide, which washes out
+      most of whichever logo is at the edge; 2% keeps the softening without eating one.
+      Prefixed copy for WebKit, which still needs it.
+    */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 2%, black 98%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 2%, black 98%, transparent 100%);
   }
 
   .logo-marquee__track {
@@ -288,20 +294,21 @@
       "id": "logo_height",
       "label": "Logo height",
       "min": 20,
-      "max": 72,
+      "max": 120,
       "step": 4,
       "unit": "px",
-      "default": 44
+      "default": 64,
+      "info": "Raise this if your logo files have white space baked around the mark."
     },
     {
       "type": "range",
       "id": "logo_max_width",
       "label": "Logo maximum width",
       "min": 60,
-      "max": 200,
+      "max": 260,
       "step": 4,
       "unit": "px",
-      "default": 124
+      "default": 160
     },
     {
       "type": "checkbox",
