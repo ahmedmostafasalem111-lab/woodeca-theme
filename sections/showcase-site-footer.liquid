@@ -1,0 +1,763 @@
+{% comment %}
+  Site footer — three stacked bands separated by thin rules:
+    1. Link columns + contact block
+    2. Payment provider logos (static row; the scrolling marquee is a separate section)
+    3. Logo + acknowledgement text + social icons
+
+  Link columns come from Shopify menus rather than nested blocks, so links are
+  managed in Navigation. On mobile the columns render a second time as accordions
+  and the desktop grid is hidden — the same two-version approach as the reference,
+  because a closed <details> can't be reliably forced open with CSS across browsers.
+{% endcomment %}
+
+{% liquid
+  assign columns = section.blocks | where: 'type', 'column'
+  assign payments = section.blocks | where: 'type', 'payment'
+  assign socials = section.blocks | where: 'type', 'social'
+
+  # Count blocks that actually carry an image, so a band of not-yet-populated
+  # blocks collapses instead of rendering as an empty gap between two rules.
+  assign payment_count = 0
+  for block in payments
+    if block.settings.image != blank
+      assign payment_count = payment_count | plus: 1
+    endif
+  endfor
+%}
+
+{%- comment -%}
+  base.css forces `.section` transparent, so the tint has to live on this sibling.
+{%- endcomment -%}
+<div
+  class="section-background"
+  style="background-color: {{ section.settings.background_color | default: '#f6f6f6' }};"
+></div>
+
+<div
+  class="section section--{{ section.settings.section_width }} site-footer spacing-style"
+  style="
+    {% render 'spacing-padding', settings: section.settings %}
+    --footer-background: {{ section.settings.background_color | default: '#f6f6f6' }};
+    --footer-divider: {{ section.settings.divider_color | default: '#e7e7e7' }};
+    --footer-heading-color: {{ section.settings.heading_color | default: '#181818' }};
+    --footer-text-color: {{ section.settings.text_color | default: '#5c5c5c' }};
+    --footer-logo-height: {{ section.settings.logo_height }}px;
+    --footer-payment-height: {{ section.settings.payment_height }}px;
+  "
+>
+  {%- comment -%} ---------- Band 1: link columns + contact ---------- {%- endcomment -%}
+  {% if section.settings.show_links_band %}
+    <div class="site-footer__band site-footer__band--links">
+      {%- comment -%} Contact sits first in the DOM; desktop order is set in CSS. {%- endcomment -%}
+      {% if section.settings.show_contact %}
+        <div class="footer-contact">
+          {% if section.settings.contact_heading != blank %}
+            <h3 class="footer-heading">{{ section.settings.contact_heading }}</h3>
+          {% endif %}
+
+          {% if section.settings.contact_support != blank %}
+            <p class="footer-contact__support">{{ section.settings.contact_support }}</p>
+          {% endif %}
+
+          {% if section.settings.phone_number != blank %}
+            {% assign phone_href = section.settings.phone_number | remove: ' ' | remove: '(' | remove: ')' | remove: '-' %}
+            <a href="tel:{{ phone_href }}" class="footer-contact__row">
+              {% if section.settings.phone_icon != blank %}
+                {{
+                  section.settings.phone_icon
+                  | image_url: width: 96
+                  | image_tag: loading: 'lazy', class: 'footer-contact__icon', alt: ''
+                }}
+              {% endif %}
+              <span class="footer-contact__text">
+                <span class="footer-contact__label">{{ section.settings.phone_label | default: 'Call us' }}</span>
+                <span class="footer-contact__value">{{ section.settings.phone_number }}</span>
+              </span>
+            </a>
+          {% endif %}
+
+          {% if section.settings.email_link_text != blank %}
+            <a href="{{ section.settings.email_link | default: '#' }}" class="footer-contact__row">
+              {% if section.settings.email_icon != blank %}
+                {{
+                  section.settings.email_icon
+                  | image_url: width: 96
+                  | image_tag: loading: 'lazy', class: 'footer-contact__icon', alt: ''
+                }}
+              {% endif %}
+              <span class="footer-contact__text">
+                <span class="footer-contact__label">{{ section.settings.email_label | default: 'Email us' }}</span>
+                <span class="footer-contact__value">{{ section.settings.email_link_text }}</span>
+              </span>
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if columns.size > 0 %}
+        {%- comment -%} Desktop: side-by-side columns. {%- endcomment -%}
+        <div class="footer-columns">
+          {% for block in columns %}
+            <div class="footer-column" {{ block.shopify_attributes }}>
+              {% if block.settings.heading != blank %}
+                <h3 class="footer-heading">{{ block.settings.heading }}</h3>
+              {% endif %}
+
+              {% if block.settings.menu != blank %}
+                <ul class="footer-column__list">
+                  {% for link in block.settings.menu.links %}
+                    <li><a href="{{ link.url }}" class="footer-column__link">{{ link.title }}</a></li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+
+        {%- comment -%} Mobile: the same columns as collapsed accordions. {%- endcomment -%}
+        <div class="footer-accordions">
+          {% for block in columns %}
+            <details class="footer-accordion">
+              <summary class="footer-accordion__summary">
+                <span class="footer-heading">{{ block.settings.heading }}</span>
+                <span class="svg-wrapper footer-accordion__chevron" aria-hidden="true">
+                  {{- 'icon-chevron-down.svg' | inline_asset_content -}}
+                </span>
+              </summary>
+
+              {% if block.settings.menu != blank %}
+                <ul class="footer-column__list">
+                  {% for link in block.settings.menu.links %}
+                    <li><a href="{{ link.url }}" class="footer-column__link">{{ link.title }}</a></li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </details>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {%- comment -%} ---------- Band 2: payment logos ---------- {%- endcomment -%}
+  {% if section.settings.show_payments_band and payment_count > 0 %}
+    <div class="site-footer__band site-footer__band--payments">
+      {% for block in payments %}
+        {% if block.settings.image != blank %}
+          <span class="footer-payment" {{ block.shopify_attributes }}>
+            {{
+              block.settings.image
+              | image_url: width: 240
+              | image_tag: loading: 'lazy', class: 'footer-payment__logo', alt: block.settings.alt
+            }}
+          </span>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {%- comment -%} ---------- Band 3: logo + text + social ---------- {%- endcomment -%}
+  {% if section.settings.show_bottom_band %}
+    <div class="site-footer__band site-footer__band--bottom">
+      <div class="footer-bottom__logo">
+        {%- comment -%}
+          The header's logo lives in its own section setting and isn't reachable from
+          here, so the fallback is the store's brand logo.
+        {%- endcomment -%}
+        {% liquid
+          assign bottom_logo = section.settings.logo
+          if bottom_logo == blank
+            assign bottom_logo = shop.brand.logo
+          endif
+        %}
+        {% if bottom_logo != blank %}
+          <a href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
+            {{
+              bottom_logo
+              | image_url: width: 600
+              | image_tag: loading: 'lazy', class: 'footer-bottom__logo-img', alt: shop.name
+            }}
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="footer-bottom__center">
+        {% if section.settings.acknowledgement != blank %}
+          <div class="footer-bottom__text">{{ section.settings.acknowledgement }}</div>
+        {% endif %}
+
+        {% if section.settings.legal_menu != blank %}
+          <ul class="footer-bottom__legal">
+            {% for link in section.settings.legal_menu.links %}
+              <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <div class="footer-bottom__social">
+        {% for block in socials %}
+          <a
+            href="{{ block.settings.link | default: '#' }}"
+            class="footer-social"
+            aria-label="{{ block.settings.label | default: 'Social' | escape }}"
+            {{ block.shopify_attributes }}
+          >
+            {% if block.settings.icon != blank %}
+              {{
+                block.settings.icon
+                | image_url: width: 60
+                | image_tag: loading: 'lazy', class: 'footer-social__icon', alt: ''
+              }}
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .site-footer {
+    color: var(--footer-text-color);
+  }
+
+  .site-footer__band + .site-footer__band {
+    border-block-start: 1px solid var(--footer-divider);
+  }
+
+  .footer-heading {
+    margin: 0 0 var(--margin-md);
+    color: var(--footer-heading-color);
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  /* ---- Band 1 ---- */
+  .site-footer__band--links {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--gap-2xl);
+    padding-block: 48px;
+  }
+
+  .footer-columns {
+    display: flex;
+    /* Columns sit left of the contact block, which is first in the DOM. */
+    order: -1;
+  }
+
+  .footer-column {
+    width: 224px;
+    margin-inline-end: 48px;
+  }
+
+  .footer-column__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer-column__list li + li {
+    margin-block-start: 14px;
+  }
+
+  .footer-column__link {
+    color: var(--footer-text-color);
+    font-size: var(--font-size--sm);
+    line-height: 1.6;
+    text-decoration: none;
+  }
+
+  .footer-column__link:hover {
+    text-decoration: underline;
+  }
+
+  /* Accordions are mobile-only; the grid above covers desktop. */
+  .footer-accordions {
+    display: none;
+  }
+
+  .footer-contact {
+    flex: 0 0 264px;
+    width: 264px;
+  }
+
+  .footer-contact__support {
+    margin: 0 0 var(--margin-lg);
+    font-size: var(--font-size--sm);
+  }
+
+  .footer-contact__row {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    color: var(--footer-text-color);
+    text-decoration: none;
+  }
+
+  .footer-contact__row + .footer-contact__row {
+    margin-block-start: 40px;
+  }
+
+  .footer-contact__icon {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+  }
+
+  .footer-contact__text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .footer-contact__label {
+    color: var(--footer-heading-color);
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+  }
+
+  .footer-contact__value {
+    font-size: var(--font-size--sm);
+  }
+
+  /* ---- Band 2 ---- */
+  .site-footer__band--payments {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Wraps to a second centred row rather than scrolling. */
+    flex-wrap: wrap;
+    gap: var(--gap-lg);
+    padding-block: var(--padding-lg);
+  }
+
+  .footer-payment {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .footer-payment__logo {
+    width: auto;
+    height: var(--footer-payment-height, 24px);
+    max-width: 64px;
+    object-fit: contain;
+  }
+
+  /* ---- Band 3 ---- */
+  .site-footer__band--bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-lg);
+    padding-block: 32px;
+  }
+
+  .footer-bottom__logo-img {
+    display: block;
+    width: auto;
+    height: var(--footer-logo-height, 44px);
+    object-fit: contain;
+  }
+
+  .footer-bottom__center {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap-2xs);
+    text-align: center;
+  }
+
+  .footer-bottom__text {
+    max-width: 70ch;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .footer-bottom__text > :first-child {
+    margin-block-start: 0;
+  }
+
+  .footer-bottom__text > :last-child {
+    margin-block-end: 0;
+  }
+
+  .footer-bottom__legal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--gap-md);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer-bottom__legal a {
+    color: var(--footer-text-color);
+    font-size: 14px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .footer-bottom__social {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-md);
+  }
+
+  .footer-social__icon {
+    display: block;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+  }
+
+  @media screen and (max-width: 989px) {
+    /* Contact moves above the accordions, matching the reference's column-reverse. */
+    .site-footer__band--links {
+      flex-direction: column;
+      gap: var(--gap-xl);
+      padding-block: var(--padding-xl);
+    }
+
+    .footer-contact {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+
+    .footer-columns {
+      display: none;
+    }
+
+    .footer-accordions {
+      display: block;
+      order: 1;
+    }
+
+    .footer-accordion {
+      border-block-start: 1px solid var(--footer-divider);
+    }
+
+    .footer-accordion:last-child {
+      border-block-end: 1px solid var(--footer-divider);
+    }
+
+    .footer-accordion__summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--gap-sm);
+      padding-block: var(--padding-md);
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .footer-accordion__summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .footer-accordion__summary .footer-heading {
+      margin: 0;
+    }
+
+    .footer-accordion__chevron,
+    .footer-accordion__chevron svg {
+      width: var(--icon-size-xs);
+      height: var(--icon-size-xs);
+      transition: rotate var(--animation-speed) var(--animation-easing);
+    }
+
+    .footer-accordion[open] .footer-accordion__chevron {
+      rotate: 180deg;
+    }
+
+    .footer-accordion .footer-column__list {
+      padding-block-end: var(--padding-md);
+    }
+
+    /* Bottom bar reverses: social, then text, then logo. */
+    .site-footer__band--bottom {
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: var(--gap-lg);
+      padding-block: var(--padding-xl);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Site footer",
+  "tag": "footer",
+  "class": "section-site-footer",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Bands"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_links_band",
+      "label": "Show link columns and contact",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payments_band",
+      "label": "Show payment logos",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bottom_band",
+      "label": "Show bottom bar",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Contact block"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact",
+      "label": "Show contact block",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "contact_heading",
+      "label": "Heading",
+      "default": "Any questions? We can help"
+    },
+    {
+      "type": "text",
+      "id": "contact_support",
+      "label": "Supporting line",
+      "default": "Available Sunday to Thursday, 9am to 6pm"
+    },
+    {
+      "type": "image_picker",
+      "id": "phone_icon",
+      "label": "Phone icon"
+    },
+    {
+      "type": "text",
+      "id": "phone_label",
+      "label": "Phone label",
+      "default": "Call us"
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "Phone number",
+      "default": "+20 10 41920335"
+    },
+    {
+      "type": "image_picker",
+      "id": "email_icon",
+      "label": "Email icon"
+    },
+    {
+      "type": "text",
+      "id": "email_label",
+      "label": "Email label",
+      "default": "Email us"
+    },
+    {
+      "type": "text",
+      "id": "email_link_text",
+      "label": "Email link text",
+      "default": "Send us a message"
+    },
+    {
+      "type": "url",
+      "id": "email_link",
+      "label": "Email link"
+    },
+    {
+      "type": "header",
+      "content": "Payment logos"
+    },
+    {
+      "type": "range",
+      "id": "payment_height",
+      "label": "Logo height",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Bottom bar"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo",
+      "info": "Falls back to the store's brand logo. Pick your header logo here if the bar looks empty."
+    },
+    {
+      "type": "range",
+      "id": "logo_height",
+      "label": "Logo height",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "richtext",
+      "id": "acknowledgement",
+      "label": "Acknowledgement text",
+      "default": "<p>Woodeca designs and builds furniture in our own workshop, so every piece reaches you without a middleman.</p>"
+    },
+    {
+      "type": "link_list",
+      "id": "legal_menu",
+      "label": "Legal links menu"
+    },
+    {
+      "type": "header",
+      "content": "Layout and colors"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#f6f6f6"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider line",
+      "default": "#e7e7e7"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Headings",
+      "default": "#181818"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Body text",
+      "default": "#5c5c5c"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Link column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "About"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "info": "Manage the links in Navigation."
+        }
+      ]
+    },
+    {
+      "type": "payment",
+      "name": "Payment logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo"
+        },
+        {
+          "type": "text",
+          "id": "alt",
+          "label": "Alt text"
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "name": "Social icon",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Accessible label",
+          "default": "Instagram"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Site footer",
+      "blocks": [
+        { "type": "column", "settings": { "heading": "About" } },
+        { "type": "column", "settings": { "heading": "Customer service" } },
+        { "type": "column", "settings": { "heading": "Information" } },
+        { "type": "social", "settings": { "label": "Instagram" } },
+        { "type": "social", "settings": { "label": "Facebook" } },
+        { "type": "social", "settings": { "label": "YouTube" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
