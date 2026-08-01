@@ -11,6 +11,142 @@
   "type": "footer",
   "name": "t:names.footer",
   "sections": {
+    "site_footer": {
+      "type": "showcase-site-footer",
+      "blocks": {
+        "col_1": {
+          "type": "column",
+          "settings": {
+            "heading": "About",
+            "menu": "footer-1"
+          }
+        },
+        "col_2": {
+          "type": "column",
+          "settings": {
+            "heading": "Customer service",
+            "menu": "footer-2"
+          }
+        },
+        "col_3": {
+          "type": "column",
+          "settings": {
+            "heading": "Wholesale & Projects",
+            "menu": "footer-3"
+          }
+        },
+        "pay_pay_2": {
+          "type": "payment",
+          "settings": {
+            "image": "shopify://shop_images/6.png",
+            "alt": "Valu"
+          }
+        },
+        "pay_pay_3": {
+          "type": "payment",
+          "settings": {
+            "image": "shopify://shop_images/1_8186a6be-58bf-4851-8186-a8e5edef6e36.png",
+            "alt": "Amex"
+          }
+        },
+        "pay_pay_1": {
+          "type": "payment",
+          "settings": {
+            "image": "shopify://shop_images/3.png",
+            "alt": "Mastercard"
+          }
+        },
+        "soc_soc_3": {
+          "type": "social",
+          "settings": {
+            "icon": "shopify://shop_images/4_63de3c7f-28a9-4a2a-9da2-256486ddd6a9.png",
+            "label": "Instagram",
+            "link": ""
+          }
+        },
+        "soc_soc_4": {
+          "type": "social",
+          "settings": {
+            "icon": "shopify://shop_images/5.png",
+            "label": "Pinterest",
+            "link": ""
+          }
+        },
+        "soc_soc_5": {
+          "type": "social",
+          "settings": {
+            "icon": "shopify://shop_images/2.png",
+            "label": "TikTok",
+            "link": ""
+          }
+        },
+        "social_6FEpy7": {
+          "type": "social",
+          "settings": {
+            "icon": "shopify://shop_images/8_c1a4bd5a-d82a-4733-a8cd-61c9a5c1c4c5.png",
+            "label": "TikTok",
+            "link": ""
+          }
+        },
+        "social_VEpAeY": {
+          "type": "social",
+          "settings": {
+            "icon": "shopify://shop_images/9_05176fcb-a875-4a45-8d27-25184e419109.png",
+            "label": "TikTok",
+            "link": ""
+          }
+        },
+        "social_bLqrp3": {
+          "type": "social",
+          "settings": {
+            "icon": "shopify://shop_images/7_dd50f5be-14ac-4503-80cc-a2081a5773b0.png",
+            "label": "TikTok",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "col_1",
+        "col_2",
+        "col_3",
+        "pay_pay_2",
+        "pay_pay_3",
+        "pay_pay_1",
+        "soc_soc_3",
+        "soc_soc_4",
+        "soc_soc_5",
+        "social_6FEpy7",
+        "social_VEpAeY",
+        "social_bLqrp3"
+      ],
+      "settings": {
+        "show_links_band": true,
+        "show_payments_band": true,
+        "show_bottom_band": true,
+        "show_contact": true,
+        "contact_heading": "Any questions? We can help",
+        "contact_support": "Phone calls available From 9am to 5pm  Saturday to Thrusday",
+        "phone_icon": "shopify://shop_images/Phone.svg",
+        "phone_label": "Call us",
+        "phone_number": "+20 10 41920335",
+        "email_icon": "shopify://shop_images/Email.svg",
+        "email_label": "Email us",
+        "email_link_text": "hello@woodeca.com",
+        "email_link": "mailto:hello@woodeca.com",
+        "payment_height": 32,
+        "logo": "shopify://shop_images/logo_6e4f98dc-b8f6-401f-bb77-f599e87908db.png",
+        "logo_height": 44,
+        "acknowledgement": "<p>Copyright © Woodeca 2026 rights reserved.<br/><br/></p>",
+        "legal_menu": "",
+        "section_width": "page-width",
+        "background_color": "#f6f6f6",
+        "divider_color": "#e7e7e7",
+        "heading_color": "#181818",
+        "text_color": "#5c5c5c",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
     "showcase_mobile_tab_bar": {
       "type": "showcase-mobile-tab-bar",
       "blocks": {
@@ -85,80 +221,6 @@
         "feedback_background": "#333333",
         "feedback_text_color": "#ffffff"
       }
-    },
-    "site_footer": {
-      "type": "showcase-site-footer",
-      "blocks": {
-        "col_1": {
-          "type": "column",
-          "settings": {
-            "heading": "About"
-          }
-        },
-        "col_2": {
-          "type": "column",
-          "settings": {
-            "heading": "Customer service"
-          }
-        },
-        "col_3": {
-          "type": "column",
-          "settings": {
-            "heading": "Information"
-          }
-        },
-        "pay_pay_2": {
-          "type": "payment",
-          "settings": {
-            "alt": "Visa"
-          }
-        },
-        "pay_pay_3": {
-          "type": "payment",
-          "settings": {
-            "alt": "Amex"
-          }
-        },
-        "pay_pay_1": {
-          "type": "payment",
-          "settings": {
-            "alt": "Mastercard"
-          }
-        },
-        "soc_soc_3": {
-          "type": "social",
-          "settings": {
-            "label": "Instagram",
-            "link": ""
-          }
-        },
-        "soc_soc_4": {
-          "type": "social",
-          "settings": {
-            "label": "Pinterest",
-            "link": ""
-          }
-        },
-        "soc_soc_5": {
-          "type": "social",
-          "settings": {
-            "label": "TikTok",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "col_1",
-        "col_2",
-        "col_3",
-        "pay_pay_2",
-        "pay_pay_3",
-        "pay_pay_1",
-        "soc_soc_3",
-        "soc_soc_4",
-        "soc_soc_5"
-      ],
-      "settings": {}
     }
   },
   "order": [
