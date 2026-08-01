@@ -57,52 +57,52 @@
           }
         },
         "soc_soc_3": {
-          "type": "social",
+          "type": "payment",
           "settings": {
-            "icon": "shopify://shop_images/4_63de3c7f-28a9-4a2a-9da2-256486ddd6a9.png",
-            "label": "Instagram",
-            "link": ""
-          }
+            "image": "shopify://shop_images/4_63de3c7f-28a9-4a2a-9da2-256486ddd6a9.png",
+            "alt": "Instagram"
+          },
+          "name": "Instagram"
         },
         "soc_soc_4": {
-          "type": "social",
+          "type": "payment",
           "settings": {
-            "icon": "shopify://shop_images/5.png",
-            "label": "Pinterest",
-            "link": ""
-          }
+            "image": "shopify://shop_images/5.png",
+            "alt": "Pinterest"
+          },
+          "name": "Pinterest"
         },
         "soc_soc_5": {
-          "type": "social",
+          "type": "payment",
           "settings": {
-            "icon": "shopify://shop_images/2.png",
-            "label": "TikTok",
-            "link": ""
-          }
+            "image": "shopify://shop_images/2.png",
+            "alt": "TikTok"
+          },
+          "name": "TikTok"
         },
         "social_6FEpy7": {
-          "type": "social",
+          "type": "payment",
           "settings": {
-            "icon": "shopify://shop_images/8_c1a4bd5a-d82a-4733-a8cd-61c9a5c1c4c5.png",
-            "label": "TikTok",
-            "link": ""
-          }
+            "image": "shopify://shop_images/8_c1a4bd5a-d82a-4733-a8cd-61c9a5c1c4c5.png",
+            "alt": "TikTok"
+          },
+          "name": "TikTok"
         },
         "social_VEpAeY": {
-          "type": "social",
+          "type": "payment",
           "settings": {
-            "icon": "shopify://shop_images/9_05176fcb-a875-4a45-8d27-25184e419109.png",
-            "label": "TikTok",
-            "link": ""
-          }
+            "image": "shopify://shop_images/9_05176fcb-a875-4a45-8d27-25184e419109.png",
+            "alt": "TikTok"
+          },
+          "name": "TikTok"
         },
         "social_bLqrp3": {
-          "type": "social",
+          "type": "payment",
           "settings": {
-            "icon": "shopify://shop_images/7_dd50f5be-14ac-4503-80cc-a2081a5773b0.png",
-            "label": "TikTok",
-            "link": ""
-          }
+            "image": "shopify://shop_images/7_dd50f5be-14ac-4503-80cc-a2081a5773b0.png",
+            "alt": "TikTok"
+          },
+          "name": "TikTok"
         }
       },
       "block_order": [

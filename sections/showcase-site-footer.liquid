@@ -91,6 +91,41 @@
               </span>
             </a>
           {% endif %}
+
+          {%- comment -%}
+            Location and tax rows are plain divs, not links — nothing to navigate to.
+          {%- endcomment -%}
+          {% if section.settings.show_location_row and section.settings.location_text != blank %}
+            <div class="footer-contact__row">
+              {% if section.settings.location_icon != blank %}
+                {{
+                  section.settings.location_icon
+                  | image_url: width: 96
+                  | image_tag: loading: 'lazy', class: 'footer-contact__icon', alt: ''
+                }}
+              {% endif %}
+              <span class="footer-contact__text">
+                <span class="footer-contact__label">{{ section.settings.location_label | default: 'Location' }}</span>
+                <span class="footer-contact__value">{{ section.settings.location_text }}</span>
+              </span>
+            </div>
+          {% endif %}
+
+          {% if section.settings.show_tax_row and section.settings.tax_text != blank %}
+            <div class="footer-contact__row">
+              {% if section.settings.tax_icon != blank %}
+                {{
+                  section.settings.tax_icon
+                  | image_url: width: 96
+                  | image_tag: loading: 'lazy', class: 'footer-contact__icon', alt: ''
+                }}
+              {% endif %}
+              <span class="footer-contact__text">
+                <span class="footer-contact__label">{{ section.settings.tax_label | default: 'Tax ID' }}</span>
+                <span class="footer-contact__value">{{ section.settings.tax_text }}</span>
+              </span>
+            </div>
+          {% endif %}
         </div>
       {% endif %}
 
@@ -170,12 +205,24 @@
             assign bottom_logo = shop.brand.logo
           endif
         %}
+        {%- comment -%}
+          Deliberately no `format:` or `quality:` filter here — either would re-encode
+          the file and could flatten a transparent PNG onto white. Nothing in the CSS
+          chain sets a background either, so a white box behind the logo means the
+          uploaded file itself is opaque. The blend toggle below is the workaround.
+        {%- endcomment -%}
         {% if bottom_logo != blank %}
+          {% liquid
+            assign logo_class = 'footer-bottom__logo-img'
+            if section.settings.logo_blend
+              assign logo_class = 'footer-bottom__logo-img footer-bottom__logo-img--blend'
+            endif
+          %}
           <a href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
             {{
               bottom_logo
               | image_url: width: 600
-              | image_tag: loading: 'lazy', class: 'footer-bottom__logo-img', alt: shop.name
+              | image_tag: loading: 'lazy', class: logo_class, alt: shop.name
             }}
           </a>
         {% endif %}
@@ -318,8 +365,10 @@
     font-weight: 600;
   }
 
+  /* Line-height gives a wrapped address room without affecting single-line rows. */
   .footer-contact__value {
     font-size: var(--font-size--sm);
+    line-height: 1.5;
   }
 
   /* ---- Band 2 ---- */
@@ -359,6 +408,15 @@
     width: auto;
     height: var(--footer-logo-height, 44px);
     object-fit: contain;
+  }
+
+  /*
+    Escape hatch for a logo whose white background is baked into the file: multiply
+    drops white to the band tint. Only works on a light band, and it will also mute
+    genuinely light parts of the mark — off by default.
+  */
+  .footer-bottom__logo-img--blend {
+    mix-blend-mode: multiply;
   }
 
   .footer-bottom__center {
@@ -496,6 +554,7 @@
   "enabled_on": {
     "groups": ["footer"]
   },
+  "max_blocks": 50,
   "settings": [
     {
       "type": "header",
@@ -581,6 +640,53 @@
       "label": "Email link"
     },
     {
+      "type": "checkbox",
+      "id": "show_location_row",
+      "label": "Show location row",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "location_icon",
+      "label": "Location icon"
+    },
+    {
+      "type": "text",
+      "id": "location_label",
+      "label": "Location label",
+      "default": "Location"
+    },
+    {
+      "type": "textarea",
+      "id": "location_text",
+      "label": "Address",
+      "default": "Alexandria, Borg El Arab, 3rd Industrial Zone, Block 24",
+      "info": "Wraps naturally inside the contact column."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tax_row",
+      "label": "Show tax ID row",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "tax_icon",
+      "label": "Tax ID icon"
+    },
+    {
+      "type": "text",
+      "id": "tax_label",
+      "label": "Tax ID label",
+      "default": "Tax ID"
+    },
+    {
+      "type": "text",
+      "id": "tax_text",
+      "label": "Tax ID number",
+      "default": "697-277-623"
+    },
+    {
       "type": "header",
       "content": "Payment logos"
     },
@@ -613,6 +719,13 @@
       "step": 2,
       "unit": "px",
       "default": 44
+    },
+    {
+      "type": "checkbox",
+      "id": "logo_blend",
+      "label": "Blend logo with background",
+      "default": false,
+      "info": "Workaround for a logo file with a baked-in white background. Drops white to the band colour, but also mutes light parts of the mark. A transparent PNG is the proper fix."
     },
     {
       "type": "richtext",
@@ -691,7 +804,7 @@
   "blocks": [
     {
       "type": "column",
-      "name": "Link column",
+      "name": "Link column (top)",
       "settings": [
         {
           "type": "text",
@@ -709,8 +822,12 @@
     },
     {
       "type": "payment",
-      "name": "Payment logo",
+      "name": "Payment logo (strip)",
       "settings": [
+        {
+          "type": "paragraph",
+          "content": "Appears in the centred payment strip. Duplicating a block keeps its type, so use Add block to create a different kind."
+        },
         {
           "type": "image_picker",
           "id": "image",
@@ -719,14 +836,19 @@
         {
           "type": "text",
           "id": "alt",
-          "label": "Alt text"
+          "label": "Alt text",
+          "info": "Also names the block in the sidebar."
         }
       ]
     },
     {
       "type": "social",
-      "name": "Social icon",
+      "name": "Social icon (bottom)",
       "settings": [
+        {
+          "type": "paragraph",
+          "content": "Appears at 20x20 in the bottom bar, not the payment strip."
+        },
         {
           "type": "image_picker",
           "id": "icon",
