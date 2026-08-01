@@ -111,6 +111,14 @@
             "highlight": false
           }
         },
+        "promo_link_XGVMyK": {
+          "type": "promo_link",
+          "settings": {
+            "label": "Storage Furniture",
+            "link": "shopify://collections/workspace",
+            "highlight": false
+          }
+        },
         "promo_discount": {
           "type": "promo_link",
           "settings": {
@@ -129,6 +137,7 @@
         "promo_decor",
         "promo_sale",
         "promo_collab",
+        "promo_link_XGVMyK",
         "promo_discount"
       ],
       "settings": {

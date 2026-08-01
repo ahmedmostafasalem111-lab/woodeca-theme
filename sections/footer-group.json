@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "type": "footer",
   "name": "t:names.footer",
@@ -13,39 +22,74 @@
           "blocks": {
             "c_phone": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "+1 (555) 207-29-24" }
+              "settings": {
+                "label": "+1 (555) 207-29-24",
+                "link": ""
+              },
+              "blocks": {}
             },
             "c_video": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Video consultation with a specialist" }
+              "settings": {
+                "label": "Video consultation with a specialist",
+                "link": ""
+              },
+              "blocks": {}
             },
             "c_contacts": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Contacts" }
+              "settings": {
+                "label": "Contacts",
+                "link": ""
+              },
+              "blocks": {}
             },
             "c_quality": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Contacting the Quality Department" }
+              "settings": {
+                "label": "Contacting the Quality Department",
+                "link": ""
+              },
+              "blocks": {}
             },
             "c_management": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Write to management" }
+              "settings": {
+                "label": "Write to management",
+                "link": ""
+              },
+              "blocks": {}
             },
             "c_partners_heading": {
               "type": "_showcase-footer-subheading",
-              "settings": { "text": "Partners" }
+              "settings": {
+                "text": "Partners"
+              },
+              "blocks": {}
             },
             "c_business": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "For business" }
+              "settings": {
+                "label": "For business",
+                "link": ""
+              },
+              "blocks": {}
             },
             "c_designers": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "For designers" }
+              "settings": {
+                "label": "For designers",
+                "link": ""
+              },
+              "blocks": {}
             },
             "c_franchising": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Franchising" }
+              "settings": {
+                "label": "Franchising",
+                "link": ""
+              },
+              "blocks": {}
             }
           },
           "block_order": [
@@ -68,18 +112,31 @@
           "blocks": {
             "h_daily": {
               "type": "_showcase-footer-text",
-              "settings": { "text": "daily from 9:00 to 22:00" }
+              "settings": {
+                "text": "daily from 9:00 to 22:00"
+              },
+              "blocks": {}
             },
             "h_orders_heading": {
               "type": "_showcase-footer-subheading",
-              "settings": { "text": "Delivery of orders" }
+              "settings": {
+                "text": "Delivery of orders"
+              },
+              "blocks": {}
             },
             "h_orders": {
               "type": "_showcase-footer-text",
-              "settings": { "text": "from 10:00 to 22:00" }
+              "settings": {
+                "text": "from 10:00 to 22:00"
+              },
+              "blocks": {}
             }
           },
-          "block_order": ["h_daily", "h_orders_heading", "h_orders"]
+          "block_order": [
+            "h_daily",
+            "h_orders_heading",
+            "h_orders"
+          ]
         },
         "col_buyers": {
           "type": "_showcase-footer-column",
@@ -89,39 +146,75 @@
           "blocks": {
             "b_about": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "About the company" }
+              "settings": {
+                "label": "About the company",
+                "link": ""
+              },
+              "blocks": {}
             },
             "b_addresses": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Store addresses" }
+              "settings": {
+                "label": "Store addresses",
+                "link": ""
+              },
+              "blocks": {}
             },
             "b_delivery": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Delivery and payment" }
+              "settings": {
+                "label": "Delivery and payment",
+                "link": ""
+              },
+              "blocks": {}
             },
             "b_warranty": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Warranty, exchange and return" }
+              "settings": {
+                "label": "Warranty, exchange and return",
+                "link": ""
+              },
+              "blocks": {}
             },
             "b_club": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Lorem club" }
+              "settings": {
+                "label": "Lorem club",
+                "link": ""
+              },
+              "blocks": {}
             },
             "b_career": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Career" }
+              "settings": {
+                "label": "Career",
+                "link": ""
+              },
+              "blocks": {}
             },
             "b_sitemap": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Sitemap" }
+              "settings": {
+                "label": "Sitemap",
+                "link": ""
+              },
+              "blocks": {}
             },
             "b_gift": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Gift certificates" }
+              "settings": {
+                "label": "Gift certificates",
+                "link": ""
+              },
+              "blocks": {}
             },
             "b_press": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "We are in the press" }
+              "settings": {
+                "label": "We are in the press",
+                "link": ""
+              },
+              "blocks": {}
             }
           },
           "block_order": [
@@ -144,31 +237,58 @@
           "blocks": {
             "k_upholstered": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Upholstered furniture" }
+              "settings": {
+                "label": "Upholstered furniture",
+                "link": ""
+              },
+              "blocks": {}
             },
             "k_cabinet": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Cabinet furniture" }
+              "settings": {
+                "label": "Cabinet furniture",
+                "link": ""
+              },
+              "blocks": {}
             },
             "k_frameless": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Frameless furniture" }
+              "settings": {
+                "label": "Frameless furniture",
+                "link": ""
+              },
+              "blocks": {}
             },
             "k_modular": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Modular furniture" }
+              "settings": {
+                "label": "Modular furniture",
+                "link": ""
+              },
+              "blocks": {}
             },
             "k_tables": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Tables and chairs" }
+              "settings": {
+                "label": "Tables and chairs",
+                "link": ""
+              },
+              "blocks": {}
             },
             "k_services_heading": {
               "type": "_showcase-footer-subheading",
-              "settings": { "text": "Services" }
+              "settings": {
+                "text": "Services"
+              },
+              "blocks": {}
             },
             "k_express": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Express design" }
+              "settings": {
+                "label": "Express design",
+                "link": ""
+              },
+              "blocks": {}
             }
           },
           "block_order": [
@@ -189,104 +309,165 @@
           "blocks": {
             "r_platform": {
               "type": "_showcase-footer-rating",
-              "settings": { "label": "Lorem Market", "rating": 4.5 }
+              "settings": {
+                "label": "Lorem Market",
+                "link": "",
+                "rating": 4.5
+              },
+              "blocks": {}
             },
             "r_winner_heading": {
               "type": "_showcase-footer-subheading",
-              "settings": { "text": "Winner" }
+              "settings": {
+                "text": "Winner"
+              },
+              "blocks": {}
             },
             "r_award1": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Ipsum Dot Award" }
+              "settings": {
+                "label": "Ipsum Dot Award",
+                "link": ""
+              },
+              "blocks": {}
             },
             "r_award2": {
               "type": "_showcase-footer-link",
-              "settings": { "label": "Dolor rating" }
+              "settings": {
+                "label": "Dolor rating",
+                "link": ""
+              },
+              "blocks": {}
             }
           },
-          "block_order": ["r_platform", "r_winner_heading", "r_award1", "r_award2"]
+          "block_order": [
+            "r_platform",
+            "r_winner_heading",
+            "r_award1",
+            "r_award2"
+          ]
         }
       },
-      "block_order": ["col_contact", "col_hours", "col_buyers", "col_catalog", "col_reviews"],
+      "block_order": [
+        "col_contact",
+        "col_hours",
+        "col_buyers",
+        "col_catalog",
+        "col_reviews"
+      ],
       "settings": {
         "show_top_band": true,
         "band_heading": "Delivery throughout Lorem",
         "band_body": "To order a product in the store, please contact our manager by phone.",
         "phone_number": "+1 (555) 207-29-24",
         "band_link_text": "Read more",
-        "columns": 5
+        "band_link": "",
+        "columns": 5,
+        "background_color": "#ffffff",
+        "text_color": "#1c1c1c",
+        "band_background_color": "#f2f2f0",
+        "rating_color": "#f2b03d"
       }
     },
     "showcase_footer_bottom": {
       "type": "showcase-footer-bottom",
       "blocks": {
-        "pay_1": {
-          "type": "payment",
-          "settings": { "label": "Mastercard" }
-        },
         "pay_2": {
           "type": "payment",
-          "settings": { "label": "Visa" }
+          "settings": {
+            "label": "Visa"
+          }
         },
         "pay_3": {
           "type": "payment",
-          "settings": { "label": "Amex" }
+          "settings": {
+            "label": "Amex"
+          }
         },
-        "soc_1": {
-          "type": "social",
-          "settings": { "icon": "external", "label": "YouTube" }
-        },
-        "soc_2": {
-          "type": "social",
-          "settings": { "icon": "chat", "label": "Telegram" }
+        "pay_1": {
+          "type": "payment",
+          "settings": {
+            "label": "Mastercard"
+          }
         },
         "soc_3": {
           "type": "social",
-          "settings": { "icon": "camera", "label": "Instagram" }
+          "settings": {
+            "icon": "camera",
+            "label": "Instagram",
+            "link": ""
+          }
         },
         "soc_4": {
           "type": "social",
-          "settings": { "icon": "star", "label": "Pinterest" }
+          "settings": {
+            "icon": "star",
+            "label": "Pinterest",
+            "link": ""
+          }
         },
         "soc_5": {
           "type": "social",
-          "settings": { "icon": "account", "label": "TikTok" }
+          "settings": {
+            "icon": "account",
+            "label": "TikTok",
+            "link": ""
+          }
         },
         "legal_1": {
           "type": "legal",
-          "settings": { "label": "Offer for individuals" }
+          "settings": {
+            "label": "Offer for individuals",
+            "link": ""
+          }
         },
         "legal_2": {
           "type": "legal",
-          "settings": { "label": "Offer for legal entities" }
+          "settings": {
+            "label": "Offer for legal entities",
+            "link": ""
+          }
         },
         "legal_3": {
           "type": "legal",
-          "settings": { "label": "List of partners" }
+          "settings": {
+            "label": "List of partners",
+            "link": ""
+          }
         },
         "legal_4": {
           "type": "legal",
-          "settings": { "label": "Privacy Policy" }
+          "settings": {
+            "label": "Privacy Policy",
+            "link": ""
+          }
         },
         "legal_5": {
           "type": "legal",
-          "settings": { "label": "Terms of the promotions" }
+          "settings": {
+            "label": "Terms of the promotions",
+            "link": ""
+          }
         },
         "legal_6": {
           "type": "legal",
-          "settings": { "label": "Payment security" }
+          "settings": {
+            "label": "Payment security",
+            "link": ""
+          }
         },
         "legal_7": {
           "type": "legal",
-          "settings": { "label": "Consent to the processing of personal data" }
+          "settings": {
+            "label": "Consent to the processing of personal data",
+            "link": ""
+          }
         }
       },
       "block_order": [
-        "pay_1",
         "pay_2",
         "pay_3",
-        "soc_1",
-        "soc_2",
+        "pay_1",
         "soc_3",
         "soc_4",
         "soc_5",
@@ -299,8 +480,15 @@
         "legal_7"
       ],
       "settings": {
+        "wordmark_image": "shopify://shop_images/Untitled_design_c5698217-c5e7-47a5-beb2-913d362867fc.svg",
         "wordmark_text": "lorem.ipsum",
-        "legal_columns": 2
+        "legal_columns": 2,
+        "copyright": "",
+        "background_color": "#ffffff",
+        "text_color": "#8a8a8a",
+        "wordmark_color": "#1c1c1c",
+        "social_background": "#f2f2f0",
+        "social_icon_color": "#1c1c1c"
       }
     },
     "showcase_mobile_tab_bar": {
@@ -308,34 +496,74 @@
       "blocks": {
         "tab_catalog": {
           "type": "tab",
-          "settings": { "icon": "grid-default", "label": "Catalog" }
+          "settings": {
+            "icon": "grid-default",
+            "label": "Catalog",
+            "link": ""
+          }
         },
         "tab_favorites": {
           "type": "tab",
-          "settings": { "icon": "heart", "label": "Favorites" }
+          "settings": {
+            "icon": "heart",
+            "label": "Favorites",
+            "link": ""
+          }
         },
         "tab_basket": {
           "type": "tab",
-          "settings": { "icon": "cart", "label": "Basket" }
+          "settings": {
+            "icon": "cart",
+            "label": "Basket",
+            "link": ""
+          }
         },
         "tab_login": {
           "type": "tab",
-          "settings": { "icon": "account", "label": "Login" }
+          "settings": {
+            "icon": "account",
+            "label": "Login",
+            "link": ""
+          }
         },
         "tab_showrooms": {
           "type": "tab",
-          "settings": { "icon": "store", "label": "Showrooms" }
+          "settings": {
+            "icon": "store",
+            "label": "Showrooms",
+            "link": ""
+          }
         }
       },
-      "block_order": ["tab_catalog", "tab_favorites", "tab_basket", "tab_login", "tab_showrooms"],
-      "settings": {}
+      "block_order": [
+        "tab_catalog",
+        "tab_favorites",
+        "tab_basket",
+        "tab_login",
+        "tab_showrooms"
+      ],
+      "settings": {
+        "nav_label": "Quick navigation",
+        "label_size": "10px",
+        "background_color": "#ffffff",
+        "text_color": "#1c1c1c",
+        "active_color": "#e8342a"
+      }
     },
     "showcase_floating_widgets": {
       "type": "showcase-floating-widgets",
       "settings": {
         "show_chat_bubble": true,
+        "chat_label": "Open support chat",
+        "chat_link": "",
+        "chat_size": 56,
+        "chat_background": "#f2f2f0",
+        "chat_icon_color": "#1c1c1c",
         "show_feedback_tab": true,
-        "feedback_label": "Site feedback"
+        "feedback_label": "Site feedback",
+        "feedback_link": "",
+        "feedback_background": "#333333",
+        "feedback_text_color": "#ffffff"
       }
     }
   },
