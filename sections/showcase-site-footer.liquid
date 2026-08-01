@@ -280,23 +280,30 @@
     font-weight: 500;
   }
 
-  /* ---- Band 1 ---- */
+  /*
+    ---- Band 1 ----
+    Four evenly distributed tracks rather than a left cluster plus a right-pinned
+    contact block, so the link columns spread across the full width instead of
+    leaving dead space in the middle. `align-items: start` stops the short columns
+    stretching to the tallest one, and the reduced bottom padding keeps the space
+    under them reading as deliberate whitespace.
+  */
   .site-footer__band--links {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 320px;
+    align-items: start;
     gap: var(--gap-2xl);
-    padding-block: 48px;
+    padding-block-start: 48px;
+    padding-block-end: 32px;
   }
 
+  /* Lets the three columns become grid items of the band itself. */
   .footer-columns {
-    display: flex;
-    /* Columns sit left of the contact block, which is first in the DOM. */
-    order: -1;
+    display: contents;
   }
 
   .footer-column {
-    width: 224px;
-    margin-inline-end: 48px;
+    min-width: 0;
   }
 
   .footer-column__list {
@@ -325,9 +332,11 @@
     display: none;
   }
 
+  /* Explicitly last, since it comes first in the DOM for the mobile stack order. */
   .footer-contact {
-    flex: 0 0 264px;
-    width: 264px;
+    grid-column: 4;
+    grid-row: 1;
+    min-width: 0;
   }
 
   .footer-contact__support {
@@ -476,12 +485,21 @@
   @media screen and (max-width: 989px) {
     /* Contact moves above the accordions, matching the reference's column-reverse. */
     .site-footer__band--links {
+      display: flex;
       flex-direction: column;
+      /*
+        Must reset the desktop `start`: in a flex column that is the cross axis, so
+        it shrinks the accordions to their text width instead of filling the row.
+      */
+      align-items: stretch;
       gap: var(--gap-xl);
       padding-block: var(--padding-xl);
     }
 
+    /* Undo the desktop grid placement so the stack order is DOM order. */
     .footer-contact {
+      grid-column: auto;
+      grid-row: auto;
       flex: 1 1 auto;
       width: 100%;
     }
@@ -504,11 +522,13 @@
     }
 
     .footer-accordion__summary {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: var(--gap-sm);
       padding-block: var(--padding-md);
+      padding-inline-end: 24px;
       cursor: pointer;
       list-style: none;
     }
@@ -521,10 +541,11 @@
       margin: 0;
     }
 
-    .footer-accordion__chevron,
-    .footer-accordion__chevron svg {
+    .footer-accordion__chevron {
+      flex: 0 0 auto;
       width: var(--icon-size-xs);
       height: var(--icon-size-xs);
+      color: var(--footer-heading-color);
       transition: rotate var(--animation-speed) var(--animation-easing);
     }
 
@@ -724,8 +745,8 @@
       "type": "checkbox",
       "id": "logo_blend",
       "label": "Blend logo with background",
-      "default": false,
-      "info": "Workaround for a logo file with a baked-in white background. Drops white to the band colour, but also mutes light parts of the mark. A transparent PNG is the proper fix."
+      "default": true,
+      "info": "Workaround for a logo file with a baked-in white background: multiply makes the white field disappear against a light band. Turn this off if you upload a properly transparent logo, or if you switch the footer to a dark background — multiply breaks on dark."
     },
     {
       "type": "richtext",
