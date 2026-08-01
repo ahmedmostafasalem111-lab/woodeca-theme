@@ -25,6 +25,7 @@
       --color-foreground-rgb: {{ section.settings.text_color.rgb }};
     {% endif %}
     --marquee-speed: {{ speed }}s;
+    --marquee-heading-size: {{ section.settings.heading_size }}px;
     --marquee-logo-height: {{ section.settings.logo_height }}px;
     --marquee-logo-max-width: {{ section.settings.logo_max_width }}px;
   "
@@ -92,6 +93,10 @@
     overflow: hidden;
   }
 
+  /*
+    Floor of 144px, but `flex: 0 0 auto` lets the block grow with the text so a
+    larger heading size stays on one line instead of wrapping or clipping.
+  */
   .logo-marquee__label {
     flex: 0 0 auto;
     display: flex;
@@ -102,10 +107,11 @@
 
   .logo-marquee__heading {
     color: var(--color-foreground);
-    font-size: 11px;
+    font-size: var(--marquee-heading-size, 14px);
     font-weight: 500;
+    line-height: 1.2;
     text-align: center;
-    text-wrap: balance;
+    white-space: nowrap;
   }
 
   /*
@@ -131,12 +137,14 @@
     mask-image: linear-gradient(to right, transparent 0%, black 2%, black 98%, transparent 100%);
   }
 
+  /* Height comes from the items — nothing in the chain forces it to zero. */
   .logo-marquee__track {
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
     justify-content: space-around;
     gap: var(--marquee-gap);
+    min-height: var(--marquee-logo-height, 64px);
     will-change: transform;
     animation: logo-marquee-scroll var(--marquee-speed, 30s) linear infinite;
   }
@@ -156,18 +164,25 @@
     }
   }
 
+  /*
+    Explicit min-height, not just a cap. `max-height` alone never creates a height,
+    so before the images load the item had nothing to size from and collapsed to 0 —
+    which then kept the lazy images permanently out of the viewport.
+  */
   .logo-marquee__item {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    min-height: var(--marquee-logo-height, 64px);
   }
 
   .logo-marquee__logo {
+    /* Real height; width follows the logo's aspect ratio. */
+    height: var(--marquee-logo-height, 64px);
     width: auto;
-    height: auto;
-    max-height: var(--marquee-logo-height, 44px);
-    max-width: var(--marquee-logo-max-width, 124px);
+    max-width: var(--marquee-logo-max-width, 160px);
+    flex-shrink: 0;
     object-fit: contain;
   }
 
@@ -193,10 +208,6 @@
     .logo-marquee__viewport {
       --marquee-gap: 52px;
     }
-
-    .logo-marquee__heading {
-      font-size: var(--font-size--sm);
-    }
   }
 
   @media screen and (min-width: 990px) {
@@ -215,6 +226,13 @@
 
     .logo-marquee__label {
       min-width: 0;
+      max-width: 100%;
+    }
+
+    /* Stacked above the strip, so a long heading may wrap rather than overflow. */
+    .logo-marquee__heading {
+      white-space: normal;
+      text-wrap: balance;
     }
 
     .logo-marquee__viewport {
@@ -259,6 +277,16 @@
       "id": "heading",
       "label": "Heading",
       "default": "Payment Partners"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 11,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 14
     },
     {
       "type": "header",
