@@ -98,7 +98,7 @@
           "settings": {
             "image": "shopify://shop_images/4_320f840b-ab56-4985-a1c4-05b51a8118e2.jpg",
             "label": "Shoe Storage",
-            "link": ""
+            "link": "shopify://collections/shoe-storage"
           }
         },
         "cat_5": {
@@ -106,7 +106,7 @@
           "settings": {
             "image": "shopify://shop_images/tv_slider.jpg",
             "label": "TV Units",
-            "link": ""
+            "link": "shopify://collections/t-v-units"
           }
         },
         "cat_6": {
@@ -114,7 +114,7 @@
           "settings": {
             "image": "shopify://shop_images/6_d45c1e60-10f3-4cfa-971c-63e0bf187507.jpg",
             "label": "Buffet",
-            "link": ""
+            "link": "shopify://collections/buffet"
           }
         },
         "cat_7": {
@@ -122,7 +122,7 @@
           "settings": {
             "image": "shopify://shop_images/7_9baf0aef-b72d-41cc-b07d-d7874cf873e7.jpg",
             "label": "Nightstand",
-            "link": ""
+            "link": "shopify://collections/nightstand"
           }
         },
         "cat_8": {
@@ -130,7 +130,7 @@
           "settings": {
             "image": "shopify://shop_images/8_6c533e52-1560-4883-b8af-a9e6ad79b515.jpg",
             "label": "Desk",
-            "link": ""
+            "link": "shopify://collections/desks"
           }
         },
         "cat_9": {
@@ -138,7 +138,7 @@
           "settings": {
             "image": "shopify://shop_images/9_f5d08d0e-384d-4ce9-a298-918c87c7f136.jpg",
             "label": "Bookcase",
-            "link": ""
+            "link": "shopify://collections/bookcase"
           }
         },
         "cat_10": {
@@ -146,7 +146,7 @@
           "settings": {
             "image": "shopify://shop_images/Untitled_design_5f414f0f-ec1e-4b5e-bac2-a5682de623df.jpg",
             "label": "Console",
-            "link": ""
+            "link": "shopify://collections/console"
           }
         }
       },
@@ -468,7 +468,7 @@
         "add_to_cart_label": "Add to cart",
         "show_wishlist": true,
         "cta_label": "View the Kids collection",
-        "cta_link": "",
+        "cta_link": "shopify://collections/kids",
         "background_color": "",
         "text_color": "",
         "thumb_background": "#f2f2f0",
@@ -547,7 +547,7 @@
         "h1": {
           "type": "product",
           "settings": {
-            "product": "",
+            "product": "casper-buffet-120cm",
             "title": "Straight sofa lorem 120 yellow",
             "price": "32,990",
             "compare_price": "",
@@ -560,7 +560,7 @@
         "h2": {
           "type": "product",
           "settings": {
-            "product": "",
+            "product": "lana-grey-linen-bed-120cm",
             "title": "Bed ipsum 120 velour olive",
             "price": "40,690",
             "compare_price": "",
@@ -570,15 +570,15 @@
             "url": ""
           }
         },
-        "h3": {
+        "h6": {
           "type": "product",
           "settings": {
-            "product": "",
-            "title": "Dolor mini velour straight sofa",
-            "price": "73,690",
+            "product": "niyra-shoe-bench",
+            "title": "Armchair elit boucle terracotta",
+            "price": "25,290",
             "compare_price": "",
             "badge": "",
-            "stock_text": "In stock: more than 20 pcs.",
+            "stock_text": "In stock: 6 pcs.",
             "stock_level": "in",
             "url": ""
           }
@@ -586,7 +586,7 @@
         "h4": {
           "type": "product",
           "settings": {
-            "product": "",
+            "product": "talia-200cm-t-v-unit",
             "title": "Children's bed amet 90 velour",
             "price": "52,790",
             "compare_price": "",
@@ -599,7 +599,7 @@
         "h5": {
           "type": "product",
           "settings": {
-            "product": "",
+            "product": "emilia-6-bookcase-2",
             "title": "Corner sofa consectetur milk",
             "price": "87,990",
             "compare_price": "",
@@ -609,15 +609,15 @@
             "url": ""
           }
         },
-        "h6": {
+        "h3": {
           "type": "product",
           "settings": {
-            "product": "",
-            "title": "Armchair elit boucle terracotta",
-            "price": "25,290",
+            "product": "elara-100cm-buffet",
+            "title": "Dolor mini velour straight sofa",
+            "price": "73,690",
             "compare_price": "",
             "badge": "",
-            "stock_text": "In stock: 6 pcs.",
+            "stock_text": "In stock: more than 20 pcs.",
             "stock_level": "in",
             "url": ""
           }
@@ -626,15 +626,15 @@
       "block_order": [
         "h1",
         "h2",
-        "h3",
+        "h6",
         "h4",
         "h5",
-        "h6"
+        "h3"
       ],
       "settings": {
-        "heading": "Online sales hits",
+        "heading": "Have you seen these?",
         "heading_size": "var(--font-size--3xl)",
-        "description": "<p>Our online store features only carefully selected models, exceptional lorem ipsum bestsellers. Each model in our catalog embodies excellent design and is a legend in the industry.</p>",
+        "description": "",
         "collection": "",
         "products_limit": 12,
         "default_badge": "",
@@ -795,63 +795,6 @@
         "padding-block-end": 56
       }
     },
-    "s7b_why": {
-      "type": "showcase-why",
-      "blocks": {
-        "f1": {
-          "type": "feature",
-          "settings": {
-            "icon": "store",
-            "title": "Made by Woodeca",
-            "description": "Designed and built in our own workshop, not resold."
-          }
-        },
-        "f2": {
-          "type": "feature",
-          "settings": {
-            "icon": "shield",
-            "title": "Built to last",
-            "description": "Solid materials and a warranty on every piece."
-          }
-        },
-        "f3": {
-          "type": "feature",
-          "settings": {
-            "icon": "truck",
-            "title": "Nationwide delivery",
-            "description": "Delivered and assembled across the country."
-          }
-        },
-        "f4": {
-          "type": "feature",
-          "settings": {
-            "icon": "chat",
-            "title": "Local support",
-            "description": "A local team on hand before and after you buy."
-          }
-        }
-      },
-      "block_order": [
-        "f1",
-        "f2",
-        "f3",
-        "f4"
-      ],
-      "settings": {
-        "heading": "Why Woodeca?",
-        "heading_size": "var(--font-size--3xl)",
-        "columns": 4,
-        "icon_size": 64,
-        "show_mission": true,
-        "mission": "<p>Our mission is to make it easy to create a home you'll love with modern, thoughtfully designed furniture built to last.</p>",
-        "mission_size": "var(--font-size--2xl)",
-        "section_width": "page-width",
-        "band_background": "#f5f5f5",
-        "text_color": "",
-        "padding-block-start": 0,
-        "padding-block-end": 0
-      }
-    },
     "s7c_payments": {
       "type": "showcase-logo-marquee",
       "blocks": {
@@ -942,6 +885,7 @@
       "settings": {
         "show_heading": true,
         "heading": "Payment Partners",
+        "heading_size": 24,
         "scroll_speed": 30,
         "direction": "left",
         "logo_height": 64,
@@ -951,6 +895,63 @@
         "text_color": "",
         "padding-block-start": 24,
         "padding-block-end": 24
+      }
+    },
+    "s7b_why": {
+      "type": "showcase-why",
+      "blocks": {
+        "f1": {
+          "type": "feature",
+          "settings": {
+            "icon": "store",
+            "title": "Made by Woodeca",
+            "description": "Designed and built in our own workshop, not resold."
+          }
+        },
+        "f2": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Built to last",
+            "description": "Solid materials and a warranty on every piece."
+          }
+        },
+        "f3": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Nationwide delivery",
+            "description": "Delivered and assembled across the country."
+          }
+        },
+        "f4": {
+          "type": "feature",
+          "settings": {
+            "icon": "chat",
+            "title": "Local support",
+            "description": "A local team on hand before and after you buy."
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3",
+        "f4"
+      ],
+      "settings": {
+        "heading": "Why Woodeca?",
+        "heading_size": "var(--font-size--3xl)",
+        "columns": 4,
+        "icon_size": 64,
+        "show_mission": true,
+        "mission": "<p>Our mission is to make it easy to create a home you'll love with modern, thoughtfully designed furniture built to last.</p>",
+        "mission_size": "var(--font-size--2xl)",
+        "section_width": "page-width",
+        "band_background": "#f5f5f5",
+        "text_color": "",
+        "padding-block-start": 0,
+        "padding-block-end": 0
       }
     },
     "s8_carousel_new": {
@@ -1119,80 +1120,6 @@
         "padding-block-end": 48
       }
     },
-    "s10_map": {
-      "type": "showcase-showroom-map",
-      "blocks": {
-        "loc1": {
-          "type": "location",
-          "settings": {
-            "name": "Lorem Central",
-            "address": "12 Ipsum Avenue, Dolor District",
-            "tags": "New",
-            "link": ""
-          }
-        },
-        "loc2": {
-          "type": "location",
-          "settings": {
-            "name": "Sit Amet Plaza",
-            "address": "45 Consectetur Road, Adipiscing",
-            "tags": "",
-            "link": ""
-          }
-        },
-        "loc3": {
-          "type": "location",
-          "settings": {
-            "name": "Elit Mall",
-            "address": "78 Tempor Boulevard, Incididunt",
-            "tags": "Flagship",
-            "link": ""
-          }
-        },
-        "loc4": {
-          "type": "location",
-          "settings": {
-            "name": "Labore Park",
-            "address": "90 Magna Street, Aliqua",
-            "tags": "",
-            "link": ""
-          }
-        },
-        "loc5": {
-          "type": "location",
-          "settings": {
-            "name": "Veniam Square",
-            "address": "34 Nostrud Lane, Exercitation",
-            "tags": "",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "loc1",
-        "loc2",
-        "loc3",
-        "loc4",
-        "loc5"
-      ],
-      "settings": {
-        "heading": "Seeing is believing!",
-        "heading_size": "var(--font-size--3xl)",
-        "description": "<p>We offer the most up-to-date selection and provide our customers with every opportunity to feel confident in their purchase. We invite you to visit our showrooms and personally evaluate the quality of our fabrics and materials.</p>",
-        "map_embed_url": "",
-        "map_title": "Showroom locations map",
-        "map_placeholder_text": "Add a map embed URL or image in the theme editor.",
-        "map_width": 65,
-        "map_height": 520,
-        "search_placeholder": "Address or name",
-        "no_results_text": "No locations match your search.",
-        "section_width": "page-width",
-        "background_color": "",
-        "text_color": "",
-        "padding-block-start": 48,
-        "padding-block-end": 48
-      }
-    },
     "s11_gallery": {
       "type": "showcase-social-gallery",
       "blocks": {
@@ -1273,11 +1200,10 @@
     "s5_collections",
     "s6_carousel_hits",
     "s7_promo",
-    "s7b_why",
     "s7c_payments",
+    "s7b_why",
     "s8_carousel_new",
     "s9_info",
-    "s10_map",
     "s11_gallery"
   ]
 }

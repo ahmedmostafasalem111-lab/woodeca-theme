@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "collection": {
@@ -29,39 +38,84 @@
         },
         "sub_1": {
           "type": "subcategory",
-          "settings": { "label": "Shelves", "count": "184" }
-        },
-        "sub_2": {
-          "type": "subcategory",
-          "settings": { "label": "Hinged wardrobes", "count": "524" }
-        },
-        "sub_3": {
-          "type": "subcategory",
-          "settings": { "label": "Sliding wardrobes", "count": "68" }
-        },
-        "sub_4": {
-          "type": "subcategory",
-          "settings": { "label": "Bookcases", "count": "404" }
+          "settings": {
+            "icon": "shopify://shop_images/bedroom_sets.svg",
+            "label": "Bedroom Sets",
+            "count": "",
+            "link": "shopify://collections/bedroom-sets"
+          }
         },
         "sub_5": {
           "type": "subcategory",
-          "settings": { "label": "Children's shelving", "count": "58" }
+          "settings": {
+            "icon": "shopify://shop_images/wardrobe.svg",
+            "label": "Wardrobes",
+            "count": "",
+            "link": "shopify://collections/wardrobes"
+          }
+        },
+        "sub_2": {
+          "type": "subcategory",
+          "settings": {
+            "icon": "shopify://shop_images/beds.svg",
+            "label": "Beds",
+            "count": "",
+            "link": "shopify://collections/beds-1"
+          }
+        },
+        "sub_3": {
+          "type": "subcategory",
+          "settings": {
+            "icon": "shopify://shop_images/drawer_units.svg",
+            "label": "Drawer Units",
+            "count": "",
+            "link": "shopify://collections/drawer-units"
+          }
+        },
+        "sub_4": {
+          "type": "subcategory",
+          "settings": {
+            "icon": "shopify://shop_images/nightstand.svg",
+            "label": "Nightstand",
+            "count": "",
+            "link": "shopify://collections/nightstand"
+          }
         },
         "sub_6": {
           "type": "subcategory",
-          "settings": { "label": "Children's wardrobes", "count": "135" }
-        },
-        "sub_7": {
-          "type": "subcategory",
-          "settings": { "label": "Modular living rooms", "count": "198" }
+          "settings": {
+            "icon": "shopify://shop_images/makeup_vaninty.svg",
+            "label": "Make Up Vanity",
+            "count": "",
+            "link": "shopify://collections/makeup-vanities"
+          }
         },
         "sub_8": {
           "type": "subcategory",
-          "settings": { "label": "Hallways", "count": "23" }
+          "settings": {
+            "icon": "shopify://shop_images/kids_wardrobes.svg",
+            "label": "Kids Wardrobes",
+            "count": "",
+            "link": "shopify://collections/kids-wardrobes"
+          }
         },
         "sub_9": {
           "type": "subcategory",
-          "settings": { "label": "Corner cabinets", "count": "109" }
+          "settings": {
+            "icon": "shopify://shop_images/kids_bed.svg",
+            "label": "Kids Beds",
+            "count": "",
+            "link": "shopify://collections/kids-beds"
+          }
+        },
+        "subcategory_PLR8dj": {
+          "type": "subcategory",
+          "settings": {
+            "icon": "shopify://shop_images/Kids_Nightstand.svg",
+            "label": "Kids Nightstand",
+            "count": "",
+            "link": "shopify://collections/kids-nightstands"
+          }
         }
       },
       "block_order": [
@@ -69,31 +123,38 @@
         "toggle_2",
         "toggle_3",
         "sub_1",
+        "sub_5",
         "sub_2",
         "sub_3",
         "sub_4",
-        "sub_5",
         "sub_6",
-        "sub_7",
         "sub_8",
-        "sub_9"
+        "sub_9",
+        "subcategory_PLR8dj"
       ],
       "settings": {
         "show_breadcrumbs": true,
-        "breadcrumb_home_label": "Online store",
+        "breadcrumb_home_label": "Home",
+        "breadcrumbs_label": "Breadcrumb",
         "title_size": "var(--font-size--4xl)",
         "show_count": true,
         "count_label": "found",
-        "show_editorial": true,
+        "show_editorial": false,
         "editorial_text": "Spacious Lorem wardrobe with a choice of options.",
         "editorial_link_text": "Read more",
+        "editorial_link": "",
         "show_banner": true,
         "banner_height": 380,
         "sort_default_label": "The most popular",
         "filters_label": "Filters",
+        "apply_label": "Apply",
+        "clear_label": "Clear",
+        "clear_all_label": "Clear all",
+        "close_label": "Close",
         "columns": 4,
         "columns_mobile": 2,
         "products_per_page": 24,
+        "empty_text": "No products match these filters.",
         "show_wishlist": true,
         "show_quick_add": true,
         "show_swatches": true,
@@ -106,16 +167,32 @@
         "dimensions_label": "Dimensions (L x W x H), cm",
         "dimensions_namespace": "custom",
         "dimensions_key": "dimensions",
+        "card_badge_text": "",
+        "card_stock_text": "",
         "show_promo": true,
         "promo_after_products": 8,
         "promo_span": 2,
         "promo_heading": "The first step to productivity",
         "promo_subtext": "Comfortable furniture for work and study with a discount of up to 20%",
         "promo_link_text": "Buy",
+        "promo_link": "",
         "show_more_label": "Show more",
-        "section_width": "page-width"
+        "loading_label": "Loading…",
+        "section_width": "page-width",
+        "background_color": "",
+        "text_color": "",
+        "filters_button_background": "#333333",
+        "filters_button_text": "#ffffff",
+        "toggle_active_color": "#7ec8e8",
+        "toggle_active_background": "#d6f0fa",
+        "badge_background": "#e8705a",
+        "badge_text_color": "#ffffff",
+        "padding-block-start": 24,
+        "padding-block-end": 56
       }
     }
   },
-  "order": ["collection"]
+  "order": [
+    "collection"
+  ]
 }

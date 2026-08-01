@@ -36,7 +36,7 @@
       "settings": {
         "speed": 5,
         "section_width": "page-width",
-        "background_color": "#CBDDE3",
+        "background_color": "#cbdde3",
         "text_color": "",
         "divider_width": 0,
         "divider_color": "",
@@ -75,7 +75,7 @@
           "type": "promo_link",
           "settings": {
             "label": "Bedroom furniture",
-            "link": "",
+            "link": "shopify://collections/bedroom",
             "highlight": false
           }
         },
@@ -83,7 +83,7 @@
           "type": "promo_link",
           "settings": {
             "label": "Kids furniture",
-            "link": "",
+            "link": "shopify://collections/kids",
             "highlight": false
           }
         },
@@ -91,7 +91,7 @@
           "type": "promo_link",
           "settings": {
             "label": "Living Room furniture",
-            "link": "",
+            "link": "shopify://collections/living-room",
             "highlight": false
           }
         },
@@ -99,23 +99,23 @@
           "type": "promo_link",
           "settings": {
             "label": "Dining Room furniture",
-            "link": "",
+            "link": "shopify://collections/dining-room",
             "highlight": false
           }
         },
         "promo_collab": {
           "type": "promo_link",
           "settings": {
-            "label": "lorem.ipsum x DOLOR",
-            "link": "",
+            "label": "Office Furniture",
+            "link": "shopify://collections/workspace",
             "highlight": false
           }
         },
         "promo_discount": {
           "type": "promo_link",
           "settings": {
-            "label": "Discount",
-            "link": "",
+            "label": "Final Pieces",
+            "link": "shopify://collections/bestsellers",
             "highlight": true
           }
         }
@@ -133,11 +133,16 @@
       ],
       "settings": {
         "logo_image": "shopify://shop_images/Untitled_design_c5698217-c5e7-47a5-beb2-913d362867fc.svg",
-        "logo_text": "lorem.ipsum",
+        "logo_text": "Woodeca",
         "logo_font_size": "var(--font-size--2xl)",
         "show_utility_bar": true,
-        "show_location": true,
-        "location_label": "Lorem City",
+        "phone_number": "+20 10 41920335",
+        "call_label": "Call Us",
+        "show_call_button": true,
+        "show_phone": true,
+        "call_background": "{{ settings.color_palette.background }}",
+        "call_text_color": "{{ settings.color_palette.foreground }}",
+        "location_label": "+20 10 41920335",
         "location_menu": "",
         "dropdown_empty_text": "Pick a navigation menu for this dropdown.",
         "utility_font_size": "var(--font-size--xs)",
@@ -155,7 +160,6 @@
         "show_account": true,
         "account_label": "Account",
         "account_link": "",
-        "show_wishlist": true,
         "wishlist_label": "Wishlist",
         "wishlist_link": "",
         "cart_label": "Cart",
