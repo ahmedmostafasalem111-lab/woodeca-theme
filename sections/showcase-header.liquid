@@ -359,6 +359,14 @@
   {% endif %}
 </div>
 
+{% if section.settings.sticky_main_row %}
+  <script
+    src="{{ 'showcase-header-sticky.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
+
 {% stylesheet %}
   .showcase-header {
     background-color: var(--showcase-header-background);
@@ -516,10 +524,38 @@
     border-block-end: var(--border-width-sm) solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
   }
 
-  .showcase-header__main--sticky {
+  /*
+    Sticky lives on the header group, not the main row. A sticky element is bound to
+    its parent's box, so pinning the row alone only held while the ~166px header was
+    still on screen — it unstuck immediately.
+  */
+  #header-group:has(.showcase-header__main--sticky) {
     position: sticky;
     top: 0;
     z-index: var(--layer-sticky, 20);
+  }
+
+  /* Rows 1 and 3 collapse on scroll, leaving the main row pinned. */
+  .showcase-header__utility,
+  .showcase-header__promo {
+    overflow: hidden;
+    transition:
+      max-height var(--animation-speed) var(--animation-easing),
+      opacity var(--animation-speed) var(--animation-easing);
+    max-height: 120px;
+  }
+
+  .showcase-header--stuck .showcase-header__utility,
+  .showcase-header--stuck .showcase-header__promo {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .showcase-header__utility,
+    .showcase-header__promo {
+      transition: none;
+    }
   }
 
   .showcase-header__main-inner {

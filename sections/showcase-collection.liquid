@@ -20,7 +20,12 @@
     assign show_promo = true
   endif
 
-  assign subcategory_blocks = section.blocks | where: 'type', 'subcategory'
+  # Sub-category tiles are read from the current collection, not from section blocks.
+  assign sub_ns = section.settings.subcat_namespace | default: 'custom'
+  assign sub_key = section.settings.subcat_key | default: 'subcollections'
+  assign icon_ns = section.settings.subcat_icon_namespace | default: 'custom'
+  assign icon_key = section.settings.subcat_icon_key | default: 'tile_icon'
+  assign subcollections = collection.metafields[sub_ns][sub_key].value
 %}
 
 <div
@@ -123,21 +128,34 @@
     {% endif %}
   {% endif %}
 
-  {%- comment -%} ---------- Sub-category refinement row ---------- {%- endcomment -%}
-  {% if subcategory_blocks.size > 0 %}
+  {%- comment -%}
+    ---------- Sub-category refinement row ----------
+    Driven by a list-of-collections metafield on the collection being viewed, so each
+    category shows its own sub-categories instead of one hardcoded set repeated
+    everywhere. The icon travels with each sub-collection via its own metafield.
+    No metafield means no row — never a fallback to some other category's tiles.
+  {%- endcomment -%}
+  {% if subcollections != blank and subcollections.size > 0 %}
     <div class="collection-subcats">
-      {% for block in subcategory_blocks %}
+      {% for subcollection in subcollections %}
+        {% liquid
+          assign sub_icon = subcollection.metafields[icon_ns][icon_key]
+          if sub_icon.value != blank
+            assign sub_icon_value = sub_icon.value
+          else
+            assign sub_icon_value = null
+          endif
+        %}
         <a
-          href="{{ block.settings.link | default: '#' }}"
+          href="{{ subcollection.url }}"
           class="collection-subcat"
-          {{ block.shopify_attributes }}
         >
           <span class="collection-subcat__media">
-            {% if block.settings.icon != blank %}
+            {% if sub_icon_value != null %}
               {{
-                block.settings.icon
+                sub_icon_value
                 | image_url: width: 200
-                | image_tag: loading: 'lazy', class: 'collection-subcat__icon', alt: block.settings.label
+                | image_tag: loading: 'lazy', class: 'collection-subcat__icon', alt: subcollection.title
               }}
             {% else %}
               <span class="svg-wrapper collection-subcat__icon-fallback" aria-hidden="true">
@@ -145,12 +163,12 @@
               </span>
             {% endif %}
 
-            {% if block.settings.count != blank %}
-              <span class="collection-subcat__count">{{ block.settings.count }}</span>
+            {% if section.settings.show_subcat_count %}
+              <span class="collection-subcat__count">{{ subcollection.products_count }}</span>
             {% endif %}
           </span>
 
-          <span class="collection-subcat__label">{{ block.settings.label }}</span>
+          <span class="collection-subcat__label">{{ subcollection.title }}</span>
         </a>
       {% endfor %}
     </div>
@@ -189,7 +207,8 @@
               swatch_limit: section.settings.swatch_limit,
               show_variant_button: section.settings.show_variant_button,
               variant_button_label: section.settings.variant_button_label,
-              show_reviews: section.settings.show_reviews,
+              show_image_slider: section.settings.show_image_slider,
+              slider_limit: section.settings.slider_limit,
               show_dimensions: section.settings.show_dimensions,
               dimensions_namespace: section.settings.dimensions_namespace,
               dimensions_key: section.settings.dimensions_key,
@@ -260,6 +279,20 @@
   src="{{ 'showcase-collection.js' | asset_url }}"
   type="module"
 ></script>
+
+<script
+  src="{{ 'showcase-card-cart.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+{% if section.settings.show_image_slider %}
+  <script
+    src="{{ 'showcase-card-slider.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
 
 {% stylesheet %}
   .collection-breadcrumbs {
@@ -412,6 +445,10 @@
 
   /* ---- Product grid ---- */
   .collection-grid {
+    /* Container so the promo can derive one column's width for its height. */
+    container-type: inline-size;
+    --collection-grid-cols: var(--collection-columns, 4);
+
     display: grid;
     grid-template-columns: repeat(var(--collection-columns, 4), minmax(0, 1fr));
     gap: var(--gap-xl) var(--gap-lg);
@@ -421,12 +458,46 @@
     min-width: 0;
   }
 
+  /*
+    Hover lifts the card into an elevated panel that overlays its neighbours, so the
+    swatch row and controls have room without reflowing the grid. Scoped to the
+    collection grid — homepage and PDP carousels keep the flat card.
+    Pointer/hover query so it never latches on touch.
+  */
+  @media (hover: hover) and (pointer: fine) {
+    .collection-grid__item {
+      position: relative;
+    }
+
+    .collection-grid__item:hover {
+      z-index: var(--layer-raised, 5);
+    }
+
+    .collection-grid__item:hover .showcase-card {
+      position: absolute;
+      inset-inline: 0;
+      top: 0;
+      padding: var(--padding-sm);
+      border-radius: var(--style-border-radius-inputs, 8px);
+      background-color: var(--color-background, #fff);
+      box-shadow: 0 6px 24px rgb(0 0 0 / 0.12);
+    }
+  }
+
   /* ---- Mid-grid promo banner ---- */
+  /*
+    Height matches the product IMAGE box, not the whole card, so the banner sits
+    flush with the image row and the neighbouring titles and prices flow beneath it.
+    The media is 1:1, so one column's width is exactly the image height.
+  */
   .collection-promo {
     position: relative;
     grid-column: span var(--collection-promo-span, 2);
+    align-self: start;
     display: block;
-    min-height: 100%;
+    height: calc(
+      (100cqi - (var(--collection-grid-cols, 4) - 1) * var(--gap-lg)) / var(--collection-grid-cols, 4)
+    );
     border-radius: var(--style-border-radius-inputs, 8px);
     color: var(--collection-promo-text, #fff);
     text-decoration: none;
@@ -528,6 +599,9 @@
 
   @media screen and (max-width: 989px) {
     .collection-grid {
+      /* Keep the promo height calc in step with the tablet column count. */
+      --collection-grid-cols: 3;
+
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
@@ -554,9 +628,10 @@
       gap: var(--gap-lg) var(--gap-sm);
     }
 
-    /* Promo spans the full mobile grid width. */
+    /* Promo spans the full mobile grid width and sizes to its own content. */
     .collection-promo {
       grid-column: 1 / -1;
+      height: auto;
       min-height: 160px;
     }
 
@@ -724,6 +799,45 @@
     },
     {
       "type": "header",
+      "content": "Sub-category tiles"
+    },
+    {
+      "type": "paragraph",
+      "content": "Tiles come from a list-of-collections metafield on the collection being viewed, so each category shows its own sub-categories. The row is hidden when that metafield is empty."
+    },
+    {
+      "type": "text",
+      "id": "subcat_namespace",
+      "label": "Sub-collections metafield namespace",
+      "default": "custom"
+    },
+    {
+      "type": "text",
+      "id": "subcat_key",
+      "label": "Sub-collections metafield key",
+      "default": "subcollections"
+    },
+    {
+      "type": "text",
+      "id": "subcat_icon_namespace",
+      "label": "Tile icon metafield namespace",
+      "default": "custom"
+    },
+    {
+      "type": "text",
+      "id": "subcat_icon_key",
+      "label": "Tile icon metafield key",
+      "default": "tile_icon",
+      "info": "Set on each sub-collection, so the icon travels with it."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_subcat_count",
+      "label": "Show product count on tiles",
+      "default": true
+    },
+    {
+      "type": "header",
       "content": "Filter and sort bar"
     },
     {
@@ -855,10 +969,19 @@
     },
     {
       "type": "checkbox",
-      "id": "show_reviews",
-      "label": "Show review count",
+      "id": "show_image_slider",
+      "label": "Let cards page through product images",
       "default": true,
-      "info": "Reads the reviews.rating_count metafield."
+      "info": "Arrows on hover for desktop, swipe on mobile. Collection grid only."
+    },
+    {
+      "type": "range",
+      "id": "slider_limit",
+      "label": "Maximum images per card",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 5
     },
     {
       "type": "checkbox",

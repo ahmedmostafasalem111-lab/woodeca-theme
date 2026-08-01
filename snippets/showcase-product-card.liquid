@@ -30,6 +30,8 @@
   @param {boolean} [show_variant_button] - Render the "Change color and options" button for products with variants.
   @param {string} [variant_button_label] - Label for that button.
   @param {boolean} [show_reviews] - Render the review-count line when review data exists.
+  @param {boolean} [show_image_slider] - Page through the product's images in the media box. Default false.
+  @param {number} [slider_limit] - Maximum images the slider renders. Default 5.
   @param {boolean} [show_dimensions] - Render the dimensions line when the metafield exists.
   @param {string} [dimensions_namespace] - Metafield namespace for dimensions. Default 'custom'.
   @param {string} [dimensions_key] - Metafield key for dimensions. Default 'dimensions'.
@@ -129,26 +131,121 @@
   if product != blank and product != nil and product.variants.size > 1
     assign has_variants = true
   endif
+
+  # ---- Card image slider ----
+  # Opt-in so the collection grid can carry it without changing the homepage or PDP
+  # carousels. Capped so a product with 30 photos doesn't bloat a 24-card grid.
+  assign card_slider_images = null
+  if show_image_slider and product != blank and product != nil
+    assign slider_limit = slider_limit | default: 5
+    if product.images.size > 1
+      assign card_slider_images = product.images | slice: 0, slider_limit
+    endif
+  endif
+
+  # ---- Add to cart ----
+  # The card has no variant picker, so it adds the first available variant. Resolved
+  # server-side so the button can never post a missing or unavailable variant id.
+  assign card_variant_id = null
+  assign card_purchasable = false
+  if product != blank and product != nil
+    assign card_variant = product.selected_or_first_available_variant
+    if card_variant != nil and card_variant.available
+      assign card_variant_id = card_variant.id
+      assign card_purchasable = true
+    endif
+  endif
+
+  # Already-in-cart state comes from the cart itself, so removing the item elsewhere
+  # returns the button to its default state on the next page load.
+  assign card_in_cart = false
+  if card_variant_id != null
+    for line_item in cart.items
+      if line_item.variant_id == card_variant_id
+        assign card_in_cart = true
+        break
+      endif
+    endfor
+  endif
 %}
 
 <div class="showcase-card">
   <div class="showcase-card__media">
-    <a
-      href="{{ card_url }}"
-      class="showcase-card__media-link"
-      tabindex="-1"
-      aria-hidden="true"
-    >
-      {% if card_image != blank %}
-        {{
-          card_image
-          | image_url: width: 600
-          | image_tag: loading: 'lazy', class: 'showcase-card__image', alt: card_title
-        }}
-      {% else %}
-        {{ 'product-apparel-1' | placeholder_svg_tag: 'showcase-card__image showcase-card__image--placeholder' }}
-      {% endif %}
-    </a>
+    {%- comment -%}
+      With the slider on, the media box becomes a scroll-snap track of the product's
+      own images. Native scrolling gives the mobile swipe for free; the arrows just
+      drive the same scroll on desktop. Only image 1 loads eagerly.
+    {%- endcomment -%}
+    {% if card_slider_images != null and card_slider_images.size > 1 %}
+      <div class="showcase-card__slides" data-card-slides>
+        {% for slide_image in card_slider_images %}
+          <a
+            href="{{ card_url }}"
+            class="showcase-card__slide"
+            tabindex="-1"
+            aria-hidden="true"
+          >
+            {% liquid
+              if forloop.first
+                assign slide_loading = 'eager'
+              else
+                assign slide_loading = 'lazy'
+              endif
+            %}
+            {{
+              slide_image
+              | image_url: width: 600
+              | image_tag: loading: slide_loading, class: 'showcase-card__image', alt: card_title
+            }}
+          </a>
+        {% endfor %}
+      </div>
+
+      <button
+        type="button"
+        class="showcase-card__slide-arrow showcase-card__slide-arrow--prev"
+        data-card-slide-prev
+        aria-label="Previous image of {{ card_title | escape }}"
+      >
+        <span class="svg-wrapper" aria-hidden="true">
+          {{- 'icon-chevron-left.svg' | inline_asset_content -}}
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="showcase-card__slide-arrow showcase-card__slide-arrow--next"
+        data-card-slide-next
+        aria-label="Next image of {{ card_title | escape }}"
+      >
+        <span class="svg-wrapper" aria-hidden="true">
+          {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+        </span>
+      </button>
+
+      <div class="showcase-card__slide-dots" data-card-slide-dots aria-hidden="true">
+        {% for slide_image in card_slider_images %}
+          <span class="showcase-card__slide-dot{% if forloop.first %} showcase-card__slide-dot--active{% endif %}"></span>
+        {% endfor %}
+      </div>
+    {% else %}
+      <a
+        href="{{ card_url }}"
+        class="showcase-card__media-link"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        {% if card_image != blank %}
+          {{
+            card_image
+            | image_url: width: 600
+            | image_tag: loading: 'lazy', class: 'showcase-card__image', alt: card_title
+          }}
+        {% else %}
+          {{ 'product-apparel-1' | placeholder_svg_tag: 'showcase-card__image showcase-card__image--placeholder' }}
+        {% endif %}
+      </a>
+    {% endif %}
 
     {% if badge != blank %}
       <span class="showcase-card__badge">{{ badge }}</span>
@@ -237,30 +334,50 @@
         {% if swatch_overflow > 0 %}
           <span class="showcase-card__swatch-overflow">+{{ swatch_overflow }}</span>
         {% endif %}
-      </div>
-    {% endif %}
 
-    {% if show_variant_button and has_variants %}
-      <a
-        href="{{ card_url }}"
-        class="showcase-card__variant-button"
-      >
-        <span class="svg-wrapper" aria-hidden="true">
-          {{- 'icon-filter.svg' | inline_asset_content -}}
-        </span>
-        {{ variant_button_label | default: 'Change color and options' }}
-      </a>
+        {%- comment -%}
+          Compact square button closing the swatch row, replacing the old full-width
+          bar so the row reads as one control group.
+        {%- endcomment -%}
+        {% if show_variant_button and has_variants %}
+          {% assign variant_label = variant_button_label | default: 'Change color and options' %}
+          <a
+            href="{{ card_url }}"
+            class="showcase-card__variant-button"
+            aria-label="{{ variant_label | escape }}"
+            title="{{ variant_label | escape }}"
+          >
+            <span class="svg-wrapper" aria-hidden="true">
+              {{- 'icon-pencil.svg' | inline_asset_content -}}
+            </span>
+          </a>
+        {% endif %}
+      </div>
     {% endif %}
     </div>
 
-    {% if show_quick_add %}
+    {% if show_quick_add and card_purchasable %}
       <button
         type="button"
-        class="showcase-card__quick-add"
-        aria-label="Add {{ card_title | escape }} to cart"
+        class="showcase-card__quick-add{% if card_in_cart %} showcase-card__quick-add--added{% endif %}"
+        data-cart-add
+        data-variant-id="{{ card_variant_id }}"
+        data-cart-url="{{ routes.cart_url }}"
+        data-label-add="Add {{ card_title | escape }} to cart"
+        data-label-added="{{ card_title | escape }} is in your cart. Go to cart"
+        aria-label="
+          {%- if card_in_cart -%}
+            {{ card_title | escape }} is in your cart. Go to cart
+          {%- else -%}
+            Add {{ card_title | escape }} to cart
+          {%- endif -%}
+        "
       >
-        <span class="svg-wrapper" aria-hidden="true">
+        <span class="svg-wrapper showcase-card__quick-add-icon showcase-card__quick-add-icon--bag" aria-hidden="true">
           {{- 'icon-cart.svg' | inline_asset_content -}}
+        </span>
+        <span class="svg-wrapper showcase-card__quick-add-icon showcase-card__quick-add-icon--done" aria-hidden="true">
+          {{- 'icon-checkmark.svg' | inline_asset_content -}}
         </span>
       </button>
     {% endif %}
@@ -290,6 +407,112 @@
     justify-content: center;
     width: 100%;
     height: 100%;
+  }
+
+  /* ---- Image slider ---- */
+  .showcase-card__slides {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .showcase-card__slides::-webkit-scrollbar {
+    display: none;
+  }
+
+  .showcase-card__slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    scroll-snap-align: start;
+  }
+
+  .showcase-card__slide-arrow {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: rgb(255 255 255 / 0.85);
+    color: var(--color-foreground);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--animation-speed) var(--animation-easing);
+  }
+
+  .showcase-card__slide-arrow--prev {
+    inset-inline-start: var(--padding-2xs);
+  }
+
+  .showcase-card__slide-arrow--next {
+    inset-inline-end: var(--padding-2xs);
+  }
+
+  .showcase-card__slide-arrow .svg-wrapper,
+  .showcase-card__slide-arrow svg {
+    width: var(--icon-size-xs);
+    height: var(--icon-size-xs);
+  }
+
+  /* Arrows only on real pointers, and only while the card is hovered. */
+  @media (hover: hover) and (pointer: fine) {
+    .showcase-card:hover .showcase-card__slide-arrow {
+      opacity: 1;
+    }
+  }
+
+  .showcase-card__slide-dots {
+    position: absolute;
+    inset-inline: 0;
+    bottom: var(--padding-2xs);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity var(--animation-speed) var(--animation-easing);
+  }
+
+  .showcase-card__slide-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-30));
+  }
+
+  .showcase-card__slide-dot--active {
+    background-color: var(--color-foreground);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .showcase-card:hover .showcase-card__slide-dots {
+      opacity: 1;
+    }
+  }
+
+  /* No hover on touch, so dots stay visible as the swipe affordance. */
+  @media (hover: none), (pointer: coarse) {
+    .showcase-card__slide-dots {
+      opacity: 1;
+    }
+
+    .showcase-card__slide-arrow {
+      display: none;
+    }
   }
 
   /*
@@ -368,6 +591,29 @@
   .showcase-card__quick-add svg {
     width: var(--icon-size-sm);
     height: var(--icon-size-sm);
+  }
+
+  /* Both icons are rendered; the state class decides which one shows. */
+  .showcase-card__quick-add-icon--done,
+  .showcase-card__quick-add--added .showcase-card__quick-add-icon--bag {
+    display: none;
+  }
+
+  .showcase-card__quick-add--added .showcase-card__quick-add-icon--done {
+    display: flex;
+  }
+
+  .showcase-card__quick-add--added {
+    background-color: var(--showcase-card-quick-add-added-background, #2e7d32);
+  }
+
+  .showcase-card__quick-add--busy {
+    opacity: var(--opacity-60);
+    pointer-events: none;
+  }
+
+  .showcase-card__quick-add--error {
+    background-color: var(--showcase-card-quick-add-error-background, #c0392b);
   }
 
   /*
@@ -501,16 +747,33 @@
     white-space: nowrap;
   }
 
+  /*
+    One row, never wrapping. Swatches keep a fixed diameter on every card so a
+    product with many variants can't shrink them or push them onto a second line —
+    the overflow chip absorbs the remainder instead.
+  */
   .showcase-card__swatches {
     display: flex;
     align-items: center;
-    gap: 4px;
-    margin-block-start: var(--margin-3xs);
+    flex-wrap: nowrap;
+    gap: 6px;
+    margin-block-start: var(--margin-2xs);
   }
 
   .showcase-card__swatch {
     display: inline-flex;
-    --swatch-size: 16px;
+    flex: 0 0 auto;
+    width: var(--showcase-card-swatch-size, 18px);
+    height: var(--showcase-card-swatch-size, 18px);
+    --swatch-size: var(--showcase-card-swatch-size, 18px);
+  }
+
+  /* Pin the shared swatch snippet to the same diameter regardless of its own sizing. */
+  .showcase-card__swatch > * {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0;
+    min-height: 0;
   }
 
   .showcase-card__swatch-fallback {
@@ -527,17 +790,18 @@
     font-size: var(--font-size--2xs);
   }
 
+  /* Compact square control closing the swatch row, not a full-width bar. */
   .showcase-card__variant-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--gap-3xs);
-    margin-block-start: var(--margin-2xs);
-    padding: var(--padding-2xs) var(--padding-sm);
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    margin-inline-start: var(--margin-3xs);
     border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
-    border-radius: 999px;
+    border-radius: 4px;
     color: var(--color-foreground);
-    font-size: var(--font-size--2xs);
     text-decoration: none;
     transition: background-color var(--animation-speed) var(--animation-easing);
   }
