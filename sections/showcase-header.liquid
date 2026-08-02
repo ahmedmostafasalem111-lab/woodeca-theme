@@ -37,6 +37,8 @@
     --showcase-photo-border: {{ section.settings.photo_search_border_color | default: '#3b7de0' }};
     --showcase-photo-text: {{ section.settings.photo_search_text_color | default: '#1c1c1c' }};
     --showcase-logo-size: {{ section.settings.logo_font_size }};
+    --drawer-bar-background: {{ section.settings.drawer_bar_background | default: '#111111' }};
+    --drawer-bar-text: {{ section.settings.drawer_bar_text | default: '#ffffff' }};
     --showcase-call-background: {{ section.settings.call_background | default: '#e8262d' }};
     --showcase-call-text: {{ section.settings.call_text_color | default: '#ffffff' }};
     --showcase-cart-bubble-background: {{ section.settings.cart_bubble_background | default: '#e8705a' }};
@@ -136,37 +138,11 @@
   {%- comment -%} ---------- Row 2: main row (sticky) ---------- {%- endcomment -%}
   <div class="showcase-header__main{% if section.settings.sticky_main_row %} showcase-header__main--sticky{% endif %}">
     <div class="showcase-header__inner showcase-header__main-inner">
-      {%- comment -%} Mobile-only: menu drawer trigger {%- endcomment -%}
-      <details class="showcase-header__mobile-menu">
-        <summary
-          class="showcase-header__icon-button"
-          aria-label="{{ section.settings.menu_label | default: 'Menu' | escape }}"
-        >
-          <span class="svg-wrapper" aria-hidden="true">
-            {{- 'icon-menu.svg' | inline_asset_content -}}
-          </span>
-        </summary>
-        <div class="showcase-header__mobile-panel">
-          {% if section.settings.catalog_menu != blank %}
-            <ul class="showcase-dropdown__list">
-              {% for link in section.settings.catalog_menu.links %}
-                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-
-          {% if nav_links.size > 0 or promo_links.size > 0 %}
-            <ul class="showcase-dropdown__list">
-              {% for block in nav_links %}
-                <li><a href="{{ block.settings.link | default: '#' }}">{{ block.settings.label }}</a></li>
-              {% endfor %}
-              {% for block in promo_links %}
-                <li><a href="{{ block.settings.link | default: '#' }}">{{ block.settings.label }}</a></li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </div>
-      </details>
+      {%- comment -%}
+        Mobile-only: full-height navigation drawer. Replaces the old <details>
+        dropdown, which floated a flat mixed link list under the sticky header.
+      {%- endcomment -%}
+      {% render 'showcase-mobile-drawer', section: section %}
 
       {%- comment -%} Mobile-only: search disclosure {%- endcomment -%}
       <details class="showcase-header__mobile-search">
@@ -366,6 +342,12 @@
     fetchpriority="low"
   ></script>
 {% endif %}
+
+<script
+  src="{{ 'showcase-mobile-drawer.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
 
 {% stylesheet %}
   .showcase-header {
@@ -765,7 +747,7 @@
   }
 
   /* ---------- Mobile-only pieces, hidden on desktop ---------- */
-  .showcase-header__mobile-menu,
+  .showcase-header__drawer-trigger,
   .showcase-header__mobile-search,
   .showcase-header__icon-button--mobile {
     display: none;
@@ -781,7 +763,11 @@
       display: none;
     }
 
-    .showcase-header__mobile-menu,
+    .showcase-header__drawer-trigger {
+      display: flex;
+      flex-shrink: 0;
+    }
+
     .showcase-header__mobile-search {
       display: block;
       position: relative;
@@ -834,18 +820,230 @@
       box-shadow: var(--shadow-popover);
     }
 
-    .showcase-header__mobile-panel {
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 0;
-      z-index: var(--layer-raised);
-      width: min(88vw, 380px);
-      max-height: 70vh;
-      padding: var(--padding-sm);
-      border-radius: var(--style-border-radius-popover, 8px);
-      background-color: var(--color-background, #fff);
-      box-shadow: var(--shadow-popover);
-      overflow-y: auto;
+  }
+
+  /* ---------- Mobile navigation drawer ---------- */
+  /* Locks the page behind the drawer without shifting it. */
+  .mobile-drawer-locked {
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  .mobile-drawer[hidden] {
+    display: none;
+  }
+
+  .mobile-drawer {
+    position: fixed;
+    inset: 0;
+    /* Above the sticky header, bottom nav and any floating widgets. */
+    z-index: 2147483000;
+  }
+
+  .mobile-drawer__overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgb(0 0 0 / 0.5);
+    opacity: 0;
+    transition: opacity 240ms var(--animation-easing, ease);
+  }
+
+  .mobile-drawer--open .mobile-drawer__overlay {
+    opacity: 1;
+  }
+
+  .mobile-drawer__panel {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    display: flex;
+    flex-direction: column;
+    width: 88%;
+    max-width: 420px;
+    height: 100vh;
+    height: 100dvh;
+    background-color: #ffffff;
+    translate: -100% 0;
+    transition: translate 240ms var(--animation-easing, ease);
+  }
+
+  .mobile-drawer--open .mobile-drawer__panel {
+    translate: 0 0;
+  }
+
+  .mobile-drawer__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 0 0 auto;
+    padding: 12px 16px;
+    background-color: var(--drawer-bar-background, #111111);
+    color: var(--drawer-bar-text, #ffffff);
+  }
+
+  .mobile-drawer__bar-title {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .mobile-drawer__bar-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .mobile-drawer__bar-close .svg-wrapper,
+  .mobile-drawer__bar-close svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Panels stack here; sub views slide over the main one. */
+  .mobile-drawer__views {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .mobile-drawer__view {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    background-color: #ffffff;
+  }
+
+  .mobile-drawer__view--sub {
+    translate: 100% 0;
+    transition: translate 240ms var(--animation-easing, ease);
+  }
+
+  .mobile-drawer__view--sub.is-active {
+    translate: 0 0;
+  }
+
+  /* Group separation: a thicker rule reads as a cluster break. */
+  .mobile-drawer__group + .mobile-drawer__group {
+    border-block-start: 8px solid rgb(0 0 0 / 0.05);
+  }
+
+  .mobile-drawer__group--flush + .mobile-drawer__group--flush,
+  .mobile-drawer__group--flush {
+    border-block-start: 0;
+  }
+
+  .mobile-drawer__row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    min-height: 54px;
+    padding: 0 16px;
+    border: 0;
+    border-block-end: 1px solid #e7e7e7;
+    background: transparent;
+    color: var(--color-foreground);
+    font-size: 12.5px;
+    text-align: start;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .mobile-drawer__row--drill {
+    justify-content: space-between;
+    font-weight: 600;
+  }
+
+  .mobile-drawer__row-label {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* Fixed width keeps labels aligned whether or not an icon exists. */
+  .mobile-drawer__row-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 30px;
+    height: 28px;
+  }
+
+  .mobile-drawer__row-img {
+    width: auto;
+    height: auto;
+    max-width: 26px;
+    max-height: 26px;
+    object-fit: contain;
+  }
+
+  .mobile-drawer__row-icon .svg-wrapper,
+  .mobile-drawer__row-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .mobile-drawer__chevron,
+  .mobile-drawer__chevron svg {
+    width: 12px;
+    height: 12px;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+  }
+
+  .mobile-drawer__subbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-block-end: 1px solid #e7e7e7;
+    background-color: #f7f7f7;
+  }
+
+  .mobile-drawer__back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-foreground);
+    cursor: pointer;
+  }
+
+  .mobile-drawer__back .svg-wrapper,
+  .mobile-drawer__back svg {
+    width: 17px;
+    height: 14px;
+  }
+
+  .mobile-drawer__subtitle {
+    flex: 1 1 auto;
+    /* Offset by the back button so the title sits optically centred. */
+    margin-inline-end: 28px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-drawer__panel,
+    .mobile-drawer__overlay,
+    .mobile-drawer__view--sub {
+      transition: none;
     }
   }
 {% endstylesheet %}
@@ -1010,6 +1208,173 @@
       "id": "menu_label",
       "label": "Mobile menu button label",
       "default": "Menu"
+    },
+    {
+      "type": "header",
+      "content": "Mobile drawer"
+    },
+    {
+      "type": "color",
+      "id": "drawer_bar_background",
+      "label": "Drawer bar background",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "drawer_bar_text",
+      "label": "Drawer bar text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "text",
+      "id": "menu_close_label",
+      "label": "Close button label",
+      "default": "Close menu"
+    },
+    {
+      "type": "text",
+      "id": "menu_back_label",
+      "label": "Back button label",
+      "default": "Back to menu"
+    },
+    {
+      "type": "text",
+      "id": "menu_icon_namespace",
+      "label": "Category icon metafield namespace",
+      "default": "custom"
+    },
+    {
+      "type": "text",
+      "id": "menu_icon_key",
+      "label": "Category icon metafield key",
+      "default": "tile_icon",
+      "info": "Same collection metafield the collection page sub-category tiles use, so icons stay in sync."
+    },
+    {
+      "type": "header",
+      "content": "Drawer — drill-down menus"
+    },
+    {
+      "type": "text",
+      "id": "product_menu_label",
+      "label": "First drill-down label",
+      "default": "Shop By Product"
+    },
+    {
+      "type": "link_list",
+      "id": "mobile_product_menu",
+      "label": "First drill-down menu"
+    },
+    {
+      "type": "text",
+      "id": "room_menu_label",
+      "label": "Second drill-down label",
+      "default": "Shop By Room"
+    },
+    {
+      "type": "link_list",
+      "id": "mobile_room_menu",
+      "label": "Second drill-down menu"
+    },
+    {
+      "type": "header",
+      "content": "Drawer — shortcut links"
+    },
+    {
+      "type": "text",
+      "id": "bestsellers_label",
+      "label": "Bestsellers label",
+      "default": "Bestsellers"
+    },
+    {
+      "type": "url",
+      "id": "bestsellers_link",
+      "label": "Bestsellers link"
+    },
+    {
+      "type": "image_picker",
+      "id": "bestsellers_icon",
+      "label": "Bestsellers icon"
+    },
+    {
+      "type": "image_picker",
+      "id": "wishlist_icon",
+      "label": "Wish list icon"
+    },
+    {
+      "type": "image_picker",
+      "id": "account_icon",
+      "label": "Account icon"
+    },
+    {
+      "type": "header",
+      "content": "Drawer — support links"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_returns",
+      "label": "Show Exchange & Returns",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "returns_label",
+      "label": "Exchange & Returns label",
+      "default": "Exchange & Returns"
+    },
+    {
+      "type": "url",
+      "id": "returns_link",
+      "label": "Exchange & Returns link"
+    },
+    {
+      "type": "image_picker",
+      "id": "returns_icon",
+      "label": "Exchange & Returns icon"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_warranty",
+      "label": "Show Warranty",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "warranty_label",
+      "label": "Warranty label",
+      "default": "Warranty"
+    },
+    {
+      "type": "url",
+      "id": "warranty_link",
+      "label": "Warranty link"
+    },
+    {
+      "type": "image_picker",
+      "id": "warranty_icon",
+      "label": "Warranty icon"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_business",
+      "label": "Show For Business",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "business_label",
+      "label": "For Business label",
+      "default": "For Business"
+    },
+    {
+      "type": "url",
+      "id": "business_link",
+      "label": "For Business link"
+    },
+    {
+      "type": "image_picker",
+      "id": "business_icon",
+      "label": "For Business icon"
     },
     {
       "type": "header",

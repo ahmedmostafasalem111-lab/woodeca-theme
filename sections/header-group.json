@@ -190,7 +190,9 @@
         "photo_search_border_color": "#3b7de0",
         "photo_search_text_color": "#1c1c1c",
         "cart_bubble_background": "#e8705a",
-        "cart_bubble_text": "#ffffff"
+        "cart_bubble_text": "#ffffff",
+        "mobile_product_menu": "main-menu",
+        "mobile_room_menu": "main-menu"
       }
     }
   },

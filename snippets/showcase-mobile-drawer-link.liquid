@@ -1,0 +1,28 @@
+{% comment %}
+  One flat drawer row: leading icon, then label. Used by the drawer's Group B and
+  Group C entries so the markup exists in one place only.
+
+  @param {string} label - Merchant label. Falls back when blank.
+  @param {string} fallback_label - Default label text.
+  @param {string} link - Destination.
+  @param {object} [image] - Merchant-picked icon image. Wins over inline_icon.
+  @param {string} [inline_icon] - Theme SVG filename used when no image is picked.
+{% endcomment %}
+
+{% liquid
+  assign row_label = label | default: fallback_label
+  assign row_href = link | default: '#'
+%}
+
+<a href="{{ row_href }}" class="mobile-drawer__row mobile-drawer__row--flat">
+  <span class="mobile-drawer__row-icon">
+    {% if image != blank %}
+      {{ image | image_url: width: 96 | image_tag: loading: 'lazy', class: 'mobile-drawer__row-img', alt: '' }}
+    {% elsif inline_icon != blank %}
+      <span class="svg-wrapper" aria-hidden="true">
+        {{- inline_icon | inline_asset_content -}}
+      </span>
+    {% endif %}
+  </span>
+  <span class="mobile-drawer__row-label">{{ row_label }}</span>
+</a>

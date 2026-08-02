@@ -1,0 +1,234 @@
+{% comment %}
+  Full-height mobile navigation drawer.
+
+  Level 1 is three visually separated groups: drill-down entries with a chevron,
+  flat entries with a leading icon, and merchant-configurable support links.
+  Level 2 panels slide over the top and are driven by Shopify navigation menus.
+
+  Category icons are read from the same collection metafield that powers the
+  collection page's sub-category tiles, so an icon set once travels everywhere.
+
+  @param {object} section - The header section.
+{% endcomment %}
+
+{% liquid
+  assign icon_ns = section.settings.menu_icon_namespace | default: 'custom'
+  assign icon_key = section.settings.menu_icon_key | default: 'tile_icon'
+  assign product_menu = section.settings.mobile_product_menu
+  assign room_menu = section.settings.mobile_room_menu
+%}
+
+<button
+  type="button"
+  class="showcase-header__icon-button showcase-header__drawer-trigger"
+  data-drawer-open
+  aria-expanded="false"
+  aria-controls="MobileDrawer-{{ section.id }}"
+  aria-label="{{ section.settings.menu_label | default: 'Menu' | escape }}"
+>
+  <span class="svg-wrapper" aria-hidden="true">
+    {{- 'icon-menu.svg' | inline_asset_content -}}
+  </span>
+</button>
+
+<div
+  class="mobile-drawer"
+  id="MobileDrawer-{{ section.id }}"
+  data-mobile-drawer
+  hidden
+>
+  <div class="mobile-drawer__overlay" data-drawer-close></div>
+
+  <div
+    class="mobile-drawer__panel"
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ section.settings.menu_label | default: 'Menu' | escape }}"
+  >
+    <div class="mobile-drawer__bar">
+      <span class="mobile-drawer__bar-title">{{ section.settings.menu_label | default: 'Menu' }}</span>
+      <button
+        type="button"
+        class="mobile-drawer__bar-close"
+        data-drawer-close
+        aria-label="{{ section.settings.menu_close_label | default: 'Close menu' | escape }}"
+      >
+        <span class="svg-wrapper" aria-hidden="true">
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </span>
+      </button>
+    </div>
+
+    <div class="mobile-drawer__views">
+      {%- comment -%} ---------- Level 1 ---------- {%- endcomment -%}
+      <div class="mobile-drawer__view" data-drawer-view="main">
+        {%- comment -%} Group A — drill-downs, chevron right, no leading icon. {%- endcomment -%}
+        <div class="mobile-drawer__group">
+          {% if product_menu != blank %}
+            <button
+              type="button"
+              class="mobile-drawer__row mobile-drawer__row--drill"
+              data-drawer-to="product"
+              aria-label="{{ section.settings.product_menu_label | default: 'Shop By Product' | escape }}"
+            >
+              <span class="mobile-drawer__row-label">
+                {{- section.settings.product_menu_label | default: 'Shop By Product' -}}
+              </span>
+              <span class="svg-wrapper mobile-drawer__chevron" aria-hidden="true">
+                {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+              </span>
+            </button>
+          {% endif %}
+
+          {% if room_menu != blank %}
+            <button
+              type="button"
+              class="mobile-drawer__row mobile-drawer__row--drill"
+              data-drawer-to="room"
+              aria-label="{{ section.settings.room_menu_label | default: 'Shop By Room' | escape }}"
+            >
+              <span class="mobile-drawer__row-label">
+                {{- section.settings.room_menu_label | default: 'Shop By Room' -}}
+              </span>
+              <span class="svg-wrapper mobile-drawer__chevron" aria-hidden="true">
+                {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+              </span>
+            </button>
+          {% endif %}
+        </div>
+
+        {%- comment -%} Group B — flat entries with a leading icon. {%- endcomment -%}
+        <div class="mobile-drawer__group">
+          {% render 'showcase-mobile-drawer-link',
+            label: section.settings.bestsellers_label,
+            fallback_label: 'Bestsellers',
+            link: section.settings.bestsellers_link,
+            image: section.settings.bestsellers_icon,
+            inline_icon: 'icon-star.svg'
+          %}
+
+          {% render 'showcase-mobile-drawer-link',
+            label: section.settings.wishlist_label,
+            fallback_label: 'My Wish List',
+            link: section.settings.wishlist_link,
+            image: section.settings.wishlist_icon,
+            inline_icon: 'icon-heart.svg'
+          %}
+
+          {% liquid
+            assign account_href = section.settings.account_link
+            if shop.customer_accounts_enabled
+              assign account_href = routes.account_url
+            endif
+          %}
+          {% render 'showcase-mobile-drawer-link',
+            label: section.settings.account_label,
+            fallback_label: 'My Account',
+            link: account_href,
+            image: section.settings.account_icon,
+            inline_icon: 'icon-account.svg'
+          %}
+        </div>
+
+        {%- comment -%} Group C — merchant-configurable support links. {%- endcomment -%}
+        {% if section.settings.show_returns or section.settings.show_warranty or section.settings.show_business %}
+          <div class="mobile-drawer__group">
+            {% if section.settings.show_returns %}
+              {% render 'showcase-mobile-drawer-link',
+                label: section.settings.returns_label,
+                fallback_label: 'Exchange & Returns',
+                link: section.settings.returns_link,
+                image: section.settings.returns_icon,
+                inline_icon: 'icon-return.svg'
+              %}
+            {% endif %}
+
+            {% if section.settings.show_warranty %}
+              {% render 'showcase-mobile-drawer-link',
+                label: section.settings.warranty_label,
+                fallback_label: 'Warranty',
+                link: section.settings.warranty_link,
+                image: section.settings.warranty_icon,
+                inline_icon: 'icon-shield.svg'
+              %}
+            {% endif %}
+
+            {% if section.settings.show_business %}
+              {% render 'showcase-mobile-drawer-link',
+                label: section.settings.business_label,
+                fallback_label: 'For Business',
+                link: section.settings.business_link,
+                image: section.settings.business_icon,
+                inline_icon: 'icon-store.svg'
+              %}
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+      {%- comment -%}
+        ---------- Level 2 ----------
+        Rendered from the navigation menus, with each row enriched by the linked
+        collection's icon metafield where one exists.
+      {%- endcomment -%}
+      {% for pair in (1..2) %}
+        {% liquid
+          if forloop.first
+            assign view_key = 'product'
+            assign view_menu = product_menu
+            assign view_title = section.settings.product_menu_label | default: 'Shop By Product'
+          else
+            assign view_key = 'room'
+            assign view_menu = room_menu
+            assign view_title = section.settings.room_menu_label | default: 'Shop By Room'
+          endif
+        %}
+
+        {% if view_menu != blank %}
+          <div class="mobile-drawer__view mobile-drawer__view--sub" data-drawer-view="{{ view_key }}" hidden>
+            <div class="mobile-drawer__subbar">
+              <button
+                type="button"
+                class="mobile-drawer__back"
+                data-drawer-back
+                aria-label="{{ section.settings.menu_back_label | default: 'Back to menu' | escape }}"
+              >
+                <span class="svg-wrapper" aria-hidden="true">
+                  {{- 'icon-arrow-left.svg' | inline_asset_content -}}
+                </span>
+              </button>
+              <span class="mobile-drawer__subtitle">{{ view_title }}</span>
+            </div>
+
+            <div class="mobile-drawer__group mobile-drawer__group--flush">
+              {% for link in view_menu.links %}
+                {%- comment -%}
+                  Only a collection link can carry an icon. Guard the type before
+                  touching metafields so custom and external links stay safe.
+                {%- endcomment -%}
+                {% liquid
+                  assign row_icon = null
+                  if link.type == 'collection_link' and link.object != blank
+                    assign row_icon = link.object.metafields[icon_ns][icon_key].value
+                  endif
+                %}
+                <a href="{{ link.url }}" class="mobile-drawer__row mobile-drawer__row--category">
+                  <span class="mobile-drawer__row-icon">
+                    {% if row_icon != blank %}
+                      {{
+                        row_icon
+                        | image_url: width: 96
+                        | image_tag: loading: 'lazy', class: 'mobile-drawer__row-img', alt: ''
+                      }}
+                    {% endif %}
+                  </span>
+                  <span class="mobile-drawer__row-label">{{ link.title }}</span>
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
