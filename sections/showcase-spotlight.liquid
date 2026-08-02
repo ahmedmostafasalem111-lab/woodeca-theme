@@ -35,6 +35,11 @@
     --spotlight-image-ratio: {{ spotlight_ratio }};
     --spotlight-image-position: {{ section.settings.image_position | default: '50% 50%' }};
     --spotlight-overlap: {{ section.settings.mobile_overlap | default: 0 }}px;
+    {%- comment -%}
+      Emitted on the section so it is inspectable here rather than only on the
+      inner list. Tablet narrows it in the 989 block.
+    {%- endcomment -%}
+    --spotlight-card-width: {{ section.settings.mobile_card_width | default: 43 }}%;
   "
 >
   {% if section.settings.heading != blank or section.settings.description != blank %}
@@ -474,9 +479,16 @@
       grid-template-columns: 1fr;
     }
 
+    /*
+      Square from the point the layout goes single-column. Without this the box
+      keeps the desktop's image-derived ratio, so the banner took the shape of
+      whatever photo was uploaded. min/max-height existed only to prop up that
+      ratio-driven box and would fight the square, so both are neutralised.
+    */
     .showcase-spotlight__media {
-      min-height: 280px;
-      max-height: 420px;
+      min-height: 0;
+      max-height: none;
+      aspect-ratio: 1 / 1;
     }
 
     /*
@@ -497,6 +509,15 @@
       overflow-y: visible;
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
+    }
+
+    /*
+      Tablet override. The section emits 43% for phones; at this width that would
+      give only two very wide cards, so narrow it here and let the 749 block put
+      it back for phones.
+    */
+    .showcase-spotlight__list {
+      --spotlight-card-width: 32%;
     }
 
     .showcase-spotlight__list > .spotlight-item {
@@ -595,7 +616,8 @@
       The overlap setting can pull the row up over the photo's lower edge.
     */
     .showcase-spotlight__list {
-      --spotlight-card-width: 43%;
+      /* Undo the tablet narrowing so the section's setting governs on phones. */
+      --spotlight-card-width: inherit;
 
       position: relative;
       z-index: 1;
@@ -773,6 +795,17 @@
       ],
       "default": "50% 50%",
       "info": "Which part of the photo to keep when the mobile square crops it."
+    },
+    {
+      "type": "range",
+      "id": "mobile_card_width",
+      "label": "Card width on phones",
+      "min": 30,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "default": 43,
+      "info": "Percentage of the row width. Around 43 shows two cards plus a peek of the third."
     },
     {
       "type": "range",
