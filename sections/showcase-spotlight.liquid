@@ -33,6 +33,8 @@
     --spotlight-cta-text: {{ section.settings.cta_text_color | default: '#ffffff' }};
     --spotlight-thumb-background: {{ section.settings.thumb_background | default: '#f2f2f0' }};
     --spotlight-image-ratio: {{ spotlight_ratio }};
+    --spotlight-image-position: {{ section.settings.image_position | default: '50% 50%' }};
+    --spotlight-overlap: {{ section.settings.mobile_overlap | default: 0 }}px;
   "
 >
   {% if section.settings.heading != blank or section.settings.description != blank %}
@@ -558,30 +560,47 @@
       not constraining this box, so the image rendered at its natural portrait
       height. 56vw is ~210px at 375px wide.
     */
+    /*
+      Square on mobile, matching the reference. The image is absolutely positioned
+      so it contributes no height — with `height: 100%` in normal flow it resolves
+      against an indefinite parent, falls back to the photo's natural height and
+      overrides the aspect-ratio, which is what produced the wide letterbox strip.
+    */
     .showcase-spotlight__media {
+      position: relative;
       min-height: 0;
       max-height: none;
-      height: clamp(180px, 56vw, 250px);
-      /* Cancels the page gutter. A 100vw bleed is not safe here — see the note in
-         the section comment about the page being wider than the viewport. */
+      height: auto;
+      aspect-ratio: 1 / 1;
+      align-self: start;
+      /* Cancels the page gutter so the square reaches both edges. */
       margin-inline: calc(var(--page-margin, 16px) * -1);
       border-radius: 0;
-      aspect-ratio: auto;
+      overflow: hidden;
     }
 
     .showcase-spotlight__image {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      /* Merchant-adjustable, so a square crop can be re-aimed per image. */
+      object-position: var(--spotlight-image-position, 50% 50%);
       mix-blend-mode: normal;
     }
 
-    /* Row starts ~6px from the edge and sits tight under the hero. */
+    /*
+      Flush against the image bottom by default, so the two read as one block.
+      The overlap setting can pull the row up over the photo's lower edge.
+    */
     .showcase-spotlight__list {
-      --spotlight-card-width: clamp(108px, 35vw, 140px);
+      --spotlight-card-width: 43%;
 
+      position: relative;
+      z-index: 1;
       gap: 9px;
-      margin-block-start: 4px;
+      margin-block-start: var(--spotlight-overlap, 0px);
       padding-inline: 0;
       padding-block-end: 0;
       overscroll-behavior-x: contain;
@@ -598,6 +617,8 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+      /* Opaque, so cards read cleanly when overlapped onto the photo. */
+      background-color: var(--color-background, #fff);
     }
 
     .spotlight-item__media {
@@ -664,7 +685,8 @@
       padding-inline: 4px;
       border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
       border-radius: 3px;
-      background-color: #ffffff;
+      /* Transparent fill, matching the desktop outlined treatment. */
+      background-color: transparent;
       font-size: 10px;
       font-weight: 500;
       line-height: 1.2;
@@ -677,8 +699,12 @@
       outline-offset: 1px;
     }
 
+    /* Matches the reference's small centred indicator. */
     .showcase-spotlight__progress {
       display: block;
+      width: 62px;
+      height: 4px;
+      margin-block-start: 12px;
     }
 
     .showcase-spotlight__cta {
@@ -729,6 +755,35 @@
       "type": "image_picker",
       "id": "image",
       "label": "Lifestyle image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image focal point",
+      "options": [
+        { "value": "50% 0%", "label": "Top" },
+        { "value": "0% 50%", "label": "Left" },
+        { "value": "50% 50%", "label": "Center" },
+        { "value": "100% 50%", "label": "Right" },
+        { "value": "50% 100%", "label": "Bottom" },
+        { "value": "0% 0%", "label": "Top left" },
+        { "value": "100% 0%", "label": "Top right" },
+        { "value": "0% 100%", "label": "Bottom left" },
+        { "value": "100% 100%", "label": "Bottom right" }
+      ],
+      "default": "50% 50%",
+      "info": "Which part of the photo to keep when the mobile square crops it."
+    },
+    {
+      "type": "range",
+      "id": "mobile_overlap",
+      "label": "Overlap product row onto image",
+      "min": -60,
+      "max": 0,
+      "step": 4,
+      "unit": "px",
+      "default": 0,
+      "info": "Mobile only. 0 sits the cards flush against the image; negative pulls them over it."
     },
     {
       "type": "range",
