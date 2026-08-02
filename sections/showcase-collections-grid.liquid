@@ -149,7 +149,13 @@
     gap: var(--gap-lg);
   }
 
-  .collection-card {
+  /*
+    Every `.collection-card` rule is scoped under `.showcase-collections`, which is
+    unique to this section. The bare class is NOT unique — Horizon's own
+    collection-card, bento-grid and editorial-collection-grid snippets and base.css
+    all use it, so unscoped rules here leak into those.
+  */
+  .showcase-collections .collection-card {
     display: flex;
     flex-direction: column;
     border-radius: var(--style-border-radius-inputs, 8px);
@@ -158,7 +164,7 @@
     overflow: hidden;
   }
 
-  .collection-card__media {
+  .showcase-collections .collection-card__media {
     position: relative;
     display: block;
     aspect-ratio: 4 / 5;
@@ -166,22 +172,22 @@
     overflow: hidden;
   }
 
-  .collection-card__image {
+  .showcase-collections .collection-card__image {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: scale var(--animation-speed-slow) var(--animation-easing);
   }
 
-  .collection-card:hover .collection-card__image {
+  .showcase-collections .collection-card:hover .collection-card__image {
     scale: 1.03;
   }
 
-  .collection-card__image--placeholder {
+  .showcase-collections .collection-card__image--placeholder {
     fill: rgb(var(--color-foreground-rgb) / var(--opacity-20));
   }
 
-  .collection-card__badge {
+  .showcase-collections .collection-card__badge {
     position: absolute;
     top: var(--padding-sm);
     left: var(--padding-sm);
@@ -192,7 +198,7 @@
     font-size: var(--font-size--2xs);
   }
 
-  .collection-card__footer {
+  .showcase-collections .collection-card__footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -201,24 +207,24 @@
     background-color: var(--collections-footer-background);
   }
 
-  .collection-card__text {
+  .showcase-collections .collection-card__text {
     display: flex;
     flex-direction: column;
     gap: 2px;
     min-width: 0;
   }
 
-  .collection-card__title {
+  .showcase-collections .collection-card__title {
     font-size: var(--font-size--md);
     font-weight: 600;
   }
 
-  .collection-card__subtitle {
+  .showcase-collections .collection-card__subtitle {
     color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
     font-size: var(--font-size--xs);
   }
 
-  .collection-card__arrow {
+  .showcase-collections .collection-card__arrow {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -230,23 +236,72 @@
     color: var(--collections-arrow-icon);
   }
 
-  .collection-card__arrow .svg-wrapper,
-  .collection-card__arrow svg {
+  .showcase-collections .collection-card__arrow .svg-wrapper,
+  .showcase-collections .collection-card__arrow svg {
     width: var(--icon-size-xs);
     height: var(--icon-size-xs);
   }
 
-  /* Mobile: the grid becomes a swipeable row with the next card peeking. */
+  /*
+    ---- Mobile ----
+    One large card plus a peek of the next, matching the reference. Desktop is
+    untouched: everything here lives inside the 749px query and stays scoped to
+    `.showcase-collections`.
+  */
   @media screen and (max-width: 749px) {
+    /* Tighter gutter than the 16px page margin, without letting the page scroll. */
+    .showcase-collections.spacing-style {
+      padding-block-start: 20px;
+    }
+
     .showcase-collections__heading {
-      font-size: var(--font-size--xl);
+      margin-block-end: 14px;
+      font-size: var(--font-size--lg);
+    }
+
+    /* Pills stay on one line and scroll horizontally. */
+    .showcase-collections__tabs {
+      flex-wrap: nowrap;
+      gap: 6px;
+      margin-block-end: 16px;
+      margin-inline: -4px;
+      padding-inline: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .showcase-collections__tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .showcase-tab {
+      flex: 0 0 auto;
+      height: 31px;
+      padding: 0 15px;
+      border-color: #dddddd;
+      background-color: #ffffff;
+      font-size: 11.5px;
+      white-space: nowrap;
+    }
+
+    /* Active reads as a soft fill rather than the dark desktop pill. */
+    .showcase-tab--active {
+      border-color: transparent;
+      background-color: #f0efec;
+      color: var(--color-foreground);
     }
 
     .showcase-collections__grid {
       display: flex;
-      gap: var(--gap-md);
+      gap: 11px;
+      /* Pulls the row 4px into the page gutter for a ~12px effective margin. */
+      margin-inline: -4px;
+      padding-inline: 4px;
       overflow-x: auto;
-      scroll-snap-type: x proximity;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
       scrollbar-width: none;
       -ms-overflow-style: none;
     }
@@ -255,10 +310,85 @@
       display: none;
     }
 
-    .collection-card {
-      flex: 0 0 auto;
-      width: 82%;
+    .showcase-collections .collection-card {
+      flex: 0 0 clamp(220px, 74vw, 280px);
+      width: auto;
+      /* Stretch keeps every card the same height regardless of text length. */
+      align-self: stretch;
+      border-radius: 2px;
+      background-color: #f5f4f1;
+      box-shadow: none;
       scroll-snap-align: start;
+    }
+
+    .showcase-collections .collection-card__media {
+      aspect-ratio: 1 / 1;
+    }
+
+    .showcase-collections .collection-card__badge {
+      top: 8px;
+      left: 8px;
+      padding: 3px 8px;
+      border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+      background-color: #ffffff;
+      font-size: 9.5px;
+      line-height: 1.4;
+    }
+
+    .showcase-collections .collection-card__footer {
+      /* Top-aligned so the arrow sits level with the title, not the whole block. */
+      align-items: flex-start;
+      gap: 8px;
+      flex: 1 1 auto;
+      padding: 11px;
+      background-color: transparent;
+    }
+
+    .showcase-collections .collection-card__text {
+      gap: 3px;
+    }
+
+    /* Clamping both lines is what keeps the card heights equal. */
+    .showcase-collections .collection-card__title {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      font-size: 13.5px;
+      line-height: 1.3;
+      overflow: hidden;
+    }
+
+    .showcase-collections .collection-card__subtitle {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      font-size: 10.5px;
+      line-height: 1.45;
+      overflow: hidden;
+    }
+
+    .showcase-collections .collection-card__arrow {
+      width: 22px;
+      height: 22px;
+      /* Nudged down to centre against the first line of the title. */
+      margin-block-start: 1px;
+    }
+
+    .showcase-collections .collection-card__arrow .svg-wrapper,
+    .showcase-collections .collection-card__arrow svg {
+      width: 11px;
+      height: 11px;
+    }
+
+    /* Subtle rule closing the section. */
+    .showcase-collections__grid::after {
+      content: '';
+      flex: 0 0 1px;
+    }
+
+    .showcase-collections.spacing-style {
+      border-block-end: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+      padding-block-end: 20px;
     }
   }
 {% endstylesheet %}

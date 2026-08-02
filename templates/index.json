@@ -490,7 +490,7 @@
             "subtitle": "Bedroom Collection",
             "show_badge": true,
             "badge": "New product",
-            "filter_keys": "collections",
+            "filter_keys": "bedroom",
             "link": "shopify://collections/bedroom"
           }
         },
@@ -502,7 +502,7 @@
             "subtitle": "Discover TV units, coffee tables, and more.",
             "show_badge": true,
             "badge": "New product",
-            "filter_keys": "co-creation",
+            "filter_keys": "living-room",
             "link": "shopify://collections/living-room"
           }
         },
@@ -514,12 +514,44 @@
             "subtitle": "Dining tables, buffets, and storage for every home.",
             "show_badge": false,
             "badge": "New product",
-            "filter_keys": "collections, co-creation",
+            "filter_keys": "dining-room",
             "link": "shopify://collections/dining-room"
+          }
+        },
+        "tab_all": {
+          "type": "tab",
+          "settings": {
+            "label": "All",
+            "filter_key": ""
+          }
+        },
+        "tab_bed": {
+          "type": "tab",
+          "settings": {
+            "label": "Bedroom",
+            "filter_key": "bedroom"
+          }
+        },
+        "tab_living": {
+          "type": "tab",
+          "settings": {
+            "label": "Living Room",
+            "filter_key": "living-room"
+          }
+        },
+        "tab_dining": {
+          "type": "tab",
+          "settings": {
+            "label": "Dining Room",
+            "filter_key": "dining-room"
           }
         }
       },
       "block_order": [
+        "tab_all",
+        "tab_bed",
+        "tab_living",
+        "tab_dining",
         "card_1",
         "card_2",
         "card_3"
