@@ -61,7 +61,7 @@
     </div>
 
     <div class="showcase-spotlight__list-column">
-      <div class="showcase-spotlight__list">
+      <div class="showcase-spotlight__list" data-spotlight-scroller>
         {% for block in section.blocks %}
           {% liquid
             assign item_product = block.settings.product
@@ -77,6 +77,19 @@
               assign item_url = block.settings.url
             endif
             assign item_url = item_url | default: '#'
+
+            # Only a single-variant, in-stock product can be added straight from the
+            # card. Anything with options keeps its link so we never silently add the
+            # wrong variant on a product that requires a choice.
+            assign item_variant_id = null
+            if item_product != blank and item_product != nil
+              if item_product.variants.size == 1
+                assign only_variant = item_product.variants.first
+                if only_variant.available
+                  assign item_variant_id = only_variant.id
+                endif
+              endif
+            endif
           %}
           <div
             class="spotlight-item"
@@ -123,16 +136,44 @@
               <p class="spotlight-item__price">{{ item_price }}</p>
 
               {% if section.settings.add_to_cart_label != blank %}
-                <button
-                  type="button"
-                  class="spotlight-item__add"
-                >
-                  {{ section.settings.add_to_cart_label }}
-                </button>
+                {% if item_variant_id != null %}
+                  <button
+                    type="button"
+                    class="spotlight-item__add"
+                    data-cart-add
+                    data-variant-id="{{ item_variant_id }}"
+                    data-cart-url="{{ routes.cart_url }}"
+                    data-label-add="Add {{ item_title | escape }} to cart"
+                    data-label-added="{{ item_title | escape }} is in your cart. Go to cart"
+                    aria-label="Add {{ item_title | escape }} to cart"
+                  >
+                    {{ section.settings.add_to_cart_label }}
+                  </button>
+                {% else %}
+                  {%- comment -%}
+                    Options required, or out of stock — send the shopper to the product
+                    page rather than guessing a variant.
+                  {%- endcomment -%}
+                  <a
+                    href="{{ item_url }}"
+                    class="spotlight-item__add"
+                    aria-label="Choose options for {{ item_title | escape }}"
+                  >
+                    {{ section.settings.options_label | default: 'Choose options' }}
+                  </a>
+                {% endif %}
               {% endif %}
             </div>
           </div>
         {% endfor %}
+      </div>
+
+      {%- comment -%}
+        Mobile-only scroll indicator. Hidden on desktop, where the list scrolls
+        vertically inside the panel instead.
+      {%- endcomment -%}
+      <div class="showcase-spotlight__progress" data-spotlight-progress aria-hidden="true">
+        <span class="showcase-spotlight__progress-thumb" data-spotlight-thumb></span>
       </div>
     </div>
   </div>
@@ -150,7 +191,31 @@
   {% endif %}
 </div>
 
+{%- comment -%}
+  Reuses the shared card add-to-cart delegation rather than a second implementation.
+{%- endcomment -%}
+<script
+  src="{{ 'showcase-card-cart.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
+<script
+  src="{{ 'showcase-spotlight-progress.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
+
 {% stylesheet %}
+  /*
+    The header group is sticky, so an editor scroll-to-section or an anchor jump
+    lands the section top underneath it. scroll-margin keeps the heading clear
+    without any layout-shifting top margin.
+  */
+  .showcase-spotlight {
+    scroll-margin-block-start: calc(var(--header-group-height, 0px) + 12px);
+  }
+
   .showcase-spotlight__header {
     display: flex;
     flex-direction: column;
@@ -352,6 +417,33 @@
     background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
   }
 
+  /* Scroll indicator — only meaningful in the mobile horizontal layout. */
+  .showcase-spotlight__progress {
+    display: none;
+    position: relative;
+    width: 110px;
+    height: 4px;
+    margin: 14px auto 0;
+    border-radius: 999px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    overflow: hidden;
+  }
+
+  .showcase-spotlight__progress-thumb {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 30%;
+    border-radius: 999px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .showcase-spotlight__list {
+      scroll-behavior: smooth;
+    }
+  }
+
   /* Full-width dark pill CTA under both columns. */
   .showcase-spotlight__cta {
     display: flex;
@@ -412,18 +504,187 @@
     }
   }
 
+  /*
+    ---- Mobile ----
+    Compact editorial block: heading, description, full-bleed hero, then a swipe row
+    of small cards. Everything is scoped to `.showcase-spotlight`, so no other card
+    or carousel on the site is touched.
+  */
   @media screen and (max-width: 749px) {
+    .showcase-spotlight.spacing-style {
+      padding-block-start: 20px;
+      padding-block-end: 16px;
+    }
+
+    /*
+      Text keeps the page gutter. Pulling it outward risked overflowing the page,
+      which the brief rules out — only the hero bleeds, and that pull exactly
+      cancels the gutter so it can never exceed the viewport.
+    */
+    .showcase-spotlight__header {
+      gap: 0;
+      margin-block-end: 0;
+    }
+
     .showcase-spotlight__heading {
-      font-size: var(--font-size--xl);
+      margin-block-end: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.3;
+      text-align: start;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
     }
 
     .showcase-spotlight__description {
-      font-size: var(--font-size--sm);
+      max-width: 100%;
+      margin-block-end: 14px;
+      color: var(--color-foreground);
+      font-size: 11.5px;
+      font-weight: 400;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
     }
 
-    /* Roughly two cards plus a peek of the third. */
+    .showcase-spotlight__columns {
+      gap: 0;
+    }
+
+    /*
+      Hero bleeds to both viewport edges by cancelling the page gutter exactly.
+      Height is explicit rather than an aspect-ratio: the desktop rule's ratio was
+      not constraining this box, so the image rendered at its natural portrait
+      height. 56vw is ~210px at 375px wide.
+    */
+    .showcase-spotlight__media {
+      min-height: 0;
+      max-height: none;
+      height: clamp(180px, 56vw, 250px);
+      /* Cancels the page gutter. A 100vw bleed is not safe here — see the note in
+         the section comment about the page being wider than the viewport. */
+      margin-inline: calc(var(--page-margin, 16px) * -1);
+      border-radius: 0;
+      aspect-ratio: auto;
+    }
+
+    .showcase-spotlight__image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      mix-blend-mode: normal;
+    }
+
+    /* Row starts ~6px from the edge and sits tight under the hero. */
     .showcase-spotlight__list {
-      --spotlight-card-width: 44%;
+      --spotlight-card-width: clamp(108px, 35vw, 140px);
+
+      gap: 9px;
+      margin-block-start: 4px;
+      padding-inline: 0;
+      padding-block-end: 0;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .showcase-spotlight__list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .showcase-spotlight__list > .spotlight-item {
+      flex: 0 0 var(--spotlight-card-width);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .spotlight-item__media {
+      aspect-ratio: 1 / 1;
+      border-radius: 3px;
+      background-color: #f3f3f3;
+    }
+
+    /* Contain, so furniture is never cropped. */
+    .spotlight-item__image {
+      width: 88%;
+      height: 88%;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+    }
+
+    .spotlight-item__wishlist {
+      top: 7px;
+      right: 7px;
+      width: 16px;
+      height: 16px;
+      background: transparent;
+    }
+
+    .spotlight-item__wishlist .svg-wrapper,
+    .spotlight-item__wishlist svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    /* Column layout is what keeps prices and buttons on a shared baseline. */
+    .spotlight-item__info {
+      flex: 1 1 auto;
+      gap: 0;
+      padding-inline: 0;
+    }
+
+    .spotlight-item__title {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      /* Reserves two lines so short names don't shorten their card. */
+      min-height: calc(2 * 1.35 * 10.5px);
+      font-size: 10.5px;
+      font-weight: 400;
+      line-height: 1.35;
+      overflow: hidden;
+    }
+
+    .spotlight-item__price {
+      margin-block-start: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .spotlight-item__add {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 27px;
+      /* auto pushes every button to the bottom of its card. */
+      margin-block-start: auto;
+      padding-inline: 4px;
+      border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+      border-radius: 3px;
+      background-color: #ffffff;
+      font-size: 10px;
+      font-weight: 500;
+      line-height: 1.2;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .spotlight-item__add:focus-visible {
+      outline: 2px solid var(--color-foreground);
+      outline-offset: 1px;
+    }
+
+    .showcase-spotlight__progress {
+      display: block;
+    }
+
+    .showcase-spotlight__cta {
+      margin-block-start: 16px;
+      padding-block: var(--padding-sm);
+      font-size: var(--font-size--sm);
     }
   }
 {% endstylesheet %}
@@ -489,6 +750,13 @@
       "label": "Add to cart button label",
       "default": "Add to cart",
       "info": "Leave blank to hide the buttons."
+    },
+    {
+      "type": "text",
+      "id": "options_label",
+      "label": "Label for products needing options",
+      "default": "Choose options",
+      "info": "Shown instead of Add to cart when a product has variants to pick, so no variant is chosen for the shopper."
     },
     {
       "type": "checkbox",
