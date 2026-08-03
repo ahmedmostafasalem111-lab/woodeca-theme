@@ -66,6 +66,9 @@ class ShowcaseProductComponent extends Component {
   connectedCallback() {
     super.connectedCallback();
     this.refs.scroller?.addEventListener('scroll', this.#onScroll, { passive: true });
+    // Escape closes a <dialog> natively, without going through our close action,
+    // which would leave the video playing with its audio audible.
+    this.refs.inspirationDialog?.addEventListener('close', this.#onInspirationClose);
     this.#readVariants();
     this.#watchStickyBar();
   }
@@ -73,6 +76,7 @@ class ShowcaseProductComponent extends Component {
   disconnectedCallback() {
     super.disconnectedCallback();
     this.refs.scroller?.removeEventListener('scroll', this.#onScroll);
+    this.refs.inspirationDialog?.removeEventListener('close', this.#onInspirationClose);
     if (this.#frame != null) cancelAnimationFrame(this.#frame);
     this.#barObserver?.disconnect();
     document.documentElement.style.removeProperty('--mobile-sticky-bar-height');
@@ -286,30 +290,66 @@ class ShowcaseProductComponent extends Component {
     this.refs.instalmentDialog?.close();
   }
 
-  /** @param {Event} event */
+  /**
+   * Opens the tapped video full screen and starts it immediately.
+   *
+   * This runs inside the tap's own event handler, which is what lets the browser
+   * treat both the fullscreen request and the playback as user-initiated — from
+   * a timeout or a promise continuation, either can be refused.
+   *
+   * @param {Event} event
+   */
   openInspiration(event) {
     const trigger = /** @type {HTMLElement} */ (event.target)?.closest('[data-inspiration-index]');
     const dialog = this.refs.inspirationDialog;
     if (!(trigger instanceof HTMLElement) || !dialog) return;
 
     const index = trigger.dataset.inspirationIndex;
-    for (const stage of this.refs.inspirationStages ?? []) {
-      stage.hidden = stage.dataset.inspirationIndex !== index;
+    /** @type {HTMLElement | undefined} */
+    let stage;
+    for (const candidate of this.refs.inspirationStages ?? []) {
+      const active = candidate.dataset.inspirationIndex === index;
+      candidate.hidden = !active;
+      if (active) stage = candidate;
     }
 
     dialog.showModal();
+
+    // Fullscreen on the dialog, so an external embed goes full screen too.
+    dialog.requestFullscreen?.().catch(() => {
+      // iOS Safari refuses fullscreen on anything but a <video>; the modal
+      // dialog already fills the screen there, so this is not worth surfacing.
+    });
+
+    const video = stage?.querySelector('video');
+    if (video instanceof HTMLVideoElement) {
+      video.currentTime = 0;
+      video.play().catch(() => {
+        // Blocked with sound on some browsers — retry muted rather than
+        // leaving the customer looking at a still frame.
+        video.muted = true;
+        video.play().catch(() => {});
+      });
+      // Where the dialog cannot go fullscreen, the video element still can.
+      if (!document.fullscreenElement) video.webkitEnterFullscreen?.();
+    }
   }
 
   closeInspiration() {
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    // Everything else is handled by the dialog's own close event, so Escape and
+    // this button end up in exactly the same place.
+    this.refs.inspirationDialog?.close();
+  }
+
+  /** Stops playback and resets the stages however the dialog was dismissed. */
+  #onInspirationClose = () => {
     const dialog = this.refs.inspirationDialog;
     if (!dialog) return;
 
-    // A video left running behind a closed dialog keeps its audio playing.
     for (const video of dialog.querySelectorAll('video')) video.pause();
     for (const stage of this.refs.inspirationStages ?? []) stage.hidden = true;
-
-    dialog.close();
-  }
+  };
 
   /** @param {Event} event */
   toggleWishlist(event) {

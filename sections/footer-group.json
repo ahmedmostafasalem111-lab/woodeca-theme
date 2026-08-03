@@ -157,7 +157,7 @@
         "chat_size": 56,
         "chat_background": "#f2f2f0",
         "chat_icon_color": "#1c1c1c",
-        "show_feedback_tab": true,
+        "show_feedback_tab": false,
         "feedback_label": "Site feedback",
         "feedback_link": "",
         "feedback_background": "#333333",

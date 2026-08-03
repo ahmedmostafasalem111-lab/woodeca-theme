@@ -220,6 +220,27 @@
     height: auto;
   }
 
+  /*
+    Fullscreen strips the dialog's own sizing, so the media has to be told to
+    fill the screen rather than keep its 16:9 letterbox. `contain` keeps portrait
+    clips whole instead of cropping them to the screen's shape.
+  */
+  .product-inspiration__dialog:fullscreen {
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .product-inspiration__dialog:fullscreen .product-inspiration__stage,
+  .product-inspiration__dialog:fullscreen .product-inspiration__stage video,
+  .product-inspiration__dialog:fullscreen .product-inspiration__stage iframe {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    object-fit: contain;
+  }
+
   @media screen and (max-width: 749px) {
     .product-inspiration__bubble {
       --inspiration-size: 66px;

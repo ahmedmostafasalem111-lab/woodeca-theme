@@ -58,7 +58,7 @@
             %}
             <input
               type="radio"
-              class="product-option__input visually-hidden"
+              class="product-option__input"
               id="{{ input_id }}"
               name="{{ 'ProductOption-' | append: section.id | append: '-' | append: product_option.position }}"
               value="{{ option_value.name | escape }}"
@@ -183,6 +183,24 @@
     align-items: center;
     flex-wrap: wrap;
     gap: var(--gap-2xs);
+  }
+
+  /*
+    Hidden unconditionally, not via the shared `visually-hidden` helper: that one
+    is written `.visually-hidden:not(:focus, :active)`, so clicking a swatch
+    focused the radio, un-hid it, and drew a native radio dot beside the chips.
+    Keyboard focus is still visible — it is styled on the chip below.
+  */
+  .product-option__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    clip-path: inset(50%);
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   /* Text pill — the fallback for any option Shopify has no swatch for. */

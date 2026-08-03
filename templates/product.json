@@ -4,31 +4,23 @@
       "type": "showcase-product",
       "blocks": {
         "a1": { "type": "assurance", "settings": { "icon": "shield", "text": "3 Year Warranty" } },
-        "a2": {
-          "type": "assurance",
-          "settings": { "icon": "truck", "text": "Free delivery over EGP 10,000" }
-        },
         "a3": {
           "type": "assurance",
           "settings": { "icon": "return", "text": "Exchange & Return within 14 Days" }
-        },
-        "a4": {
-          "type": "assurance",
-          "settings": { "icon": "checkmark", "text": "Egyptian craftsmanship" }
         },
         "p1": { "type": "instalment_plan", "settings": { "months": 3, "rate_label": "0%" } },
         "p2": { "type": "instalment_plan", "settings": { "months": 6, "rate_label": "0%" } },
         "p3": { "type": "instalment_plan", "settings": { "months": 9, "rate_label": "0%" } },
         "p4": { "type": "instalment_plan", "settings": { "months": 12, "rate_label": "0%" } }
       },
-      "block_order": ["a1", "a2", "a3", "a4", "p1", "p2", "p3", "p4"],
+      "block_order": ["a1", "a3", "p1", "p2", "p3", "p4"],
       "settings": {
         "show_breadcrumbs": true,
-        "breadcrumb_home_label": "Online store",
+        "breadcrumb_home_label": "Home",
         "thumb_limit": 8,
         "show_share": true,
         "title_size": "var(--font-size--2xl)",
-        "show_stock_badge": true,
+        "show_stock_badge": false,
         "stock_threshold": 20,
         "add_to_cart_label": "Add To Cart",
         "sold_out_label": "Sold out",
@@ -156,6 +148,7 @@
       "settings": {
         "heading": "Why We Love",
         "columns": 2,
+        "peek": 18,
         "image_height": 210,
         "show_numbers": true,
         "metafield_namespace": "custom",
@@ -172,39 +165,6 @@
         "card_stock_text": "In stock",
         "columns": 4,
         "columns_mobile": 2
-      }
-    },
-    "delivery": {
-      "type": "showcase-delivery-detail",
-      "blocks": {
-        "d1": { "type": "price_row", "settings": { "label": "Within the city", "price": "EGP 350" } },
-        "d2": { "type": "price_row", "settings": { "label": "By freight elevator or to 1st floor", "price": "EGP 500" } },
-        "d3": {
-          "type": "price_row",
-          "settings": {
-            "label": "Manual carry, per floor",
-            "price": "EGP 120",
-            "note": "Charged per floor above the first."
-          }
-        },
-        "a1": { "type": "assembly_row", "settings": { "label": "Standard assembly", "price": "EGP 250" } },
-        "a2": {
-          "type": "assembly_row",
-          "settings": {
-            "label": "Complex assembly",
-            "price": "EGP 450",
-            "note": "Wardrobes and modular units."
-          }
-        }
-      },
-      "block_order": ["d1", "d2", "d3", "a1", "a2"],
-      "settings": {
-        "anchor_id": "delivery-and-assembly",
-        "heading": "Delivery and assembly",
-        "show_calculator": true,
-        "calculator_placeholder": "City, street, house",
-        "calculator_button_label": "Calculate",
-        "calculator_fallback_text": "Contact us for a delivery quote to your address."
       }
     },
     "reviews": {
@@ -227,7 +187,6 @@
     "why_woodeca",
     "why_we_love",
     "related_interested",
-    "delivery",
     "reviews"
   ]
 }

@@ -178,6 +178,7 @@
         "mobile_chat_link": "",
         "show_mobile_location": true,
         "mobile_location_link": "",
+        "show_mobile_call": true,
         "sticky_main_row": true,
         "promo_font_size": "var(--font-size--sm)",
         "promo_highlight_color": "#e8342a",

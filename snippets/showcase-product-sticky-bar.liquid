@@ -42,12 +42,14 @@
       <span class="product-sticky-bar__text">
         <span class="product-sticky-bar__title">{{ product.title }}</span>
 
+        {%- comment -%}
+          Only the specs anchor remains; the delivery block it used to point at is
+          no longer part of the product page, and a link to a missing id does
+          nothing but look broken.
+        {%- endcomment -%}
         <span class="product-sticky-bar__anchors">
           <a href="#{{ section.settings.specs_anchor | default: 'specifications' }}">
             {{- section.settings.specs_anchor_label | default: 'Characteristics' -}}
-          </a>
-          <a href="#{{ section.settings.delivery_anchor | default: 'delivery-and-assembly' }}">
-            {{- section.settings.delivery_anchor_label | default: 'Delivery and assembly' -}}
           </a>
         </span>
       </span>

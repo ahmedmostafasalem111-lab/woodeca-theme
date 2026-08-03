@@ -68,7 +68,7 @@
     {% if section.settings.show_breadcrumbs %}
       <nav class="product-breadcrumbs" aria-label="Breadcrumb">
         <a href="{{ routes.root_url }}">
-          {{- section.settings.breadcrumb_home_label | default: 'Online store' }} {{ shop.name -}}
+          {{- section.settings.breadcrumb_home_label | default: 'Home' -}}
         </a>
         {% if collection != blank %}
           <span aria-hidden="true">/</span>
@@ -921,6 +921,23 @@
       font-size: var(--font-size--xl);
     }
 
+    /*
+      The bottom-pinned buy bar carries Add To Cart and Buy It Now on mobile, so
+      the in-page pair is redundant here. Desktop keeps them, because there the
+      bar sits below the hero and is off screen when the page first loads.
+
+      Hidden rather than removed from the markup: the form still has to exist for
+      the bar's buttons to submit through, and the quantity field posts with it.
+    */
+    .product-buybox__actions .product-buybox__add,
+    .product-buybox__actions > .wishlist-button {
+      display: none;
+    }
+
+    .product-quantity {
+      margin-block-end: 0;
+    }
+
     /* Leaves room for the fixed buy bar so the last row is never covered. */
     .showcase-product__body {
       padding-block-end: calc(var(--mobile-sticky-bar-height, 72px) + var(--padding-lg));
@@ -951,7 +968,7 @@
       "type": "text",
       "id": "breadcrumb_home_label",
       "label": "Home label",
-      "default": "Online store"
+      "default": "Home"
     },
     {
       "type": "header",

@@ -282,14 +282,25 @@
           </a>
         {% endif %}
 
-        {% if section.settings.show_mobile_location %}
+        {%- comment -%}
+          Direct-dial button. The number is the one already set for the utility
+          bar's Call Us pill, so there is a single place to change it, and the
+          `tel:` href opens the dialer rather than routing through a page.
+        {%- endcomment -%}
+        {% if section.settings.show_mobile_call and section.settings.phone_number != blank %}
+          {% assign mobile_call_href = section.settings.phone_number
+            | remove: ' '
+            | remove: '('
+            | remove: ')'
+            | remove: '-'
+          %}
           <a
-            href="{{ section.settings.mobile_location_link | default: '#' }}"
+            href="tel:{{ mobile_call_href }}"
             class="showcase-header__icon-button showcase-header__icon-button--mobile"
-            aria-label="{{ section.settings.location_label | escape }}"
+            aria-label="{{ section.settings.call_label | default: 'Call Us' | escape }}"
           >
             <span class="svg-wrapper" aria-hidden="true">
-              {{- 'icon-pin.svg' | inline_asset_content -}}
+              {{- 'icon-phone.svg' | inline_asset_content -}}
             </span>
           </a>
         {% endif %}
@@ -1561,9 +1572,17 @@
     },
     {
       "type": "checkbox",
+      "id": "show_mobile_call",
+      "label": "Show call icon on mobile",
+      "default": true,
+      "info": "Dials the phone number set above. Hidden when no number is set."
+    },
+    {
+      "type": "checkbox",
       "id": "show_mobile_location",
       "label": "Show location icon on mobile",
-      "default": true
+      "default": true,
+      "info": "No longer rendered — the call icon replaced it."
     },
     {
       "type": "url",

@@ -5,10 +5,14 @@
   set up on products, so nothing has to be re-authored: each entry supplies an
   image, a heading and a short text.
 
-  Rendered as a compact two-up grid rather than a carousel. The images are capped
-  by height rather than aspect ratio so a portrait and a landscape detail shot sit
-  on the same baseline, and the type is a step down from the page's body size —
-  this block is a supporting detail, not a hero.
+  Rendered as a horizontal scroll-snap slider. The card width is set so the next
+  card is part-visible at the right edge, which is what signals the row can be
+  swiped — no arrows, no dots, and no slider library: native overflow scrolling
+  already does all of it, including momentum and keyboard paging.
+
+  Images are capped by height rather than aspect ratio so a portrait and a
+  landscape detail shot sit on the same baseline, and the type is a step down
+  from the page's body size — this block is a supporting detail, not a hero.
 
   The whole section removes itself when the metafield is empty.
 {% endcomment %}
@@ -26,13 +30,23 @@
       {% render 'spacing-padding', settings: section.settings %}
       --love-columns: {{ section.settings.columns }};
       --love-image-height: {{ section.settings.image_height }}px;
+      --love-peek: {{ section.settings.peek | default: 18 }}%;
     "
   >
     {% if section.settings.heading != blank %}
       <h2 class="product-love__heading">{{ section.settings.heading }}</h2>
     {% endif %}
 
-    <ol class="product-love__grid" role="list">
+    {%- comment -%}
+      `tabindex="0"` because a scroll container holding no focusable children is
+      unreachable by keyboard otherwise.
+    {%- endcomment -%}
+    <ol
+      class="product-love__grid"
+      role="list"
+      tabindex="0"
+      aria-label="{{ section.settings.heading | default: 'Why we love' | escape }}"
+    >
       {% for slide in slides %}
         <li class="love-card">
           {% if slide.image != blank %}
@@ -69,17 +83,41 @@
     text-align: center;
   }
 
+  /*
+    Scroll-snap track. `scroll-padding-inline-start` matches the gutter so a
+    snapped card lands flush with the heading above it rather than against the
+    viewport edge.
+  */
   .product-love__grid {
-    display: grid;
-    grid-template-columns: repeat(var(--love-columns, 2), minmax(0, 1fr));
-    gap: var(--gap-lg) var(--gap-md);
+    display: flex;
+    gap: var(--gap-md);
     margin: 0;
     padding: 0;
     list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    /* Room for the focus ring, which would otherwise be clipped by the scroller. */
+    padding-block: 2px;
   }
 
+  .product-love__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  /*
+    Card width is a share of the track minus the peek, so the following card is
+    always part-visible however many columns the merchant picks. The gap has to
+    come out of the width too, or the last card sits short of the edge.
+  */
   .love-card {
+    flex: 0 0
+      calc(
+        (100% - var(--love-peek, 18%) - (var(--love-columns, 2) - 1) * var(--gap-md)) /
+          var(--love-columns, 2)
+      );
     min-width: 0;
+    scroll-snap-align: start;
   }
 
   /*
@@ -120,14 +158,23 @@
   }
 
   @media screen and (max-width: 749px) {
-    /* Two-up stays two-up on a phone; that is what keeps the block compact. */
+    /*
+      One-and-a-bit cards on a phone: wide enough to read, with the next card
+      clearly cut off so the swipe is obvious.
+    */
     .product-love__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--gap-md) var(--gap-2xs);
+      --love-peek: 26%;
+
+      gap: var(--gap-sm);
+    }
+
+    /* Overrides the multi-column calc entirely: one card per view, plus the peek. */
+    .love-card {
+      flex-basis: calc(100% - var(--love-peek));
     }
 
     .love-card__image {
-      height: calc(var(--love-image-height, 210px) * 0.72);
+      height: calc(var(--love-image-height, 210px) * 0.9);
     }
 
     .love-card__text {
@@ -154,11 +201,23 @@
     {
       "type": "range",
       "id": "columns",
-      "label": "Columns",
+      "label": "Cards per view",
       "min": 2,
       "max": 4,
       "step": 1,
-      "default": 2
+      "default": 2,
+      "info": "Desktop only. Phones always show one card plus the peek."
+    },
+    {
+      "type": "range",
+      "id": "peek",
+      "label": "Next-card peek",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "%",
+      "default": 18,
+      "info": "How much of the following card stays visible, signalling the row can be swiped."
     },
     {
       "type": "range",
