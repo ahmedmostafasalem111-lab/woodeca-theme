@@ -36,10 +36,12 @@
     --spotlight-image-position: {{ section.settings.image_position | default: '50% 50%' }};
     --spotlight-overlap: {{ section.settings.mobile_overlap | default: 0 }}px;
     {%- comment -%}
-      Emitted on the section so it is inspectable here rather than only on the
-      inner list. Tablet narrows it in the 989 block.
+      Two separate variables, each declared exactly once and read by exactly one
+      breakpoint. A single variable re-declared per breakpoint meant the inner
+      list's value shadowed the section's for the item that reads it.
     {%- endcomment -%}
     --spotlight-card-width: {{ section.settings.mobile_card_width | default: 43 }}%;
+    --spotlight-card-width-tablet: {{ section.settings.tablet_card_width | default: 32 }}%;
   "
 >
   {% if section.settings.heading != blank or section.settings.description != blank %}
@@ -512,16 +514,12 @@
     }
 
     /*
-      Tablet override. The section emits 43% for phones; at this width that would
-      give only two very wide cards, so narrow it here and let the 749 block put
-      it back for phones.
+      Tablet reads its own variable rather than re-declaring the phone one. A
+      re-declaration on the list shadowed the section's value for the item that
+      reads it, which is why the phone width never took effect.
     */
-    .showcase-spotlight__list {
-      --spotlight-card-width: 32%;
-    }
-
     .showcase-spotlight__list > .spotlight-item {
-      flex: 0 0 var(--spotlight-card-width, 32%);
+      flex: 0 0 var(--spotlight-card-width-tablet, 32%);
       grid-template-columns: minmax(0, 1fr);
       scroll-snap-align: start;
     }
@@ -616,9 +614,6 @@
       The overlap setting can pull the row up over the photo's lower edge.
     */
     .showcase-spotlight__list {
-      /* Undo the tablet narrowing so the section's setting governs on phones. */
-      --spotlight-card-width: inherit;
-
       position: relative;
       z-index: 1;
       gap: 9px;
@@ -806,6 +801,17 @@
       "unit": "%",
       "default": 43,
       "info": "Percentage of the row width. Around 43 shows two cards plus a peek of the third."
+    },
+    {
+      "type": "range",
+      "id": "tablet_card_width",
+      "label": "Card width on tablets",
+      "min": 20,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "default": 32,
+      "info": "Applies between 750 and 989px, where the row is wider."
     },
     {
       "type": "range",
