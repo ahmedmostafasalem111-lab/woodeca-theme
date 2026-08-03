@@ -1,35 +1,31 @@
 {% comment %}
-  Product hero: breadcrumbs, thumbnail gallery + main image, buy box, the
-  variant swatch-card picker, a delivery teaser, and series/collection links.
-  The sticky mini-bar is rendered at the end of this section so it pins above
-  everything that follows.
+  Product hero, in the order the buy box reads top to bottom:
 
-  Variant selection uses the product's native Color option. Each swatch card
-  carries its variant's image, formatted price, availability and stock copy, so
-  selection swaps in place with no request and no client-side money formatting.
+    gallery → styling-inspiration videos → discount badge → title → price row →
+    instalment bar → assurances → delivery estimate → option pickers → stock →
+    quantity → add to cart
 
-  Metafield-driven rows (series, collection, loyalty bonus, instalments) render
-  only when their metafield has a value.
+  Every figure that could go stale is derived rather than authored: the discount
+  percentage comes from the variant's own compare-at price, the instalment
+  amounts from the variant price, and the delivery window from today plus the
+  product's lead-time metafields.
+
+  Option selection is resolved client-side against the variant matrix the option
+  picker renders, with money already formatted by Liquid, so switching a variant
+  costs no request and no currency formatting in JavaScript.
+
+  The bottom-pinned buy bar is rendered at the end of this section so it sits
+  above everything that follows it on the page.
 {% endcomment %}
 
 {% liquid
   assign selected_variant = product.selected_or_first_available_variant
   assign form_id = 'product-form-' | append: section.id
 
-  assign colour_option = null
-  for product_option in product.options_with_values
-    assign option_name_down = product_option.name | downcase
-    assign wanted_down = section.settings.variant_option_name | default: 'Color' | downcase
-    if option_name_down == wanted_down
-      assign colour_option = product_option
-    endif
-  endfor
-
   # Metafield-driven extras. Namespace is configurable; each row hides when empty.
   assign ns = section.settings.metafield_namespace | default: 'custom'
   assign display_name = product.metafields[ns]['display_name'].value
   assign bonus_value = product.metafields[ns]['loyalty_bonus'].value
-  assign instalment_value = product.metafields[ns]['instalment_amount'].value
   assign series_name = product.metafields[ns]['series_name'].value
   assign series_link = product.metafields[ns]['series_link'].value
   assign collection_name = product.metafields[ns]['collection_name'].value
@@ -39,6 +35,15 @@
   if media_list.size == 0
     assign media_list = product.images
   endif
+
+  # Discount is derived, never authored: no compare-at price means no badge.
+  assign has_compare = false
+  assign save_percent = 0
+  if selected_variant.compare_at_price > selected_variant.price
+    assign has_compare = true
+    assign price_gap = selected_variant.compare_at_price | minus: selected_variant.price
+    assign save_percent = price_gap | times: 100.0 | divided_by: selected_variant.compare_at_price | round
+  endif
 %}
 
 <showcase-product-component
@@ -47,6 +52,8 @@
     --product-cta-background: {{ section.settings.cta_background | default: '#333333' }};
     --product-cta-text: {{ section.settings.cta_text_color | default: '#ffffff' }};
     --product-gallery-background: {{ section.settings.gallery_background | default: '#f2f2f0' }};
+    --product-accent: {{ section.settings.accent_color | default: '#e8342a' }};
+    --product-instalment-background: {{ section.settings.instalment_background | default: '#f4f2fb' }};
     --product-title-size: {{ section.settings.title_size }};
     {% if section.settings.text_color != blank %}
       --color-foreground: {{ section.settings.text_color }};
@@ -154,16 +161,79 @@
             </div>
           {% endif %}
         </div>
+
+        {%- comment -%}
+          2 — Styling-inspiration circles. Sits under the gallery so it reads as
+          part of the imagery on desktop and directly under the photo on mobile.
+        {%- endcomment -%}
+        {% render 'showcase-product-inspiration', product: product, section: section %}
       </div>
 
       {%- comment -%} ---------- Buy box ---------- {%- endcomment -%}
       <div class="product-buybox">
+        {%- comment -%}
+          3 — Discount badge, computed from the variant's own prices. There is no
+          static label anywhere: no compare-at price means no badge.
+        {%- endcomment -%}
+        {% if save_percent > 0 %}
+          <p class="product-save-badge" ref="saveBadge">
+            {{ section.settings.save_badge_prefix | default: 'Save' }}
+            <span ref="savePercent">{{ save_percent }}</span>%
+          </p>
+        {% else %}
+          <p class="product-save-badge" ref="saveBadge" hidden>
+            {{ section.settings.save_badge_prefix | default: 'Save' }}
+            <span ref="savePercent"></span>%
+          </p>
+        {% endif %}
+
+        {%- comment -%} 4 — Title. {%- endcomment -%}
         {% if display_name != blank %}
           <h1 class="product-buybox__display-name">{{ display_name }}</h1>
           <p class="product-buybox__full-title">{{ product.title }}</p>
         {% else %}
           <h1 class="product-buybox__display-name">{{ product.title }}</h1>
         {% endif %}
+
+        {%- comment -%}
+          5 — Price row: current price and the struck-through compare-at price on
+          the same line, followed by the tax note.
+        {%- endcomment -%}
+        <div class="product-price-row">
+          <span class="product-price-row__current" ref="priceTarget">
+            {{- selected_variant.price | money -}}
+          </span>
+          <s
+            class="product-price-row__compare"
+            ref="compareTarget"
+            {% unless has_compare %}hidden{% endunless %}
+          >
+            {{- selected_variant.compare_at_price | money -}}
+          </s>
+          {% if section.settings.tax_note != blank %}
+            <span class="product-price-row__tax">{{ section.settings.tax_note }}</span>
+          {% endif %}
+        </div>
+
+        {%- comment -%} 6 — Instalment bar and its modal. {%- endcomment -%}
+        {% render 'showcase-product-installments',
+          product: product,
+          selected_variant: selected_variant,
+          section: section
+        %}
+
+        {%- comment -%} 7 — Assurance row. {%- endcomment -%}
+        {% render 'showcase-product-assurances', section: section %}
+
+        {%- comment -%} 8 — Delivery estimate, computed from today plus lead time. {%- endcomment -%}
+        {% render 'showcase-product-delivery-estimate', product: product, section: section %}
+
+        {%- comment -%} 9 — Option pickers. {%- endcomment -%}
+        {% render 'showcase-product-options',
+          product: product,
+          selected_variant: selected_variant,
+          section: section
+        %}
 
         {% if section.settings.show_stock_badge %}
           {% liquid
@@ -201,26 +271,10 @@
           </p>
         {% endif %}
 
-        <div
-          class="product-buybox__price"
-          ref="priceTarget"
-        >
-          {{ selected_variant.price | money }}
-        </div>
-
-        {%- comment -%} Instalments line — metafield only, hidden when unset. {%- endcomment -%}
-        {% if instalment_value != blank %}
-          <p class="product-buybox__instalment">
-            <span class="svg-wrapper" aria-hidden="true">
-              {{- 'icon-card.svg' | inline_asset_content -}}
-            </span>
-            <span>
-              {{- instalment_value }} {{ section.settings.instalment_suffix | default: 'per month with' }}
-              {{ section.settings.instalment_provider | default: 'instalments' -}}
-            </span>
-          </p>
-        {% endif %}
-
+        {%- comment -%}
+          10 — Quantity. Lives inside the form so its value posts with the add,
+          and the buttons are wired through the component rather than inline JS.
+        {%- endcomment -%}
         <div class="product-buybox__actions">
           {% form 'product', product, id: form_id, class: 'product-buybox__form' %}
             <input
@@ -229,6 +283,48 @@
               value="{{ selected_variant.id }}"
               ref="variantInput"
             >
+
+            <div class="product-quantity">
+              <span class="product-quantity__label" id="Quantity-{{ section.id }}-label">
+                {{- section.settings.quantity_label | default: 'Quantity' -}}
+              </span>
+              <div class="product-quantity__control">
+                <button
+                  type="button"
+                  class="product-quantity__step"
+                  data-quantity-step="-1"
+                  aria-label="{{ section.settings.quantity_down_label | default: 'Decrease quantity' | escape }}"
+                  on:click="/stepQuantity"
+                >
+                  <span class="svg-wrapper" aria-hidden="true">
+                    {{- 'icon-minus.svg' | inline_asset_content -}}
+                  </span>
+                </button>
+                <input
+                  type="number"
+                  class="product-quantity__input"
+                  name="quantity"
+                  ref="quantityInput"
+                  value="1"
+                  min="1"
+                  step="1"
+                  inputmode="numeric"
+                  aria-labelledby="Quantity-{{ section.id }}-label"
+                >
+                <button
+                  type="button"
+                  class="product-quantity__step"
+                  data-quantity-step="1"
+                  aria-label="{{ section.settings.quantity_up_label | default: 'Increase quantity' | escape }}"
+                  on:click="/stepQuantity"
+                >
+                  <span class="svg-wrapper" aria-hidden="true">
+                    {{- 'icon-plus.svg' | inline_asset_content -}}
+                  </span>
+                </button>
+              </div>
+            </div>
+
             <button
               type="submit"
               name="add"
@@ -262,87 +358,6 @@
             </span>
           </button>
         </div>
-
-        {%- comment -%} ---------- Variant swatch cards ---------- {%- endcomment -%}
-        {% if colour_option != null and colour_option.values.size > 1 %}
-          <details class="variant-picker" open>
-            <summary class="variant-picker__summary">
-              <span class="variant-picker__label">
-                {{ colour_option.name }}
-                <span class="variant-picker__count">({{ colour_option.values.size }})</span>
-              </span>
-
-              <span class="variant-picker__current">
-                {% if selected_variant.featured_image != blank %}
-                  <span class="variant-picker__current-swatch" aria-hidden="true"></span>
-                {% endif %}
-                {{ selected_variant.title }}
-                <span class="svg-wrapper variant-picker__caret" aria-hidden="true">
-                  {{- 'icon-caret.svg' | inline_asset_content -}}
-                </span>
-              </span>
-            </summary>
-
-            <div class="variant-picker__body">
-              {% if section.settings.show_in_stock_toggle %}
-                <span class="variant-picker__filter">
-                  <span class="variant-toggle" aria-hidden="true">
-                    <span class="variant-toggle__knob"></span>
-                  </span>
-                  <span>{{ section.settings.in_stock_filter_label | default: 'In stock' }}</span>
-                </span>
-              {% endif %}
-
-              <div class="variant-picker__header">
-                <span class="variant-picker__group-name">
-                  {{- section.settings.variant_group_label | default: 'Basic collection' -}}
-                </span>
-                <span class="variant-picker__from">
-                  {{ section.settings.from_label | default: 'From' }} {{ product.price_min | money }}
-                </span>
-              </div>
-
-              <div class="variant-picker__cards">
-                {% for variant in product.variants %}
-                  {% liquid
-                    assign variant_image = variant.featured_image | default: product.featured_image
-
-                    assign variant_stock = section.settings.in_stock_label | default: 'In stock'
-                    unless variant.available
-                      assign variant_stock = section.settings.out_of_stock_label | default: 'Out of stock'
-                    endunless
-
-                    capture variant_price_html
-                      echo variant.price | money
-                    endcapture
-                  %}
-                  <button
-                    type="button"
-                    class="variant-card{% if variant.id == selected_variant.id %} variant-card--active{% endif %}"
-                    ref="variantCards[]"
-                    data-variant-id="{{ variant.id }}"
-                    data-price-html="{{ variant_price_html | escape }}"
-                    data-stock-text="{{ variant_stock | escape }}"
-                    data-available="{{ variant.available }}"
-                    {% if variant_image != blank %}
-                      data-image="{{ variant_image | image_url: width: 1400 }}"
-                    {% endif %}
-                    aria-current="{% if variant.id == selected_variant.id %}true{% else %}false{% endif %}"
-                    on:click="/selectVariant"
-                  >
-                    <span class="variant-card__media">
-                      {% if variant_image != blank %}
-                        {{ variant_image | image_url: width: 300 | image_tag: loading: 'lazy', alt: variant.title }}
-                      {% endif %}
-                    </span>
-                    <span class="variant-card__name">{{ variant.title }}</span>
-                    <span class="variant-card__price">{{ variant.price | money }}</span>
-                  </button>
-                {% endfor %}
-              </div>
-            </div>
-          </details>
-        {% endif %}
 
         {%- comment -%} ---------- Delivery teaser ---------- {%- endcomment -%}
         {% if section.settings.show_delivery_teaser %}
@@ -585,37 +600,135 @@
     height: var(--icon-size-sm);
   }
 
-  .product-buybox__price {
-    font-size: var(--font-size--4xl);
+  /* ---- Discount badge ---- */
+  .product-save-badge {
+    align-self: start;
+    margin: 0;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background-color: var(--product-accent, #e8342a);
+    color: #ffffff;
+    font-size: var(--font-size--xs);
+    font-weight: 700;
+  }
+
+  .product-save-badge[hidden] {
+    display: none;
+  }
+
+  /* ---- Price row ---- */
+  .product-price-row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--gap-2xs) var(--gap-sm);
+  }
+
+  .product-price-row__current {
+    color: var(--product-accent, #e8342a);
+    font-size: var(--font-size--2xl);
     font-weight: 700;
     line-height: 1.1;
   }
 
-  .product-buybox__instalment {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-3xs);
-    margin: 0;
-    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+  .product-price-row__compare {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--lg);
+  }
+
+  .product-price-row__compare[hidden] {
+    display: none;
+  }
+
+  .product-price-row__tax {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
     font-size: var(--font-size--xs);
   }
 
-  .product-buybox__instalment .svg-wrapper,
-  .product-buybox__instalment svg {
-    width: var(--icon-size-xs);
-    height: var(--icon-size-xs);
+  /* ---- Quantity ---- */
+  .product-quantity {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    margin-block-end: var(--margin-md);
   }
 
+  .product-quantity__label {
+    font-size: var(--font-size--sm);
+    font-weight: 500;
+  }
+
+  .product-quantity__control {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .product-quantity__step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-foreground);
+    cursor: pointer;
+  }
+
+  .product-quantity__step svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .product-quantity__input {
+    width: 44px;
+    height: 38px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-size: var(--font-size--sm);
+    text-align: center;
+    /* Spinners duplicate the buttons either side of the field. */
+    appearance: textfield;
+  }
+
+  .product-quantity__input::-webkit-outer-spin-button,
+  .product-quantity__input::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  /* Spans both gallery tracks so the video row is not squeezed into the rail. */
+  .product-gallery .product-inspiration {
+    grid-column: 1 / -1;
+  }
+
+  /*
+    `end` rather than `stretch`: the form is now taller than the wishlist button
+    because it also holds the quantity control, and stretching would turn the
+    circular button into a tall pill.
+  */
   .product-buybox__actions {
     display: flex;
-    align-items: stretch;
+    align-items: end;
     gap: var(--gap-sm);
     width: 100%;
     margin-block-start: var(--margin-sm);
   }
 
+  /*
+    `min-width: 0` is what stops this row overflowing: a flex item's default
+    `min-width: auto` refuses to shrink below its content, so the full-width Add
+    To Cart button plus the 60px wishlist circle pushed past the viewport.
+  */
   .product-buybox__form {
     flex-grow: 1;
+    min-width: 0;
     margin: 0;
   }
 
@@ -642,6 +755,11 @@
     justify-content: center;
     flex-shrink: 0;
     width: 60px;
+    /*
+      Explicit height, because the row stopped stretching its items once the form
+      grew taller than the button — without it the circle flattened to an ellipse.
+    */
+    height: 60px;
     padding: 0;
     border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
     border-radius: 50%;
@@ -667,166 +785,6 @@
 
   .wishlist-button--active svg {
     fill: currentcolor;
-  }
-
-  /* ---- Variant picker ---- */
-  .variant-picker {
-    width: 100%;
-    margin-block-start: var(--margin-md);
-    border: var(--border-width-sm) solid rgb(var(--color-foreground-rgb) / var(--opacity-15));
-    border-radius: var(--style-border-radius-inputs, 8px);
-  }
-
-  .variant-picker__summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--gap-sm);
-    padding: var(--padding-lg);
-    cursor: pointer;
-    list-style: none;
-  }
-
-  .variant-picker__summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .variant-picker__label {
-    font-size: var(--font-size--lg);
-    font-weight: 600;
-  }
-
-  .variant-picker__count {
-    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
-    font-weight: 400;
-  }
-
-  .variant-picker__current {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-2xs);
-    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
-    font-size: var(--font-size--sm);
-  }
-
-  .variant-picker__caret,
-  .variant-picker__caret svg {
-    width: var(--icon-size-xs);
-    height: var(--icon-size-xs);
-    transition: rotate var(--animation-speed) var(--animation-easing);
-  }
-
-  .variant-picker[open] .variant-picker__caret {
-    rotate: 180deg;
-  }
-
-  .variant-picker__body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-sm);
-    padding: 0 var(--padding-lg) var(--padding-lg);
-  }
-
-  .variant-picker__filter {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-2xs);
-    font-size: var(--font-size--sm);
-  }
-
-  /* Toggle is scoped to this section — the collection filter bar's own toggle
-     styles are not loaded on the product template. */
-  .variant-toggle {
-    position: relative;
-    display: inline-block;
-    flex-shrink: 0;
-    width: 34px;
-    height: 20px;
-    border-radius: 999px;
-    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-15));
-  }
-
-  .variant-toggle__knob {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background-color: #fff;
-    box-shadow: 0 1px 3px rgb(0 0 0 / var(--opacity-25));
-  }
-
-  .variant-picker__header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--gap-sm);
-  }
-
-  .variant-picker__group-name {
-    font-size: var(--font-size--sm);
-    font-weight: 600;
-  }
-
-  .variant-picker__from {
-    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
-    font-size: var(--font-size--xs);
-  }
-
-  .variant-picker__cards {
-    display: flex;
-    gap: var(--gap-2xs);
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .variant-picker__cards::-webkit-scrollbar {
-    display: none;
-  }
-
-  .variant-card {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex: 0 0 auto;
-    width: 108px;
-    padding: var(--padding-2xs);
-    border: var(--border-width-md) solid transparent;
-    border-radius: 6px;
-    background: transparent;
-    color: var(--color-foreground);
-    text-align: left;
-    cursor: pointer;
-  }
-
-  .variant-card--active {
-    border-color: rgb(var(--color-foreground-rgb) / var(--opacity-40));
-  }
-
-  .variant-card__media {
-    display: block;
-    aspect-ratio: 1 / 1;
-    border-radius: 4px;
-    background-color: var(--product-gallery-background);
-    overflow: hidden;
-  }
-
-  .variant-card__media img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    mix-blend-mode: multiply;
-  }
-
-  .variant-card__name {
-    font-size: var(--font-size--2xs);
-    line-height: 1.3;
-  }
-
-  .variant-card__price {
-    font-size: var(--font-size--xs);
-    font-weight: 600;
   }
 
   /* ---- Delivery teaser + link rows ---- */
@@ -959,12 +917,13 @@
       font-size: var(--font-size--2xl);
     }
 
-    .product-buybox__price {
-      font-size: var(--font-size--3xl);
+    .product-price-row__current {
+      font-size: var(--font-size--xl);
     }
 
-    .variant-card {
-      width: 96px;
+    /* Leaves room for the fixed buy bar so the last row is never covered. */
+    .showcase-product__body {
+      padding-block-end: calc(var(--mobile-sticky-bar-height, 72px) + var(--padding-lg));
     }
   }
 {% endstylesheet %}
@@ -1110,6 +1069,238 @@
       "id": "wishlist_label",
       "label": "Wishlist accessible label",
       "default": "Add to wishlist"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_buy_now",
+      "label": "Show Buy It Now",
+      "default": true,
+      "info": "Adds the item and goes straight to checkout."
+    },
+    {
+      "type": "text",
+      "id": "buy_now_label",
+      "label": "Buy It Now label",
+      "default": "Buy It Now"
+    },
+    {
+      "type": "text",
+      "id": "buy_now_busy_label",
+      "label": "Buy It Now working label",
+      "default": "Working…"
+    },
+    {
+      "type": "text",
+      "id": "quantity_label",
+      "label": "Quantity label",
+      "default": "Quantity"
+    },
+    {
+      "type": "text",
+      "id": "quantity_down_label",
+      "label": "Decrease quantity label",
+      "default": "Decrease quantity"
+    },
+    {
+      "type": "text",
+      "id": "quantity_up_label",
+      "label": "Increase quantity label",
+      "default": "Increase quantity"
+    },
+    {
+      "type": "header",
+      "content": "Discount badge and price"
+    },
+    {
+      "type": "text",
+      "id": "save_badge_prefix",
+      "label": "Discount badge prefix",
+      "default": "Save",
+      "info": "The percentage is calculated from the variant's compare-at price. No compare-at price means no badge."
+    },
+    {
+      "type": "text",
+      "id": "tax_note",
+      "label": "Tax note",
+      "default": "Tax included."
+    },
+    {
+      "type": "header",
+      "content": "Styling inspiration"
+    },
+    {
+      "type": "paragraph",
+      "content": "The circles are built from the videos on the product's own Media, so no metafield is needed. The row hides itself when a product has no video."
+    },
+    {
+      "type": "text",
+      "id": "inspiration_heading",
+      "label": "Heading",
+      "default": "Play For Styling Inspiration"
+    },
+    {
+      "type": "text",
+      "id": "inspiration_play_label",
+      "label": "Play accessible label",
+      "default": "Play video"
+    },
+    {
+      "type": "text",
+      "id": "inspiration_close_label",
+      "label": "Close accessible label",
+      "default": "Close video"
+    },
+    {
+      "type": "header",
+      "content": "Instalments"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_instalments",
+      "label": "Show instalment bar",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "instalment_headline_months",
+      "label": "Headline duration",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "unit": "mo",
+      "default": 6,
+      "info": "The collapsed bar shows the price divided by this number."
+    },
+    {
+      "type": "text",
+      "id": "instalment_prefix",
+      "label": "Bar prefix",
+      "default": "Starting From"
+    },
+    {
+      "type": "text",
+      "id": "instalment_period_label",
+      "label": "Bar period label",
+      "default": "Month"
+    },
+    {
+      "type": "text",
+      "id": "instalment_subtext",
+      "label": "Bar subtext",
+      "default": "0% Down Payment • Fast Approval"
+    },
+    {
+      "type": "text",
+      "id": "instalment_modal_heading",
+      "label": "Modal heading",
+      "default": "Payment Methods"
+    },
+    {
+      "type": "text",
+      "id": "instalment_close_label",
+      "label": "Modal close label",
+      "default": "Close"
+    },
+    {
+      "type": "text",
+      "id": "instalment_col_duration",
+      "label": "Duration column heading",
+      "default": "Duration"
+    },
+    {
+      "type": "text",
+      "id": "instalment_col_rate",
+      "label": "Rate column heading",
+      "default": "Rate"
+    },
+    {
+      "type": "text",
+      "id": "instalment_col_payment",
+      "label": "Payment column heading",
+      "default": "Monthly payment"
+    },
+    {
+      "type": "text",
+      "id": "instalment_months_label",
+      "label": "Months word",
+      "default": "months"
+    },
+    {
+      "type": "text",
+      "id": "instalment_short_period",
+      "label": "Short period label",
+      "default": "mo"
+    },
+    {
+      "type": "text",
+      "id": "instalment_providers_empty",
+      "label": "Empty provider strip text",
+      "default": "Provider logos appear here once added in the theme editor."
+    },
+    {
+      "type": "text",
+      "id": "instalment_footnote",
+      "label": "Modal footnote",
+      "default": "Admin fees might be added in checkout."
+    },
+    {
+      "type": "color",
+      "id": "instalment_background",
+      "label": "Instalment bar background",
+      "default": "#f4f2fb"
+    },
+    {
+      "type": "header",
+      "content": "Delivery estimate"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_delivery_estimate",
+      "label": "Show delivery estimate",
+      "default": true
+    },
+    {
+      "type": "paragraph",
+      "content": "Dates are today plus each product's custom.delivery_lead_min and custom.delivery_lead_max metafields. The values below are used for products that have neither."
+    },
+    {
+      "type": "range",
+      "id": "delivery_lead_min_default",
+      "label": "Default earliest",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "d",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "delivery_lead_max_default",
+      "label": "Default latest",
+      "min": 0,
+      "max": 90,
+      "step": 1,
+      "unit": "d",
+      "default": 7
+    },
+    {
+      "type": "text",
+      "id": "delivery_estimate_prefix",
+      "label": "Estimate prefix",
+      "default": "Delivery By"
+    },
+    {
+      "type": "text",
+      "id": "delivery_date_format",
+      "label": "Date format",
+      "default": "%-d %b",
+      "info": "strftime format, e.g. %-d %b gives 11 Aug."
+    },
+    {
+      "type": "text",
+      "id": "delivery_estimate_note",
+      "label": "Estimate note",
+      "default": "excluding holidays"
     },
     {
       "type": "header",
@@ -1317,6 +1508,73 @@
       "step": 4,
       "unit": "px",
       "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "assurance",
+      "name": "Assurance",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "3 Year Warranty"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "checkmark", "label": "Checkmark" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "truck", "label": "Truck" },
+            { "value": "return", "label": "Return" },
+            { "value": "card", "label": "Card" },
+            { "value": "store", "label": "Store" }
+          ],
+          "default": "checkmark"
+        }
+      ]
+    },
+    {
+      "type": "instalment_plan",
+      "name": "Instalment plan",
+      "settings": [
+        {
+          "type": "range",
+          "id": "months",
+          "label": "Duration",
+          "min": 2,
+          "max": 24,
+          "step": 1,
+          "unit": "mo",
+          "default": 3
+        },
+        {
+          "type": "text",
+          "id": "rate_label",
+          "label": "Rate",
+          "default": "0%",
+          "info": "Display copy only — the monthly figure is always price divided by duration."
+        }
+      ]
+    },
+    {
+      "type": "instalment_logo",
+      "name": "Instalment provider",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Provider name"
+        },
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo"
+        }
+      ]
     }
   ]
 }

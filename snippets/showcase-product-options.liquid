@@ -1,0 +1,258 @@
+{% doc %}
+  Native option pickers for the product page — one row per option, in the order
+  the merchant set them in Shopify (Size, Color, Armrest side, …). Nothing about
+  which options exist is hardcoded.
+
+  Values that Shopify has a swatch for render as swatch chips using the same
+  shared `swatch` snippet the collection card uses, at the same diameter, so the
+  two stay visually identical. Everything else renders as a text pill.
+
+  Selection is resolved client-side against `variantData`, which carries the whole
+  variant matrix with money already formatted server-side.
+
+  @param {object} product - The product.
+  @param {object} selected_variant - The variant to mark selected on load.
+  @param {object} section - The section, for labels.
+
+  @example
+  {% render 'showcase-product-options', product: product, selected_variant: variant, section: section %}
+{% enddoc %}
+
+{% if product.has_only_default_variant == false %}
+  <div class="product-options">
+    {% for product_option in product.options_with_values %}
+      {% liquid
+        assign selected_value = product_option.selected_value.name
+        if selected_value == blank
+          assign selected_value = selected_variant.options[forloop.index0]
+        endif
+
+        # A row is swatch-styled only when every value actually has a swatch;
+        # a partial set would render as a mix of chips and pills.
+        assign swatch_values = product_option.values | where: 'swatch'
+        assign use_swatches = false
+        if swatch_values.size == product_option.values.size and swatch_values.size > 0
+          assign use_swatches = true
+        endif
+      %}
+      <fieldset class="product-option{% if use_swatches %} product-option--swatches{% endif %}">
+        <legend class="product-option__legend">
+          <span class="product-option__name">{{ product_option.name }}:</span>
+          <span
+            class="product-option__value"
+            ref="optionValueLabels[]"
+            data-option-position="{{ product_option.position }}"
+          >
+            {{- selected_value -}}
+          </span>
+        </legend>
+
+        <div class="product-option__values">
+          {% for option_value in product_option.values %}
+            {% liquid
+              assign input_id = 'ProductOption-' | append: section.id | append: '-' | append: product_option.position | append: '-' | append: forloop.index
+              assign is_selected = false
+              if option_value.name == selected_value
+                assign is_selected = true
+              endif
+            %}
+            <input
+              type="radio"
+              class="product-option__input visually-hidden"
+              id="{{ input_id }}"
+              name="{{ 'ProductOption-' | append: section.id | append: '-' | append: product_option.position }}"
+              value="{{ option_value.name | escape }}"
+              ref="optionInputs[]"
+              data-option-position="{{ product_option.position }}"
+              {% if is_selected %}
+                checked
+              {% endif %}
+              on:change="/selectOption"
+            >
+            <label
+              class="product-option__chip{% if use_swatches %} product-option__chip--swatch{% endif %}"
+              for="{{ input_id }}"
+              title="{{ option_value.name | escape }}"
+            >
+              {% if use_swatches %}
+                <span class="product-option__swatch">
+                  {% render 'swatch', swatch: option_value.swatch, mode: 'unscaled', label: option_value.name %}
+                </span>
+                <span class="visually-hidden">{{ option_value.name }}</span>
+              {% else %}
+                {{ option_value.name }}
+              {% endif %}
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+    {% endfor %}
+
+    {%- comment -%}
+      The full variant matrix, with money formatted by Liquid so the client never
+      has to build a currency string. Read once by the product component.
+
+      Instalment figures are precomputed here, per variant and per plan, for the
+      same reason: a variant swap must be able to update the instalment bar and
+      table without formatting currency in JavaScript.
+    {%- endcomment -%}
+    {% assign option_plans = section.blocks | where: 'type', 'instalment_plan' %}
+    <script type="application/json" ref="variantData">
+      [
+        {% for variant in product.variants %}
+          {% liquid
+            assign headline_months = section.settings.instalment_headline_months | default: 6
+            assign headline_rounding = headline_months | minus: 1
+            assign headline_amount = variant.price | plus: headline_rounding | divided_by: headline_months
+          %}
+          {
+            "id": {{ variant.id | json }},
+            "options": {{ variant.options | json }},
+            "available": {{ variant.available | json }},
+            "priceHtml": {{ variant.price | money | json }},
+            "instalmentHtml": {{ headline_amount | money | json }},
+            "instalments": {
+              {% for block in option_plans %}
+                {% liquid
+                  assign plan_months = block.settings.months | default: 3
+                  assign plan_rounding = plan_months | minus: 1
+                  assign plan_amount = variant.price | plus: plan_rounding | divided_by: plan_months
+                  assign plan_suffix = section.settings.instalment_short_period | default: 'mo'
+                  capture plan_text
+                    echo plan_amount | money
+                    echo ' / '
+                    echo plan_suffix
+                  endcapture
+                %}
+                {{ plan_months | json }}: {{ plan_text | json }}{% unless forloop.last %},{% endunless %}
+              {% endfor %}
+            },
+            "compareHtml": {%- if variant.compare_at_price > variant.price -%}
+                {{ variant.compare_at_price | money | json }}
+              {%- else -%}
+                null
+              {%- endif -%},
+            "savePercent": {%- if variant.compare_at_price > variant.price -%}
+                {% assign saved = variant.compare_at_price | minus: variant.price | times: 100.0 | divided_by: variant.compare_at_price | round %}
+                {{ saved | json }}
+              {%- else -%}
+                null
+              {%- endif -%},
+            "image": {%- if variant.featured_image != blank -%}
+                {{ variant.featured_image | image_url: width: 1400 | json }}
+              {%- else -%}
+                null
+              {%- endif -%}
+          }{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ]
+    </script>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .product-options {
+    margin-block-start: var(--margin-lg);
+  }
+
+  .product-option {
+    margin: 0 0 var(--margin-md);
+    padding: 0;
+    border: 0;
+  }
+
+  .product-option__legend {
+    display: flex;
+    align-items: baseline;
+    gap: var(--gap-3xs);
+    margin-block-end: var(--margin-2xs);
+    padding: 0;
+    font-size: var(--font-size--sm);
+  }
+
+  .product-option__name {
+    font-weight: 500;
+  }
+
+  .product-option__value {
+    color: var(--product-accent, #e8342a);
+  }
+
+  .product-option__values {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-2xs);
+  }
+
+  /* Text pill — the fallback for any option Shopify has no swatch for. */
+  .product-option__chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 36px;
+    padding: 0 var(--padding-sm);
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: 6px;
+    background-color: var(--color-background, #ffffff);
+    font-size: var(--font-size--sm);
+    cursor: pointer;
+    transition: border-color var(--animation-speed) var(--animation-easing);
+  }
+
+  /*
+    Swatch chips size to the same diameter as the collection card's, with the
+    border sitting outside the colour rather than cropping it.
+  */
+  .product-option__chip--swatch {
+    min-width: 0;
+    min-height: 0;
+    padding: 3px;
+    border-radius: 50%;
+  }
+
+  .product-option__swatch {
+    display: inline-flex;
+    width: var(--showcase-card-swatch-size, 26px);
+    height: var(--showcase-card-swatch-size, 26px);
+    --swatch-size: var(--showcase-card-swatch-size, 26px);
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  /* Same override the card uses, so the shared snippet can't set its own size. */
+  .product-option__swatch > * {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .product-option__chip:hover {
+    border-color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+  }
+
+  .product-option__input:checked + .product-option__chip {
+    border-color: var(--color-foreground);
+    border-width: 2px;
+    /* Compensate for the thicker border so the row does not shift on selection. */
+    padding: calc(var(--padding-sm) - 1px);
+    padding-block: 0;
+  }
+
+  .product-option__input:checked + .product-option__chip--swatch {
+    padding: 2px;
+  }
+
+  .product-option__input:focus-visible + .product-option__chip {
+    outline: var(--focus-outline-width, 2px) solid currentcolor;
+    outline-offset: 2px;
+  }
+
+  /* Sold-out combinations stay pickable but are visibly struck through. */
+  .product-option__chip--unavailable {
+    opacity: 0.4;
+    text-decoration: line-through;
+  }
+{% endstylesheet %}

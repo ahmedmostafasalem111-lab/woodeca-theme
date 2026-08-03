@@ -164,6 +164,92 @@
             {% endif %}
           </div>
         {% endif %}
+
+        {%- comment -%}
+          Group D — support contacts. Reuses the header's existing phone number so
+          there is a single place to change it, and hides entirely when neither a
+          phone nor an email is set.
+        {%- endcomment -%}
+        {% if section.settings.phone_number != blank or section.settings.help_email != blank %}
+          <div class="mobile-drawer__group mobile-drawer__help">
+            {% if section.settings.help_heading != blank %}
+              <h2 class="mobile-drawer__help-heading">{{ section.settings.help_heading }}</h2>
+            {% endif %}
+
+            {% if section.settings.phone_number != blank %}
+              {% assign drawer_tel = section.settings.phone_number | remove: ' ' | remove: '(' | remove: ')' | remove: '-' %}
+              <a href="tel:{{ drawer_tel }}" class="mobile-drawer__row mobile-drawer__row--help">
+                <span class="mobile-drawer__row-icon">
+                  <span class="svg-wrapper" aria-hidden="true">
+                    {{- 'icon-phone.svg' | inline_asset_content -}}
+                  </span>
+                </span>
+                <span class="mobile-drawer__row-label">
+                  {{- section.settings.help_phone_label | default: section.settings.phone_number -}}
+                </span>
+              </a>
+            {% endif %}
+
+            {% if section.settings.help_email != blank %}
+              <a href="mailto:{{ section.settings.help_email }}" class="mobile-drawer__row mobile-drawer__row--help">
+                <span class="mobile-drawer__row-icon">
+                  <span class="svg-wrapper" aria-hidden="true">
+                    {{- 'icon-mail.svg' | inline_asset_content -}}
+                  </span>
+                </span>
+                <span class="mobile-drawer__row-label">
+                  {{- section.settings.help_email_label | default: section.settings.help_email -}}
+                </span>
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {%- comment -%}
+          Language switcher. Only rendered when the store actually publishes more
+          than one language — a one-option select is a dead control.
+        {%- endcomment -%}
+        {% if section.settings.show_language_switcher and localization.available_languages.size > 1 %}
+          <div class="mobile-drawer__group mobile-drawer__language">
+            {% form 'localization', class: 'mobile-drawer__locale-form' %}
+              <span class="mobile-drawer__row-icon">
+                <span class="svg-wrapper" aria-hidden="true">
+                  {{- 'icon-globe.svg' | inline_asset_content -}}
+                </span>
+              </span>
+              <label class="visually-hidden" for="DrawerLanguage-{{ section.id }}">
+                {{- 'content.language' | t -}}
+              </label>
+              {%- comment -%}
+                Submitted by the drawer script on change, so the control works as a
+                plain form for anyone without JavaScript via the fallback button.
+              {%- endcomment -%}
+              <select
+                id="DrawerLanguage-{{ section.id }}"
+                class="mobile-drawer__locale-select"
+                name="language_code"
+                data-drawer-locale
+              >
+                {% for language in localization.available_languages %}
+                  <option
+                    value="{{ language.iso_code }}"
+                    lang="{{ language.iso_code }}"
+                    {% if language.iso_code == localization.language.iso_code %}
+                      selected
+                    {% endif %}
+                  >
+                    {{ language.endonym_name | capitalize }}
+                  </option>
+                {% endfor %}
+              </select>
+              <noscript>
+                <button type="submit" class="mobile-drawer__locale-submit">
+                  {{- 'actions.apply' | t -}}
+                </button>
+              </noscript>
+            {% endform %}
+          </div>
+        {% endif %}
       </div>
 
       {%- comment -%}

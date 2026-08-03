@@ -39,8 +39,27 @@ function showView(drawer, key) {
   if (first) first.focus();
 }
 
+/**
+ * Publishes the header's current bottom edge so the drawer can open directly
+ * beneath it instead of covering it.
+ *
+ * Measured at open time rather than baked into CSS because the header changes
+ * height as it collapses on scroll, and the announcement/utility rows can be
+ * toggled off per section.
+ *
+ * @param {HTMLElement} drawer
+ */
+function anchorBelowHeader(drawer) {
+  const header = document.querySelector('.showcase-header');
+  const bottom = header instanceof HTMLElement ? header.getBoundingClientRect().bottom : 0;
+  // Never negative: once the header has scrolled fully out of view the drawer
+  // should sit flush with the top of the viewport.
+  drawer.style.setProperty('--drawer-top', `${Math.max(bottom, 0)}px`);
+}
+
 function openDrawer(drawer, trigger) {
   lastTrigger = trigger ?? null;
+  anchorBelowHeader(drawer);
   drawer.hidden = false;
   // Next frame, so the transition runs instead of jumping straight to open.
   requestAnimationFrame(() => drawer.classList.add(OPEN_CLASS));
@@ -113,6 +132,23 @@ document.addEventListener('click', (event) => {
     }
   }
 });
+
+// Native selects have no submit of their own; changing the language applies it.
+document.addEventListener('change', (event) => {
+  const select = /** @type {HTMLElement | null} */ (event.target);
+  if (!(select instanceof HTMLSelectElement) || !select.hasAttribute('data-drawer-locale')) return;
+  select.form?.submit();
+});
+
+// The header's height changes with orientation and with its own scroll collapse.
+window.addEventListener(
+  'resize',
+  () => {
+    const drawer = document.querySelector(`[data-mobile-drawer].${OPEN_CLASS}`);
+    if (drawer instanceof HTMLElement) anchorBelowHeader(drawer);
+  },
+  { passive: true }
+);
 
 document.addEventListener('keydown', (event) => {
   const drawer = document.querySelector(`[data-mobile-drawer].${OPEN_CLASS}`);

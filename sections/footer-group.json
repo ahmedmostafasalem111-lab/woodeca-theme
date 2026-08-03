@@ -148,65 +148,6 @@
         "logo_blend": true
       }
     },
-    "showcase_mobile_tab_bar": {
-      "type": "showcase-mobile-tab-bar",
-      "blocks": {
-        "tab_catalog": {
-          "type": "tab",
-          "settings": {
-            "icon": "grid-default",
-            "label": "Catalog",
-            "link": ""
-          }
-        },
-        "tab_favorites": {
-          "type": "tab",
-          "settings": {
-            "icon": "heart",
-            "label": "Favorites",
-            "link": ""
-          }
-        },
-        "tab_basket": {
-          "type": "tab",
-          "settings": {
-            "icon": "cart",
-            "label": "Basket",
-            "link": ""
-          }
-        },
-        "tab_login": {
-          "type": "tab",
-          "settings": {
-            "icon": "account",
-            "label": "Login",
-            "link": ""
-          }
-        },
-        "tab_showrooms": {
-          "type": "tab",
-          "settings": {
-            "icon": "store",
-            "label": "Showrooms",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "tab_catalog",
-        "tab_favorites",
-        "tab_basket",
-        "tab_login",
-        "tab_showrooms"
-      ],
-      "settings": {
-        "nav_label": "Quick navigation",
-        "label_size": "10px",
-        "background_color": "#ffffff",
-        "text_color": "#1c1c1c",
-        "active_color": "#e8342a"
-      }
-    },
     "showcase_floating_widgets": {
       "type": "showcase-floating-widgets",
       "settings": {
@@ -226,7 +167,6 @@
   },
   "order": [
     "site_footer",
-    "showcase_mobile_tab_bar",
     "showcase_floating_widgets"
   ]
 }

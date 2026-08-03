@@ -1,26 +1,54 @@
 import { Component } from '@theme/component';
 
 /**
- * Product page hero: thumbnail gallery, mobile dot pagination, variant selection
- * via swatch cards, wishlist toggle, and native share.
+ * Product page hero.
  *
- * Variant selection is done client-side from data already rendered onto each card
- * (image URL, price markup, availability, stock copy), so no money formatting or
- * network request is needed. The URL's `?variant=` param and the cart form's
- * hidden input are both updated, keeping deep links and add-to-cart correct.
+ * Owns the thumbnail gallery, mobile dot pagination, option pickers, quantity
+ * stepper, the instalment and video dialogs, wishlist, share, and Buy It Now.
+ *
+ * Variant selection resolves against the matrix rendered by the option picker,
+ * which already carries money formatted by Liquid — so switching a variant costs
+ * no request and never builds a currency string in JavaScript. The URL's
+ * `?variant=` param and the cart form's hidden input are both updated, keeping
+ * deep links and add-to-cart correct.
+ *
+ * @typedef {object} VariantRecord
+ * @property {number} id
+ * @property {string[]} options
+ * @property {boolean} available
+ * @property {string} priceHtml
+ * @property {string | null} compareHtml
+ * @property {number | null} savePercent
+ * @property {string | null} image
+ * @property {string} [instalmentHtml]
+ * @property {Record<string, string>} [instalments]
  *
  * @typedef {object} Refs
  * @property {HTMLImageElement} [mainImage]
  * @property {HTMLElement[]} [thumbs]
  * @property {HTMLElement[]} [dots]
  * @property {HTMLElement} [scroller]
- * @property {HTMLElement[]} [variantCards]
+ * @property {HTMLInputElement[]} [optionInputs]
+ * @property {HTMLElement[]} [optionValueLabels]
+ * @property {HTMLScriptElement} [variantData]
  * @property {HTMLInputElement} [variantInput]
+ * @property {HTMLInputElement} [quantityInput]
  * @property {HTMLElement} [priceTarget]
+ * @property {HTMLElement} [compareTarget]
+ * @property {HTMLElement} [saveBadge]
+ * @property {HTMLElement} [savePercent]
  * @property {HTMLElement} [stickyPriceTarget]
  * @property {HTMLElement} [stockTarget]
  * @property {HTMLElement} [stickyThumb]
  * @property {HTMLButtonElement} [addButton]
+ * @property {HTMLButtonElement} [stickyAddButton]
+ * @property {HTMLButtonElement} [buyNowButton]
+ * @property {HTMLElement} [stickyBar]
+ * @property {HTMLElement} [instalmentHeadline]
+ * @property {HTMLElement[]} [instalmentRows]
+ * @property {HTMLDialogElement} [instalmentDialog]
+ * @property {HTMLDialogElement} [inspirationDialog]
+ * @property {HTMLElement[]} [inspirationStages]
  * @property {HTMLElement[]} [wishlistButtons]
  *
  * @extends {Component<Refs>}
@@ -29,15 +57,61 @@ class ShowcaseProductComponent extends Component {
   /** @type {number | null} */
   #frame = null;
 
+  /** @type {VariantRecord[]} */
+  #variants = [];
+
+  /** @type {ResizeObserver | null} */
+  #barObserver = null;
+
   connectedCallback() {
     super.connectedCallback();
     this.refs.scroller?.addEventListener('scroll', this.#onScroll, { passive: true });
+    this.#readVariants();
+    this.#watchStickyBar();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this.refs.scroller?.removeEventListener('scroll', this.#onScroll);
     if (this.#frame != null) cancelAnimationFrame(this.#frame);
+    this.#barObserver?.disconnect();
+    document.documentElement.style.removeProperty('--mobile-sticky-bar-height');
+  }
+
+  /** Parses the variant matrix once; a malformed payload must not break the page. */
+  #readVariants() {
+    const raw = this.refs.variantData?.textContent;
+    if (!raw) return;
+
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) this.#variants = parsed;
+    } catch (error) {
+      console.error('[showcase-product] Could not read the variant data.', error);
+    }
+  }
+
+  /**
+   * Publishes the fixed buy bar's height so the page can reserve space for it and
+   * the floating chat bubble can sit clear of it.
+   */
+  #watchStickyBar() {
+    const bar = this.refs.stickyBar;
+    if (!(bar instanceof HTMLElement) || typeof ResizeObserver === 'undefined') return;
+
+    const publish = () => {
+      // Only the fixed mobile layout overlaps content; the sticky desktop bar
+      // occupies its own space in the flow and needs no reservation.
+      const fixed = getComputedStyle(bar).position === 'fixed';
+      document.documentElement.style.setProperty(
+        '--mobile-sticky-bar-height',
+        fixed ? `${bar.offsetHeight}px` : '0px'
+      );
+    };
+
+    this.#barObserver = new ResizeObserver(publish);
+    this.#barObserver.observe(bar);
+    publish();
   }
 
   /**
@@ -63,68 +137,178 @@ class ShowcaseProductComponent extends Component {
     }
   }
 
-  /**
-   * Applies a variant from its swatch card. All display values come off the card
-   * itself, which was rendered server-side with correctly formatted money.
-   *
-   * @param {Event} event
-   */
-  selectVariant(event) {
-    const card = /** @type {HTMLElement} */ (event.target)?.closest('[data-variant-id]');
-    if (!(card instanceof HTMLElement)) return;
+  /** Applies whichever variant matches the currently checked option values. */
+  selectOption() {
+    const chosen = (this.refs.optionInputs ?? [])
+      .filter((input) => input.checked)
+      .sort((a, b) => Number(a.dataset.optionPosition ?? 0) - Number(b.dataset.optionPosition ?? 0))
+      .map((input) => input.value);
 
+    for (const label of this.refs.optionValueLabels ?? []) {
+      const value = chosen[Number(label.dataset.optionPosition ?? 0) - 1];
+      if (value) label.textContent = value;
+    }
+
+    const variant = this.#variants.find(
+      (candidate) =>
+        candidate.options.length === chosen.length &&
+        candidate.options.every((value, index) => value === chosen[index])
+    );
+
+    if (variant) this.#applyVariant(variant);
+  }
+
+  /** @param {VariantRecord} variant */
+  #applyVariant(variant) {
     const {
-      variantCards,
       variantInput,
       priceTarget,
+      compareTarget,
+      saveBadge,
+      savePercent,
       stickyPriceTarget,
-      stockTarget,
       mainImage,
       stickyThumb,
       addButton,
+      stickyAddButton,
+      buyNowButton,
+      instalmentHeadline,
+      instalmentRows,
     } = this.refs;
 
-    const variantId = card.dataset.variantId;
-    if (!variantId) return;
+    if (variantInput) variantInput.value = String(variant.id);
 
-    for (const candidate of variantCards ?? []) {
-      const isActive = candidate === card;
-      candidate.classList.toggle('variant-card--active', isActive);
-      candidate.setAttribute('aria-current', String(isActive));
+    // Instalment figures were precomputed per variant, so this is a lookup.
+    if (instalmentHeadline && variant.instalmentHtml) {
+      instalmentHeadline.innerHTML = variant.instalmentHtml;
     }
 
-    if (variantInput) variantInput.value = variantId;
-
-    const priceHtml = card.dataset.priceHtml;
-    if (priceHtml) {
-      if (priceTarget) priceTarget.innerHTML = priceHtml;
-      if (stickyPriceTarget) stickyPriceTarget.innerHTML = priceHtml;
+    for (const row of instalmentRows ?? []) {
+      const text = variant.instalments?.[row.dataset.instalmentMonths ?? ''];
+      if (text) row.textContent = text;
     }
 
-    if (stockTarget) {
-      const stockText = card.dataset.stockText ?? '';
-      stockTarget.textContent = stockText;
-      stockTarget.hidden = stockText === '';
+    if (priceTarget) priceTarget.innerHTML = variant.priceHtml;
+    if (stickyPriceTarget) stickyPriceTarget.innerHTML = variant.priceHtml;
+
+    if (compareTarget) {
+      compareTarget.innerHTML = variant.compareHtml ?? '';
+      compareTarget.hidden = variant.compareHtml == null;
     }
 
-    const image = card.dataset.image;
-    if (image) {
-      if (mainImage) mainImage.src = image;
+    if (saveBadge) {
+      const percent = variant.savePercent;
+      saveBadge.hidden = percent == null || percent <= 0;
+      if (savePercent && percent != null) savePercent.textContent = String(percent);
+    }
+
+    if (variant.image) {
+      if (mainImage) mainImage.src = variant.image;
       const thumbImg = stickyThumb?.querySelector('img');
-      if (thumbImg instanceof HTMLImageElement) thumbImg.src = image;
+      if (thumbImg instanceof HTMLImageElement) thumbImg.src = variant.image;
+    }
+
+    for (const button of [addButton, stickyAddButton, buyNowButton]) {
+      if (button) button.disabled = !variant.available;
     }
 
     if (addButton) {
-      const unavailable = card.dataset.available === 'false';
-      addButton.disabled = unavailable;
-      const label = unavailable ? addButton.dataset.soldOutLabel : addButton.dataset.defaultLabel;
+      const label = variant.available
+        ? addButton.dataset.defaultLabel
+        : addButton.dataset.soldOutLabel;
       if (label) addButton.textContent = label;
     }
 
     // Keep the URL shareable without adding a history entry per click.
     const url = new URL(window.location.href);
-    url.searchParams.set('variant', variantId);
+    url.searchParams.set('variant', String(variant.id));
     window.history.replaceState({}, '', url);
+  }
+
+  /**
+   * Nudges the quantity field, clamped at one — a zero-quantity add is rejected
+   * by the cart API anyway.
+   *
+   * @param {Event} event
+   */
+  stepQuantity(event) {
+    const button = /** @type {HTMLElement} */ (event.target)?.closest('[data-quantity-step]');
+    const input = this.refs.quantityInput;
+    if (!(button instanceof HTMLElement) || !input) return;
+
+    const step = Number(button.dataset.quantityStep ?? 0);
+    input.value = String(Math.max(1, (Number(input.value) || 1) + step));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  /**
+   * Adds the current selection and goes straight to checkout.
+   *
+   * Done through the cart API rather than a second submit button because a
+   * product form has no native "checkout" action — posting `name="checkout"`
+   * would just add the line and land the customer on the cart page.
+   */
+  async buyNow() {
+    const { buyNowButton, variantInput, quantityInput } = this.refs;
+    if (!buyNowButton || !variantInput) return;
+
+    const root = window.Shopify?.routes?.root ?? '/';
+    const busyLabel = buyNowButton.dataset.busyLabel;
+    const defaultLabel = buyNowButton.dataset.defaultLabel;
+
+    buyNowButton.disabled = true;
+    if (busyLabel) buyNowButton.textContent = busyLabel;
+
+    try {
+      const response = await fetch(`${root}cart/add.js`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          items: [{ id: Number(variantInput.value), quantity: Number(quantityInput?.value) || 1 }],
+        }),
+      });
+
+      if (!response.ok) throw new Error(`cart/add.js responded ${response.status}`);
+
+      window.location.href = `${root}checkout`;
+    } catch (error) {
+      console.error('[showcase-product] Buy It Now could not add the item.', error);
+      buyNowButton.disabled = false;
+      if (defaultLabel) buyNowButton.textContent = defaultLabel;
+    }
+  }
+
+  openInstalments() {
+    this.refs.instalmentDialog?.showModal();
+  }
+
+  closeInstalments() {
+    this.refs.instalmentDialog?.close();
+  }
+
+  /** @param {Event} event */
+  openInspiration(event) {
+    const trigger = /** @type {HTMLElement} */ (event.target)?.closest('[data-inspiration-index]');
+    const dialog = this.refs.inspirationDialog;
+    if (!(trigger instanceof HTMLElement) || !dialog) return;
+
+    const index = trigger.dataset.inspirationIndex;
+    for (const stage of this.refs.inspirationStages ?? []) {
+      stage.hidden = stage.dataset.inspirationIndex !== index;
+    }
+
+    dialog.showModal();
+  }
+
+  closeInspiration() {
+    const dialog = this.refs.inspirationDialog;
+    if (!dialog) return;
+
+    // A video left running behind a closed dialog keeps its audio playing.
+    for (const video of dialog.querySelectorAll('video')) video.pause();
+    for (const stage of this.refs.inspirationStages ?? []) stage.hidden = true;
+
+    dialog.close();
   }
 
   /** @param {Event} event */
@@ -133,7 +317,7 @@ class ShowcaseProductComponent extends Component {
     if (!(button instanceof HTMLElement)) return;
 
     const nowActive = button.getAttribute('aria-pressed') !== 'true';
-    // Both hero and sticky-bar buttons represent the same state.
+    // Both the hero and buy-bar buttons represent the same state.
     for (const candidate of this.refs.wishlistButtons ?? []) {
       candidate.setAttribute('aria-pressed', String(nowActive));
       candidate.classList.toggle('wishlist-button--active', nowActive);

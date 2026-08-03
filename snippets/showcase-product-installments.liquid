@@ -1,0 +1,344 @@
+{% doc %}
+  Collapsed instalment bar plus the modal it opens.
+
+  The headline figure is the selected variant's price divided by the section's
+  "headline duration" (6 months by default), so it moves with the variant instead
+  of being authored per product. Each duration inside the modal is a section block
+  carrying its own months count and rate label, and its monthly figure is computed
+  the same way — price ÷ months. No interest is applied: the rate is display copy,
+  which is what a 0% instalment plan actually is.
+
+  Money is formatted server-side per row, so nothing here has to format currency
+  in JavaScript.
+
+  @param {object} product - The product, for the price floor when no variant is chosen.
+  @param {object} selected_variant - Variant whose price drives every figure.
+  @param {object} section - The section, for labels, blocks and the headline duration.
+
+  @example
+  {% render 'showcase-product-installments', product: product, selected_variant: variant, section: section %}
+{% enddoc %}
+
+{% liquid
+  assign plans = section.blocks | where: 'type', 'instalment_plan'
+  assign providers = section.blocks | where: 'type', 'instalment_logo'
+
+  assign headline_months = section.settings.instalment_headline_months | default: 6
+  assign base_price = selected_variant.price | default: product.price
+
+  # Integer division rounds down, which would understate the payment; adding
+  # months-1 first rounds up so the sum of instalments always covers the price.
+  assign rounding = headline_months | minus: 1
+  assign headline_amount = base_price | plus: rounding | divided_by: headline_months
+%}
+
+{% if section.settings.show_instalments and base_price > 0 and plans.size > 0 %}
+  <div class="product-instalments">
+    <button
+      type="button"
+      class="instalment-bar"
+      aria-haspopup="dialog"
+      on:click="/openInstalments"
+    >
+      <span class="svg-wrapper instalment-bar__icon" aria-hidden="true">
+        {{- 'icon-card.svg' | inline_asset_content -}}
+      </span>
+
+      <span class="instalment-bar__text">
+        <span class="instalment-bar__headline">
+          {{ section.settings.instalment_prefix | default: 'Starting From' }}
+          <span class="instalment-bar__amount" ref="instalmentHeadline">
+            {{- headline_amount | money -}}
+          </span>
+          <span class="instalment-bar__period">
+            /{{ section.settings.instalment_period_label | default: 'Month' }}
+          </span>
+        </span>
+
+        {% if section.settings.instalment_subtext != blank %}
+          <span class="instalment-bar__subtext">{{ section.settings.instalment_subtext }}</span>
+        {% endif %}
+      </span>
+
+      <span class="svg-wrapper instalment-bar__chevron" aria-hidden="true">
+        {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+      </span>
+    </button>
+
+    <dialog
+      class="instalment-modal"
+      ref="instalmentDialog"
+      aria-label="{{ section.settings.instalment_modal_heading | default: 'Payment methods' | escape }}"
+    >
+      <div class="instalment-modal__head">
+        <h2 class="instalment-modal__heading">
+          {{- section.settings.instalment_modal_heading | default: 'Payment methods' -}}
+        </h2>
+        <button
+          type="button"
+          class="instalment-modal__close"
+          aria-label="{{ section.settings.instalment_close_label | default: 'Close' | escape }}"
+          on:click="/closeInstalments"
+        >
+          <span class="svg-wrapper" aria-hidden="true">
+            {{- 'icon-close.svg' | inline_asset_content -}}
+          </span>
+        </button>
+      </div>
+
+      {%- comment -%}
+        Provider logo strip. Reserved even when no logo has been uploaded yet, so
+        the modal's proportions do not jump once they are added.
+      {%- endcomment -%}
+      <div class="instalment-modal__providers">
+        {% for block in providers %}
+          <span class="instalment-provider" {{ block.shopify_attributes }}>
+            {% if block.settings.logo != blank %}
+              {{
+                block.settings.logo
+                | image_url: width: 200
+                | image_tag: loading: 'lazy', class: 'instalment-provider__logo', alt: block.settings.name
+              }}
+            {% else %}
+              <span class="instalment-provider__placeholder">{{ block.settings.name }}</span>
+            {% endif %}
+          </span>
+        {% else %}
+          <span class="instalment-provider__empty">
+            {{- section.settings.instalment_providers_empty
+              | default: 'Provider logos appear here once added in the theme editor.'
+            -}}
+          </span>
+        {% endfor %}
+      </div>
+
+      <table class="instalment-table">
+        <thead>
+          <tr>
+            <th scope="col">{{ section.settings.instalment_col_duration | default: 'Duration' }}</th>
+            <th scope="col">{{ section.settings.instalment_col_rate | default: 'Rate' }}</th>
+            <th scope="col">{{ section.settings.instalment_col_payment | default: 'Monthly payment' }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for block in plans %}
+            {% liquid
+              assign months = block.settings.months | default: 3
+              assign plan_rounding = months | minus: 1
+              assign monthly = base_price | plus: plan_rounding | divided_by: months
+            %}
+            <tr {{ block.shopify_attributes }}>
+              <th scope="row">
+                {{ months }} {{ section.settings.instalment_months_label | default: 'months' }}
+              </th>
+              <td>
+                <span class="instalment-table__rate">{{ block.settings.rate_label | default: '0%' }}</span>
+              </td>
+              <td
+                class="instalment-table__amount"
+                ref="instalmentRows[]"
+                data-instalment-months="{{ months }}"
+              >
+                {{- monthly | money }} / {{ section.settings.instalment_short_period | default: 'mo' -}}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {% if section.settings.instalment_footnote != blank %}
+        <p class="instalment-modal__footnote">{{ section.settings.instalment_footnote }}</p>
+      {% endif %}
+    </dialog>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .product-instalments {
+    margin-block-start: var(--margin-md);
+  }
+
+  .instalment-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    width: 100%;
+    padding: var(--padding-sm) var(--padding-md);
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    border-radius: var(--style-border-radius-inputs, 8px);
+    background-color: var(--product-instalment-background, #f4f2fb);
+    color: var(--color-foreground);
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .instalment-bar__icon {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background-color: var(--color-background, #ffffff);
+    color: var(--product-accent, #e8342a);
+  }
+
+  .instalment-bar__icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .instalment-bar__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .instalment-bar__headline {
+    font-size: var(--font-size--sm);
+    font-weight: 500;
+  }
+
+  .instalment-bar__amount {
+    color: var(--product-accent, #e8342a);
+    font-weight: 700;
+  }
+
+  .instalment-bar__subtext {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+  }
+
+  .instalment-bar__chevron {
+    flex: 0 0 auto;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+  }
+
+  .instalment-bar__chevron svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* ---- Modal ---- */
+  .instalment-modal {
+    width: min(520px, 92vw);
+    max-height: 86vh;
+    padding: var(--padding-lg);
+    border: none;
+    border-radius: 14px;
+    background-color: var(--color-background, #ffffff);
+    color: var(--color-foreground);
+    overflow-y: auto;
+  }
+
+  .instalment-modal::backdrop {
+    background-color: rgb(0 0 0 / 0.45);
+  }
+
+  .instalment-modal__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-sm);
+    margin-block-end: var(--margin-md);
+  }
+
+  .instalment-modal__heading {
+    margin: 0;
+    font-size: var(--font-size--lg);
+    font-weight: 700;
+  }
+
+  .instalment-modal__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .instalment-modal__close svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .instalment-modal__providers {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-md);
+    /* Holds the strip's height before any logo is uploaded. */
+    min-height: 34px;
+    margin-block-end: var(--margin-md);
+  }
+
+  .instalment-provider__logo {
+    width: auto;
+    height: 22px;
+    max-width: 80px;
+    object-fit: contain;
+  }
+
+  .instalment-provider__placeholder,
+  .instalment-provider__empty {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--xs);
+  }
+
+  .instalment-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size--sm);
+  }
+
+  .instalment-table th,
+  .instalment-table td {
+    padding: var(--padding-sm) var(--padding-xs);
+    text-align: start;
+  }
+
+  .instalment-table thead th {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-weight: 400;
+  }
+
+  .instalment-table tbody tr {
+    border-block-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .instalment-table tbody th {
+    font-weight: 500;
+  }
+
+  .instalment-table__rate {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background-color: rgb(60 160 90 / 0.14);
+    color: #2f7d4f;
+    font-size: var(--font-size--xs);
+    font-weight: 600;
+  }
+
+  .instalment-table__amount {
+    font-weight: 600;
+    text-align: end;
+    white-space: nowrap;
+  }
+
+  .instalment-modal__footnote {
+    margin: var(--margin-md) 0 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--xs);
+    text-align: center;
+  }
+{% endstylesheet %}

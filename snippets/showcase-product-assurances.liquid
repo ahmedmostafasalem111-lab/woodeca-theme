@@ -1,0 +1,61 @@
+{% doc %}
+  Compact assurance row above the variant pickers — short checkmark claims such as
+  "3 Year Warranty" and "Exchange & Return within 14 Days".
+
+  Entries are section blocks so the copy is editable per store and nothing here is
+  hardcoded. Each block picks its own icon from the theme's existing icon set.
+
+  @param {object} section - The section holding the `assurance` blocks.
+
+  @example
+  {% render 'showcase-product-assurances', section: section %}
+{% enddoc %}
+
+{% assign assurances = section.blocks | where: 'type', 'assurance' %}
+
+{% if assurances.size > 0 %}
+  <ul class="product-assurances" role="list">
+    {% for block in assurances %}
+      {% assign icon_file = block.settings.icon | default: 'checkmark' | prepend: 'icon-' | append: '.svg' %}
+      <li class="product-assurance" {{ block.shopify_attributes }}>
+        <span class="svg-wrapper product-assurance__icon" aria-hidden="true">
+          {{- icon_file | inline_asset_content -}}
+        </span>
+        <span class="product-assurance__text">{{ block.settings.text }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% stylesheet %}
+  /*
+    Two per row at every width, which is what keeps short claims paired instead of
+    running as a ragged single column on a narrow phone.
+  */
+  .product-assurances {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--gap-2xs) var(--gap-md);
+    margin: var(--margin-md) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .product-assurance {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    min-width: 0;
+    font-size: var(--font-size--sm);
+  }
+
+  .product-assurance__icon {
+    flex: 0 0 auto;
+    color: var(--color-foreground);
+  }
+
+  .product-assurance__icon svg {
+    width: 17px;
+    height: 17px;
+  }
+{% endstylesheet %}

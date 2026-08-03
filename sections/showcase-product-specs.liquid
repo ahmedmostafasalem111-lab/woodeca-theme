@@ -51,6 +51,35 @@
   if has_diagram or has_captions or populated_rows > 0 or has_files
     assign render_section = true
   endif
+
+  # The other two tabs. Description is the product's own body; care instructions
+  # are a metafield, so a product without either simply shows fewer tabs.
+  assign care_text = product.metafields[ns]['care_instructions']
+
+  assign has_specs_tab = render_section
+  assign has_description_tab = false
+  if product.description != blank
+    assign has_description_tab = true
+  endif
+  assign has_care_tab = false
+  if care_text != blank
+    assign has_care_tab = true
+  endif
+
+  if has_description_tab or has_care_tab
+    assign render_section = true
+  endif
+
+  # Whichever tab comes first is the one that opens; there is no fixed default,
+  # because the Specifications tab itself can be absent.
+  assign first_tab = ''
+  if has_specs_tab
+    assign first_tab = 'specifications'
+  elsif has_description_tab
+    assign first_tab = 'description'
+  elsif has_care_tab
+    assign first_tab = 'care'
+  endif
 %}
 
 {% if render_section %}
@@ -70,52 +99,85 @@
       <h2 class="product-specs__heading">{{ section.settings.heading }}</h2>
     {% endif %}
 
-    {% if has_diagram %}
-      <showcase-panel-tabs-component class="product-specs__tabs">
-        {% liquid
-          assign tabs_label = section.settings.tabs_label | default: 'Specification views'
-          assign tab_overall = section.settings.tab_overall_label | default: 'Overall dimensions'
-          assign tab_additional = section.settings.tab_additional_label | default: 'Additional'
+    {%- comment -%}
+      Three underlined tabs across the top. The shared tab component drives them,
+      but the strip is written out here rather than rendered from the two-option
+      snippet because this one has three entries and any of them can be absent.
+    {%- endcomment -%}
+    <showcase-panel-tabs-component class="product-specs__tabs">
+      <div
+        class="product-specs__tabstrip"
+        role="tablist"
+        aria-label="{{ section.settings.tabs_label | default: 'Product details' | escape }}"
+        on:keydown="/onKeyDown"
+      >
+        {% for entry in (1..3) %}
+          {% liquid
+            case forloop.index
+              when 1
+                assign tab_key = 'specifications'
+                assign tab_shown = has_specs_tab
+                assign tab_text = section.settings.tab_specs_label | default: 'Specifications'
+              when 2
+                assign tab_key = 'description'
+                assign tab_shown = has_description_tab
+                assign tab_text = section.settings.tab_description_label | default: 'Description'
+              else
+                assign tab_key = 'care'
+                assign tab_shown = has_care_tab
+                assign tab_text = section.settings.tab_care_label | default: 'Care Instructions'
+            endcase
 
-          assign show_additional_tab = false
-          if additional_diagram != blank
-            assign show_additional_tab = true
-          endif
-        %}
-        {% render 'showcase-panel-tabs',
-          label: tabs_label,
-          tab_a_label: tab_overall,
-          tab_b_label: tab_additional,
-          show_b: show_additional_tab,
-          a_key: 'overall',
-          b_key: 'additional'
-        %}
+            assign tab_active = false
+            if tab_key == first_tab
+              assign tab_active = true
+            endif
+          %}
+          {% if tab_shown %}
+            <button
+              type="button"
+              class="product-specs__tab{% if tab_active %} panel-tab--active{% endif %}"
+              ref="tabs[]"
+              data-panel="{{ tab_key }}"
+              role="tab"
+              aria-selected="{{ tab_active }}"
+              {% unless tab_active %}
+                tabindex="-1"
+              {% endunless %}
+              on:click="/select"
+            >
+              {{- tab_text -}}
+            </button>
+          {% endif %}
+        {% endfor %}
+      </div>
 
+      {%- comment -%} ---- Specifications ---- {%- endcomment -%}
+      {% if has_specs_tab %}
         <div
           class="product-specs__panel"
           ref="panels[]"
-          data-panel="overall"
+          data-panel="specifications"
           role="tabpanel"
+          {% unless first_tab == 'specifications' %}
+            hidden
+          {% endunless %}
         >
+          {%- comment -%}
+            The whole image block is skipped when the metafield is empty — no
+            empty frame, no placeholder.
+          {%- endcomment -%}
           {% if dimensions_diagram != blank %}
             <div class="product-specs__diagram">
               {{
                 dimensions_diagram
                 | image_url: width: 1200
-                | image_tag: loading: 'lazy', alt: section.settings.tab_overall_label
+                | image_tag: loading: 'lazy', alt: section.settings.tab_specs_label
               }}
             </div>
           {% endif %}
-        </div>
 
-        {% if additional_diagram != blank %}
-          <div
-            class="product-specs__panel"
-            ref="panels[]"
-            data-panel="additional"
-            role="tabpanel"
-            hidden
-          >
+          {% if additional_diagram != blank %}
             <div class="product-specs__diagram">
               {{
                 additional_diagram
@@ -123,98 +185,128 @@
                 | image_tag: loading: 'lazy', alt: section.settings.tab_additional_label
               }}
             </div>
-          </div>
-        {% endif %}
-      </showcase-panel-tabs-component>
-    {% endif %}
-
-    {%- comment -%} Caption stats sit below the diagram and are not tabbed. {%- endcomment -%}
-    {% if has_captions %}
-      <div class="product-specs__captions">
-        {% if dimensions_summary != blank %}
-          <p class="product-specs__caption">
-            <span class="product-specs__caption-label">
-              {{- section.settings.dimensions_caption_label | default: 'Dimensions' -}}:
-            </span>
-            <span>{{ dimensions_summary }}</span>
-          </p>
-        {% endif %}
-        {% if floor_clearance != blank %}
-          <p class="product-specs__caption">
-            <span class="product-specs__caption-label">
-              {{- section.settings.clearance_caption_label | default: 'Clearance from the floor' -}}:
-            </span>
-            <span>{{ floor_clearance }}</span>
-          </p>
-        {% endif %}
-        {% if delivery_option != blank %}
-          <p class="product-specs__caption">
-            <span class="product-specs__caption-label">
-              {{- section.settings.delivery_caption_label | default: 'Delivery option' -}}:
-            </span>
-            <span>{{ delivery_option }}</span>
-          </p>
-        {% endif %}
-      </div>
-    {% endif %}
-
-    {%- comment -%} Full spec list, one row per configured block that has a value. {%- endcomment -%}
-    {% if populated_rows > 0 %}
-      <dl class="product-specs__list">
-        {% for block in section.blocks %}
-          {% if block.type != 'spec' %}
-            {% continue %}
           {% endif %}
 
-          {% assign row_value = product.metafields[ns][block.settings.metafield_key].value %}
-          {% if row_value == blank %}
-            {% continue %}
-          {% endif %}
-
-          <div
-            class="product-specs__row"
-            {{ block.shopify_attributes }}
-          >
-            <dt class="product-specs__term">{{ block.settings.label }}</dt>
-            <dd class="product-specs__value">
-              {% if block.settings.is_link and block.settings.link_url != blank %}
-                <a href="{{ block.settings.link_url }}">{{ row_value }}</a>
-              {% else %}
-                {{ row_value }}
+          {%- comment -%} Caption stats sit below the diagram. {%- endcomment -%}
+          {% if has_captions %}
+            <div class="product-specs__captions">
+              {% if dimensions_summary != blank %}
+                <p class="product-specs__caption">
+                  <span class="product-specs__caption-label">
+                    {{- section.settings.dimensions_caption_label | default: 'Dimensions' -}}:
+                  </span>
+                  <span>{{ dimensions_summary }}</span>
+                </p>
               {% endif %}
-            </dd>
-          </div>
-        {% endfor %}
-      </dl>
-    {% endif %}
+              {% if floor_clearance != blank %}
+                <p class="product-specs__caption">
+                  <span class="product-specs__caption-label">
+                    {{- section.settings.clearance_caption_label | default: 'Clearance from the floor' -}}:
+                  </span>
+                  <span>{{ floor_clearance }}</span>
+                </p>
+              {% endif %}
+              {% if delivery_option != blank %}
+                <p class="product-specs__caption">
+                  <span class="product-specs__caption-label">
+                    {{- section.settings.delivery_caption_label | default: 'Delivery option' -}}:
+                  </span>
+                  <span>{{ delivery_option }}</span>
+                </p>
+              {% endif %}
+            </div>
+          {% endif %}
 
-    {%- comment -%} Downloadable files, from a file-list metafield. {%- endcomment -%}
-    {% if has_files %}
-      <div class="product-specs__files">
-        {% if section.settings.files_heading != blank %}
-          <h3 class="product-specs__files-heading">{{ section.settings.files_heading }}</h3>
-        {% endif %}
+          {%- comment -%} Full spec list, one row per configured block that has a value. {%- endcomment -%}
+          {% if populated_rows > 0 %}
+            <dl class="product-specs__list">
+              {% for block in section.blocks %}
+                {% if block.type != 'spec' %}
+                  {% continue %}
+                {% endif %}
 
-        <ul class="product-specs__file-list">
-          {% for file in spec_files %}
-            <li>
-              <a
-                href="{{ file | file_url }}"
-                class="product-specs__file"
-                download
-              >
-                <span class="svg-wrapper product-specs__file-icon" aria-hidden="true">
-                  {{- 'icon-file.svg' | inline_asset_content -}}
-                </span>
-                <span class="product-specs__file-name">
-                  {{- file.alt | default: file | default: section.settings.file_fallback_label -}}
-                </span>
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
+                {% assign row_value = product.metafields[ns][block.settings.metafield_key].value %}
+                {% if row_value == blank %}
+                  {% continue %}
+                {% endif %}
+
+                <div
+                  class="product-specs__row"
+                  {{ block.shopify_attributes }}
+                >
+                  <dt class="product-specs__term">{{ block.settings.label }}</dt>
+                  <dd class="product-specs__value">
+                    {% if block.settings.is_link and block.settings.link_url != blank %}
+                      <a href="{{ block.settings.link_url }}">{{ row_value }}</a>
+                    {% else %}
+                      {{ row_value }}
+                    {% endif %}
+                  </dd>
+                </div>
+              {% endfor %}
+            </dl>
+          {% endif %}
+
+          {%- comment -%} Downloadable files, from a file-list metafield. {%- endcomment -%}
+          {% if has_files %}
+            <div class="product-specs__files">
+              {% if section.settings.files_heading != blank %}
+                <h3 class="product-specs__files-heading">{{ section.settings.files_heading }}</h3>
+              {% endif %}
+
+              <ul class="product-specs__file-list">
+                {% for file in spec_files %}
+                  <li>
+                    <a
+                      href="{{ file | file_url }}"
+                      class="product-specs__file"
+                      download
+                    >
+                      <span class="svg-wrapper product-specs__file-icon" aria-hidden="true">
+                        {{- 'icon-file.svg' | inline_asset_content -}}
+                      </span>
+                      <span class="product-specs__file-name">
+                        {{- file.alt | default: file | default: section.settings.file_fallback_label -}}
+                      </span>
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {%- comment -%} ---- Description ---- {%- endcomment -%}
+      {% if has_description_tab %}
+        <div
+          class="product-specs__panel product-specs__prose"
+          ref="panels[]"
+          data-panel="description"
+          role="tabpanel"
+          {% unless first_tab == 'description' %}
+            hidden
+          {% endunless %}
+        >
+          {{ product.description }}
+        </div>
+      {% endif %}
+
+      {%- comment -%} ---- Care instructions ---- {%- endcomment -%}
+      {% if has_care_tab %}
+        <div
+          class="product-specs__panel product-specs__prose"
+          ref="panels[]"
+          data-panel="care"
+          role="tabpanel"
+          {% unless first_tab == 'care' %}
+            hidden
+          {% endunless %}
+        >
+          {{ care_text }}
+        </div>
+      {% endif %}
+    </showcase-panel-tabs-component>
   </div>
 {% endif %}
 
@@ -232,6 +324,60 @@
 
   .product-specs__panel {
     padding-block-start: var(--padding-2xl);
+  }
+
+  /*
+    Underlined tab strip, styled locally rather than on the shared pill classes so
+    the pill version used by the delivery and related-products blocks is untouched.
+    `panel-tab--active` is the one shared name kept, because the tab component
+    toggles exactly that class.
+  */
+  .product-specs__tabstrip {
+    display: flex;
+    gap: var(--gap-xl);
+    width: 100%;
+    border-block-end: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    /* Three long labels will not fit a phone; the strip scrolls instead. */
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .product-specs__tabstrip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product-specs__tab {
+    flex: 0 0 auto;
+    padding: var(--padding-xs) 0;
+    border: 0;
+    /* Reserves the active underline's space so the row cannot shift on select. */
+    border-block-end: 2px solid transparent;
+    background: transparent;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--md);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .product-specs__tab.panel-tab--active {
+    border-block-end-color: var(--color-foreground);
+    color: var(--color-foreground);
+    font-weight: 600;
+  }
+
+  /* Rich text coming from the product body or the care metafield. */
+  .product-specs__prose {
+    max-width: 72ch;
+    font-size: var(--font-size--sm);
+    line-height: 1.7;
+  }
+
+  .product-specs__prose > :first-child {
+    margin-block-start: 0;
+  }
+
+  .product-specs__prose > :last-child {
+    margin-block-end: 0;
   }
 
   .product-specs__diagram {
@@ -387,14 +533,28 @@
     },
     {
       "type": "text",
-      "id": "tab_overall_label",
-      "label": "First tab label",
-      "default": "Overall dimensions"
+      "id": "tab_specs_label",
+      "label": "Specifications tab label",
+      "default": "Specifications"
+    },
+    {
+      "type": "text",
+      "id": "tab_description_label",
+      "label": "Description tab label",
+      "default": "Description",
+      "info": "Hidden for products with no description."
+    },
+    {
+      "type": "text",
+      "id": "tab_care_label",
+      "label": "Care tab label",
+      "default": "Care Instructions",
+      "info": "Hidden unless the product's custom.care_instructions metafield is filled in."
     },
     {
       "type": "text",
       "id": "tab_additional_label",
-      "label": "Second tab label",
+      "label": "Additional diagram alt text",
       "default": "Additional"
     },
     {

@@ -1,0 +1,236 @@
+{% comment %}
+  "Why We Love" — the product's own detail shots with a short note under each.
+
+  Content comes from the existing `why_we_love_it_slides` metaobject list already
+  set up on products, so nothing has to be re-authored: each entry supplies an
+  image, a heading and a short text.
+
+  Rendered as a compact two-up grid rather than a carousel. The images are capped
+  by height rather than aspect ratio so a portrait and a landscape detail shot sit
+  on the same baseline, and the type is a step down from the page's body size —
+  this block is a supporting detail, not a hero.
+
+  The whole section removes itself when the metafield is empty.
+{% endcomment %}
+
+{% liquid
+  assign love_ns = section.settings.metafield_namespace | default: 'custom'
+  assign love_key = section.settings.metafield_key | default: 'why_we_love_it_slides'
+  assign slides = product.metafields[love_ns][love_key].value
+%}
+
+{% if slides != blank and slides.size > 0 %}
+  <div
+    class="section section--{{ section.settings.section_width }} product-love spacing-style"
+    style="
+      {% render 'spacing-padding', settings: section.settings %}
+      --love-columns: {{ section.settings.columns }};
+      --love-image-height: {{ section.settings.image_height }}px;
+    "
+  >
+    {% if section.settings.heading != blank %}
+      <h2 class="product-love__heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    <ol class="product-love__grid" role="list">
+      {% for slide in slides %}
+        <li class="love-card">
+          {% if slide.image != blank %}
+            <div class="love-card__media">
+              {{
+                slide.image
+                | image_url: width: 800
+                | image_tag: loading: 'lazy', class: 'love-card__image', alt: slide.heading
+              }}
+            </div>
+          {% endif %}
+
+          {% if section.settings.show_numbers %}
+            <span class="love-card__index" aria-hidden="true">{{ forloop.index }}.</span>
+          {% endif %}
+
+          {% if slide.heading != blank %}
+            <h3 class="love-card__heading">{{ slide.heading }}</h3>
+          {% endif %}
+
+          {% if slide.text != blank %}
+            <p class="love-card__text">{{ slide.text }}</p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .product-love__heading {
+    margin: 0 0 var(--margin-lg);
+    font-size: var(--font-size--2xl);
+    text-align: center;
+  }
+
+  .product-love__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--love-columns, 2), minmax(0, 1fr));
+    gap: var(--gap-lg) var(--gap-md);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .love-card {
+    min-width: 0;
+  }
+
+  /*
+    Fixed height, not a fixed ratio: mixed portrait and landscape detail shots
+    then share a baseline instead of each setting its own box height.
+  */
+  .love-card__media {
+    border-radius: var(--style-border-radius-inputs, 8px);
+    overflow: hidden;
+  }
+
+  .love-card__image {
+    display: block;
+    width: 100%;
+    height: var(--love-image-height, 210px);
+    object-fit: cover;
+  }
+
+  .love-card__index {
+    display: block;
+    margin-block-start: var(--margin-sm);
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+  }
+
+  .love-card__heading {
+    margin: var(--margin-2xs) 0 var(--margin-3xs);
+    font-size: var(--font-size--md);
+    font-weight: 600;
+  }
+
+  .love-card__text {
+    margin: 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+    font-size: var(--font-size--sm);
+    line-height: 1.55;
+  }
+
+  @media screen and (max-width: 749px) {
+    /* Two-up stays two-up on a phone; that is what keeps the block compact. */
+    .product-love__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--gap-md) var(--gap-2xs);
+    }
+
+    .love-card__image {
+      height: calc(var(--love-image-height, 210px) * 0.72);
+    }
+
+    .love-card__text {
+      font-size: var(--font-size--xs);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Why we love",
+  "tag": "section",
+  "class": "section-product-love",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Why We Love"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "image_height",
+      "label": "Image height",
+      "min": 120,
+      "max": 420,
+      "step": 10,
+      "unit": "px",
+      "default": 210
+    },
+    {
+      "type": "checkbox",
+      "id": "show_numbers",
+      "label": "Number the entries",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Content source"
+    },
+    {
+      "type": "text",
+      "id": "metafield_namespace",
+      "label": "Metafield namespace",
+      "default": "custom"
+    },
+    {
+      "type": "text",
+      "id": "metafield_key",
+      "label": "Metafield key",
+      "default": "why_we_love_it_slides",
+      "info": "A product metafield holding a list of Why we love it slide entries."
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    }
+  ]
+}
+{% endschema %}

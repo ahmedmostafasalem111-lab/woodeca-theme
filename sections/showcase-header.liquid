@@ -833,11 +833,18 @@
     display: none;
   }
 
+  /*
+    Opens directly under the header rather than over it. `--drawer-top` is
+    published by the drawer script from the header's measured bottom edge, so the
+    offset follows the header as it collapses on scroll. The 0px fallback keeps
+    the drawer usable if the script has not run yet.
+  */
   .mobile-drawer {
     position: fixed;
-    inset: 0;
-    /* Above the sticky header, bottom nav and any floating widgets. */
-    z-index: 2147483000;
+    inset-block: var(--drawer-top, 0px) 0;
+    inset-inline: 0;
+    /* Below the header so it stays reachable, above everything else. */
+    z-index: 2147482000;
   }
 
   .mobile-drawer__overlay {
@@ -860,8 +867,8 @@
     flex-direction: column;
     width: 88%;
     max-width: 420px;
-    height: 100vh;
-    height: 100dvh;
+    /* Fills the drawer box, which already stops short of the header. */
+    height: 100%;
     background-color: #ffffff;
     translate: -100% 0;
     transition: translate 240ms var(--animation-easing, ease);
@@ -997,6 +1004,48 @@
     width: 12px;
     height: 12px;
     color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+  }
+
+  /* Support contacts: heading plus icon rows, no trailing rule on the last row. */
+  .mobile-drawer__help {
+    padding-block-start: var(--padding-md);
+  }
+
+  .mobile-drawer__help-heading {
+    margin: 0;
+    padding: 0 16px var(--padding-2xs);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .mobile-drawer__row--help {
+    min-height: 48px;
+    font-weight: 500;
+  }
+
+  .mobile-drawer__row--help:last-child {
+    border-block-end: 0;
+  }
+
+  .mobile-drawer__language {
+    display: flex;
+    align-items: center;
+    padding: var(--padding-sm) 16px;
+  }
+
+  .mobile-drawer__locale-form {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .mobile-drawer__locale-select {
+    padding: 4px 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
   }
 
   .mobile-drawer__subbar {
@@ -1249,6 +1298,41 @@
       "label": "Category icon metafield key",
       "default": "tile_icon",
       "info": "Same collection metafield the collection page sub-category tiles use, so icons stay in sync."
+    },
+    {
+      "type": "header",
+      "content": "Drawer — need help"
+    },
+    {
+      "type": "text",
+      "id": "help_heading",
+      "label": "Help heading",
+      "default": "Need Help?"
+    },
+    {
+      "type": "text",
+      "id": "help_phone_label",
+      "label": "Call us row text",
+      "info": "Leave blank to show the phone number from the utility bar settings."
+    },
+    {
+      "type": "text",
+      "id": "help_email",
+      "label": "Email address",
+      "info": "Opens the customer's mail app. Leave blank to hide the row."
+    },
+    {
+      "type": "text",
+      "id": "help_email_label",
+      "label": "Email us row text",
+      "info": "Leave blank to show the address itself."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_language_switcher",
+      "label": "Show language switcher",
+      "default": true,
+      "info": "Only appears once the store publishes more than one language."
     },
     {
       "type": "header",

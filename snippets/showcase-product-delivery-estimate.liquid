@@ -1,0 +1,94 @@
+{% doc %}
+  "Delivery By <from> – <to>" computed at render time.
+
+  Lead time comes from two integer product metafields (min and max days). When a
+  product has neither, the section's own defaults are used, so the row never
+  renders a broken range. When the section defaults are zero as well, nothing
+  renders at all.
+
+  Liquid has no date arithmetic, so the dates are built by converting today to a
+  Unix timestamp, adding the lead time in seconds, and formatting the result.
+  `'now'` resolves in the store's timezone, so the range matches what the merchant
+  and the customer both see.
+
+  @param {object} product - The product carrying the lead-time metafields.
+  @param {object} section - The section, for the namespace, defaults and labels.
+
+  @example
+  {% render 'showcase-product-delivery-estimate', product: product, section: section %}
+{% enddoc %}
+
+{% liquid
+  assign delivery_ns = section.settings.metafield_namespace | default: 'custom'
+
+  assign lead_min = product.metafields[delivery_ns]['delivery_lead_min'].value
+  assign lead_max = product.metafields[delivery_ns]['delivery_lead_max'].value
+
+  if lead_min == blank
+    assign lead_min = section.settings.delivery_lead_min_default
+  endif
+  if lead_max == blank
+    assign lead_max = section.settings.delivery_lead_max_default
+  endif
+
+  assign lead_min = lead_min | times: 1
+  assign lead_max = lead_max | times: 1
+
+  # A max below the min would print a backwards range; treat it as a single date.
+  if lead_max < lead_min
+    assign lead_max = lead_min
+  endif
+
+  assign day_seconds = 86400
+  assign today_ts = 'now' | date: '%s' | times: 1
+  assign from_ts = lead_min | times: day_seconds | plus: today_ts
+  assign to_ts = lead_max | times: day_seconds | plus: today_ts
+
+  assign date_format = section.settings.delivery_date_format | default: '%-d %b'
+  assign date_from = from_ts | date: date_format
+  assign date_to = to_ts | date: date_format
+%}
+
+{% if section.settings.show_delivery_estimate and lead_max > 0 %}
+  <p class="product-delivery-estimate">
+    <span class="svg-wrapper product-delivery-estimate__icon" aria-hidden="true">
+      {{- 'icon-truck.svg' | inline_asset_content -}}
+    </span>
+    <span>
+      {{ section.settings.delivery_estimate_prefix | default: 'Delivery By' }}
+      <strong>
+        {{- date_from }}
+        {%- if lead_max > lead_min %} – {{ date_to }}{% endif -%}
+      </strong>
+      {% if section.settings.delivery_estimate_note != blank %}
+        <span class="product-delivery-estimate__note">
+          {{- section.settings.delivery_estimate_note -}}
+        </span>
+      {% endif %}
+    </span>
+  </p>
+{% endif %}
+
+{% stylesheet %}
+  .product-delivery-estimate {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-xs);
+    margin: var(--margin-md) 0 0;
+    font-size: var(--font-size--sm);
+  }
+
+  .product-delivery-estimate__icon {
+    flex: 0 0 auto;
+    color: var(--product-accent, #e8342a);
+  }
+
+  .product-delivery-estimate__icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .product-delivery-estimate__note {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+  }
+{% endstylesheet %}

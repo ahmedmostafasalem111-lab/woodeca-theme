@@ -1,17 +1,24 @@
 {% doc %}
-  Condensed sticky bar that takes over from the hero once it scrolls out of view:
-  product thumbnail, title with anchor links to the specs and delivery blocks,
-  price, add-to-cart and wishlist.
+  Persistent buy bar.
 
-  Rendered once inside the product hero section. It is `position: sticky` with a
-  solid background, so it pins to the top and sits above whatever section scrolls
-  beneath it. Refs here share the hero's `showcase-product-component`, so a variant
-  change updates both places at once.
+  Desktop keeps the condensed identity row that takes over once the hero scrolls
+  past: thumbnail, title with anchor links, price, add to cart and wishlist.
+
+  Mobile drops the identity row and pins two full-width buttons — Add To Cart and
+  Buy It Now — to the bottom of the viewport, which is the only place a thumb can
+  reliably reach on a long product page.
+
+  Both buttons drive the hero's form: Add To Cart submits it normally, while Buy
+  It Now posts the same line through the cart API and then sends the customer to
+  checkout, so the two share one variant id and one quantity.
+
+  Refs here belong to the hero's `showcase-product-component`, so a variant change
+  updates the bar and the buy box together.
 
   @param {object} product - The product.
   @param {object} selected_variant - The currently selected variant.
   @param {object} section - The section, for labels and anchor ids.
-  @param {string} form_id - Id of the hero's product form, so this bar's button submits it.
+  @param {string} form_id - Id of the hero's product form, so this bar's buttons submit it.
 
   @example
   {% render 'showcase-product-sticky-bar', product: product, selected_variant: variant, section: section, form_id: id %}
@@ -55,9 +62,29 @@
         type="submit"
         form="{{ form_id }}"
         class="product-sticky-bar__add"
+        ref="stickyAddButton"
+        {% unless selected_variant.available %}disabled{% endunless %}
       >
-        {{- section.settings.add_to_cart_label | default: 'Add to cart' -}}
+        {%- if selected_variant.available -%}
+          {{ section.settings.add_to_cart_label | default: 'Add to cart' }}
+        {%- else -%}
+          {{ section.settings.sold_out_label | default: 'Sold out' }}
+        {%- endif -%}
       </button>
+
+      {% if section.settings.show_buy_now %}
+        <button
+          type="button"
+          class="product-sticky-bar__buy"
+          ref="buyNowButton"
+          data-busy-label="{{ section.settings.buy_now_busy_label | default: 'Working…' | escape }}"
+          data-default-label="{{ section.settings.buy_now_label | default: 'Buy It Now' | escape }}"
+          {% unless selected_variant.available %}disabled{% endunless %}
+          on:click="/buyNow"
+        >
+          {{- section.settings.buy_now_label | default: 'Buy It Now' -}}
+        </button>
+      {% endif %}
 
       <button
         type="button"
@@ -164,36 +191,73 @@
     white-space: nowrap;
   }
 
-  .product-sticky-bar__add {
+  .product-sticky-bar__add,
+  .product-sticky-bar__buy {
     padding: var(--padding-sm) var(--padding-2xl);
     border: none;
     border-radius: var(--style-border-radius-buttons-primary, 4px);
-    background-color: var(--product-cta-background, #333);
-    color: var(--product-cta-text, #fff);
     font-size: var(--font-size--sm);
     cursor: pointer;
   }
 
+  .product-sticky-bar__add {
+    background-color: var(--product-cta-background, #333);
+    color: var(--product-cta-text, #fff);
+  }
+
+  .product-sticky-bar__buy {
+    background-color: var(--product-accent, #e8342a);
+    color: #ffffff;
+  }
+
+  .product-sticky-bar__add:disabled,
+  .product-sticky-bar__buy:disabled {
+    opacity: var(--opacity-50);
+    cursor: not-allowed;
+  }
+
   @media screen and (max-width: 989px) {
-    /* Mobile shows a compact price + CTA row; the anchor links and thumbnail
-       would crowd it out, and the fixed bottom tab bar already sits below. */
-    .product-sticky-bar__identity {
+    /*
+      Fixed to the bottom of the viewport rather than sticky to the top. Sticky
+      would pin it under the header, which is where the customer is not looking
+      once they have scrolled into the specs. The hero adds matching bottom
+      padding so the bar never covers the last row of content.
+    */
+    .product-sticky-bar {
+      position: fixed;
+      inset-block: auto 0;
+      inset-inline: 0;
+      top: auto;
+      z-index: 30;
+      border-block-end: 0;
+      border-block-start: var(--border-width-sm) solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+      box-shadow: 0 -2px 12px rgb(0 0 0 / 0.08);
+      padding-block-end: env(safe-area-inset-bottom, 0px);
+    }
+
+    /* Thumbnail, title and anchor links would crowd out the two buttons. */
+    .product-sticky-bar__identity,
+    .product-sticky-bar__price,
+    .product-sticky-bar .wishlist-button {
       display: none;
     }
 
     .product-sticky-bar__inner {
-      justify-content: space-between;
       padding-block: var(--padding-2xs);
     }
 
     .product-sticky-bar__actions {
       flex-grow: 1;
-      justify-content: space-between;
+      gap: var(--gap-2xs);
     }
 
-    .product-sticky-bar__add {
-      flex-grow: 1;
-      max-width: 60%;
+    .product-sticky-bar__add,
+    .product-sticky-bar__buy {
+      flex: 1 1 0;
+      padding-inline: var(--padding-sm);
+      border-radius: 999px;
+      font-size: var(--font-size--md);
+      font-weight: 600;
     }
   }
 {% endstylesheet %}

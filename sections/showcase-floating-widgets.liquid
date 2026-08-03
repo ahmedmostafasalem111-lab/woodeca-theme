@@ -83,10 +83,10 @@
   }
 
   @media screen and (max-width: 989px) {
-    /* Clear the fixed mobile tab bar when it's present. */
+    /* Clear the product page's sticky buy bar when one is on screen. */
     .floating-chat {
       right: var(--padding-sm);
-      bottom: calc(var(--mobile-tab-bar-height, 0px) + var(--padding-sm) + env(safe-area-inset-bottom, 0px));
+      bottom: calc(var(--mobile-sticky-bar-height, 0px) + var(--padding-sm) + env(safe-area-inset-bottom, 0px));
     }
   }
 {% endstylesheet %}

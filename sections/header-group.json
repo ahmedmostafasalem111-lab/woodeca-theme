@@ -192,7 +192,12 @@
         "cart_bubble_background": "#e8705a",
         "cart_bubble_text": "#ffffff",
         "mobile_product_menu": "main-menu",
-        "mobile_room_menu": "main-menu"
+        "mobile_room_menu": "main-menu",
+        "help_heading": "Need Help?",
+        "help_phone_label": "",
+        "help_email": "support@woodeca.com",
+        "help_email_label": "",
+        "show_language_switcher": true
       }
     }
   },
