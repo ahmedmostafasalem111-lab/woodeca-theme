@@ -198,9 +198,7 @@
           >
             {% render 'showcase-product-card',
               product: product,
-              badge: section.settings.card_badge_text,
               stock_text: section.settings.card_stock_text,
-              show_wishlist: section.settings.show_wishlist,
               show_quick_add: section.settings.show_quick_add,
               show_swatches: section.settings.show_swatches,
               swatch_option_name: section.settings.swatch_option_name,
@@ -922,12 +920,6 @@
     },
     {
       "type": "checkbox",
-      "id": "show_wishlist",
-      "label": "Show wishlist heart",
-      "default": true
-    },
-    {
-      "type": "checkbox",
       "id": "show_quick_add",
       "label": "Show quick add-to-cart button",
       "default": true
@@ -1005,12 +997,6 @@
       "id": "dimensions_key",
       "label": "Dimensions metafield key",
       "default": "dimensions"
-    },
-    {
-      "type": "text",
-      "id": "card_badge_text",
-      "label": "Badge text for all cards",
-      "info": "Applied to every card. Leave blank to hide."
     },
     {
       "type": "text",

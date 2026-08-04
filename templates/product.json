@@ -3,17 +3,57 @@
     "hero": {
       "type": "showcase-product",
       "blocks": {
-        "a1": { "type": "assurance", "settings": { "icon": "shield", "text": "3 Year Warranty" } },
+        "a1": {
+          "type": "assurance",
+          "settings": {
+            "icon": "shield",
+            "text": "3 Year Warranty"
+          }
+        },
         "a3": {
           "type": "assurance",
-          "settings": { "icon": "return", "text": "Exchange & Return within 14 Days" }
+          "settings": {
+            "icon": "return",
+            "text": "Exchange & Return within 14 Days"
+          }
         },
-        "p1": { "type": "instalment_plan", "settings": { "months": 3, "rate_label": "0%" } },
-        "p2": { "type": "instalment_plan", "settings": { "months": 6, "rate_label": "0%" } },
-        "p3": { "type": "instalment_plan", "settings": { "months": 9, "rate_label": "0%" } },
-        "p4": { "type": "instalment_plan", "settings": { "months": 12, "rate_label": "0%" } }
+        "p1": {
+          "type": "instalment_plan",
+          "settings": {
+            "months": 3,
+            "rate_label": "0%"
+          }
+        },
+        "p2": {
+          "type": "instalment_plan",
+          "settings": {
+            "months": 6,
+            "rate_label": "0%"
+          }
+        },
+        "p3": {
+          "type": "instalment_plan",
+          "settings": {
+            "months": 9,
+            "rate_label": "0%"
+          }
+        },
+        "p4": {
+          "type": "instalment_plan",
+          "settings": {
+            "months": 12,
+            "rate_label": "0%"
+          }
+        }
       },
-      "block_order": ["a1", "a3", "p1", "p2", "p3", "p4"],
+      "block_order": [
+        "a1",
+        "a3",
+        "p1",
+        "p2",
+        "p3",
+        "p4"
+      ],
       "settings": {
         "show_breadcrumbs": true,
         "breadcrumb_home_label": "Home",
@@ -73,24 +113,108 @@
     "specs": {
       "type": "showcase-product-specs",
       "blocks": {
-        "s1": { "type": "spec", "settings": { "label": "Body material", "metafield_key": "body_material" } },
-        "s2": { "type": "spec", "settings": { "label": "Legs / supports material", "metafield_key": "legs_material" } },
-        "s3": { "type": "spec", "settings": { "label": "Heel pads", "metafield_key": "heel_pads" } },
-        "s4": { "type": "spec", "settings": { "label": "Max load", "metafield_key": "max_load" } },
-        "s5": { "type": "spec", "settings": { "label": "Max load per shelf", "metafield_key": "max_load_shelf" } },
-        "s6": { "type": "spec", "settings": { "label": "Body color", "metafield_key": "body_color" } },
-        "s7": { "type": "spec", "settings": { "label": "Supports", "metafield_key": "supports" } },
-        "s8": { "type": "spec", "settings": { "label": "Support adjustment", "metafield_key": "support_adjustment" } },
-        "s9": { "type": "spec", "settings": { "label": "Warranty", "metafield_key": "warranty" } },
-        "s10": { "type": "spec", "settings": { "label": "Country of origin", "metafield_key": "country_of_origin" } },
-        "s11": { "type": "spec", "settings": { "label": "Series", "metafield_key": "series_name" } },
-        "s12": { "type": "spec", "settings": { "label": "Collection", "metafield_key": "collection_name" } }
+        "s1": {
+          "type": "spec",
+          "settings": {
+            "label": "Body material",
+            "metafield_key": "body_material"
+          }
+        },
+        "s2": {
+          "type": "spec",
+          "settings": {
+            "label": "Legs / supports material",
+            "metafield_key": "legs_material"
+          }
+        },
+        "s3": {
+          "type": "spec",
+          "settings": {
+            "label": "Heel pads",
+            "metafield_key": "heel_pads"
+          }
+        },
+        "s4": {
+          "type": "spec",
+          "settings": {
+            "label": "Max load",
+            "metafield_key": "max_load"
+          }
+        },
+        "s5": {
+          "type": "spec",
+          "settings": {
+            "label": "Max load per shelf",
+            "metafield_key": "max_load_shelf"
+          }
+        },
+        "s6": {
+          "type": "spec",
+          "settings": {
+            "label": "Body color",
+            "metafield_key": "body_color"
+          }
+        },
+        "s7": {
+          "type": "spec",
+          "settings": {
+            "label": "Supports",
+            "metafield_key": "supports"
+          }
+        },
+        "s8": {
+          "type": "spec",
+          "settings": {
+            "label": "Support adjustment",
+            "metafield_key": "support_adjustment"
+          }
+        },
+        "s9": {
+          "type": "spec",
+          "settings": {
+            "label": "Warranty",
+            "metafield_key": "warranty"
+          }
+        },
+        "s10": {
+          "type": "spec",
+          "settings": {
+            "label": "Country of origin",
+            "metafield_key": "country_of_origin"
+          }
+        },
+        "s11": {
+          "type": "spec",
+          "settings": {
+            "label": "Series",
+            "metafield_key": "series_name"
+          }
+        },
+        "s12": {
+          "type": "spec",
+          "settings": {
+            "label": "Collection",
+            "metafield_key": "collection_name"
+          }
+        }
       },
-      "block_order": ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "s12"],
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5",
+        "s6",
+        "s7",
+        "s8",
+        "s9",
+        "s10",
+        "s11",
+        "s12"
+      ],
       "settings": {
         "anchor_id": "specifications",
         "metafield_namespace": "custom",
-        "tabs_label": "Product details",
         "tab_specs_label": "Specifications",
         "tab_description_label": "Description",
         "tab_care_label": "Care Instructions",
@@ -135,7 +259,12 @@
           }
         }
       },
-      "block_order": ["w1", "w2", "w3", "w4"],
+      "block_order": [
+        "w1",
+        "w2",
+        "w3",
+        "w4"
+      ],
       "settings": {
         "heading": "Why Woodeca",
         "columns": 4,

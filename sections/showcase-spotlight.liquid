@@ -149,17 +149,6 @@
                 {% endif %}
               </a>
 
-              {% if section.settings.show_wishlist %}
-                <button
-                  type="button"
-                  class="spotlight-item__wishlist"
-                  aria-label="Add {{ item_title | escape }} to wishlist"
-                >
-                  <span class="svg-wrapper" aria-hidden="true">
-                    {{- 'icon-heart.svg' | inline_asset_content -}}
-                  </span>
-                </button>
-              {% endif %}
             </div>
 
             {%- comment -%}
@@ -399,28 +388,6 @@
 
   .spotlight-item__image--placeholder {
     fill: rgb(var(--color-foreground-rgb) / var(--opacity-20));
-  }
-
-  .spotlight-item__wishlist {
-    position: absolute;
-    top: 0;
-    right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    border: none;
-    background: transparent;
-    color: var(--color-foreground);
-    cursor: pointer;
-  }
-
-  .spotlight-item__wishlist .svg-wrapper,
-  .spotlight-item__wishlist svg {
-    width: var(--icon-size-xs);
-    height: var(--icon-size-xs);
   }
 
   .spotlight-item__info {
@@ -700,19 +667,6 @@
       mix-blend-mode: multiply;
     }
 
-    .spotlight-item__wishlist {
-      top: 7px;
-      right: 7px;
-      width: 16px;
-      height: 16px;
-      background: transparent;
-    }
-
-    .spotlight-item__wishlist .svg-wrapper,
-    .spotlight-item__wishlist svg {
-      width: 15px;
-      height: 15px;
-    }
 
     /* Column layout is what keeps prices and buttons on a shared baseline. */
     .spotlight-item__info {
@@ -923,12 +877,6 @@
       "label": "Label for products needing options",
       "default": "Choose options",
       "info": "Shown instead of Add to cart when a product has variants to pick, so no variant is chosen for the shopper."
-    },
-    {
-      "type": "checkbox",
-      "id": "show_wishlist",
-      "label": "Show wishlist hearts",
-      "default": true
     },
     {
       "type": "header",

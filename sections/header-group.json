@@ -169,8 +169,6 @@
         "show_account": true,
         "account_label": "Account",
         "account_link": "",
-        "wishlist_label": "Wishlist",
-        "wishlist_link": "",
         "cart_label": "Cart",
         "show_cart_count": true,
         "show_mobile_chat": false,

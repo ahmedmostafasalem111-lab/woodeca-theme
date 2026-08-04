@@ -36,7 +36,6 @@ function openDrawer() {
   document.body.classList.add(BODY_LOCK);
 
   startCountdown();
-  loadRecommendations();
 
   const close = el.querySelector('.cart-drawer__close');
   if (close instanceof HTMLElement) close.focus();
@@ -148,7 +147,6 @@ function replaceDrawer(html) {
   }
 
   current.replaceWith(next);
-  loadRecommendations();
   startCountdown();
 }
 
@@ -157,39 +155,6 @@ function syncCartCount(count) {
   for (const node of document.querySelectorAll('.showcase-header__cart-count')) {
     node.textContent = String(count);
     node.hidden = count === 0;
-  }
-}
-
-/* --------------------------------------------------------- recommendations */
-
-async function loadRecommendations() {
-  const box = document.querySelector('[data-cart-recs]');
-  if (!(box instanceof HTMLElement)) return;
-
-  const track = box.querySelector('[data-cart-recs-track]');
-  const productId = box.dataset.productId;
-  if (!(track instanceof HTMLElement) || !productId || track.childElementCount > 0) return;
-
-  const limit = box.dataset.limit || '4';
-  // `view=` targets an alternate template so the markup comes from Liquid, with
-  // money already formatted; the JSON endpoint would hand back raw cents.
-  const url = `${root()}recommendations/products?product_id=${encodeURIComponent(
-    productId
-  )}&limit=${encodeURIComponent(limit)}&section_id=showcase-cart-recommendations`;
-
-  try {
-    const response = await fetch(url, { headers: { Accept: 'text/html' } });
-    if (!response.ok) throw new Error(`recommendations responded ${response.status}`);
-
-    const parsed = new DOMParser().parseFromString(await response.text(), 'text/html');
-    const cards = parsed.querySelectorAll('[data-cart-rec]');
-    if (cards.length === 0) return;
-
-    track.append(...cards);
-    box.hidden = false;
-  } catch (error) {
-    // Recommendations are a bonus; a failure must never break the cart.
-    console.error('[showcase-cart-drawer] recommendations', error);
   }
 }
 

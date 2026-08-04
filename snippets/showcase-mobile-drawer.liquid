@@ -18,16 +18,24 @@
   assign room_menu = section.settings.mobile_room_menu
 %}
 
+{%- comment -%}
+  One button for both directions. Both glyphs are rendered and CSS picks between
+  them from `aria-expanded`, so the morph needs no icon swapping in JavaScript
+  and cannot fall out of step with the drawer's actual state.
+{%- endcomment -%}
 <button
   type="button"
   class="showcase-header__icon-button showcase-header__drawer-trigger"
-  data-drawer-open
+  data-drawer-toggle
   aria-expanded="false"
   aria-controls="MobileDrawer-{{ section.id }}"
   aria-label="{{ section.settings.menu_label | default: 'Menu' | escape }}"
 >
-  <span class="svg-wrapper" aria-hidden="true">
+  <span class="svg-wrapper showcase-header__drawer-icon showcase-header__drawer-icon--open" aria-hidden="true">
     {{- 'icon-menu.svg' | inline_asset_content -}}
+  </span>
+  <span class="svg-wrapper showcase-header__drawer-icon showcase-header__drawer-icon--close" aria-hidden="true">
+    {{- 'icon-close.svg' | inline_asset_content -}}
   </span>
 </button>
 
@@ -45,20 +53,11 @@
     aria-modal="true"
     aria-label="{{ section.settings.menu_label | default: 'Menu' | escape }}"
   >
-    <div class="mobile-drawer__bar">
-      <span class="mobile-drawer__bar-title">{{ section.settings.menu_label | default: 'Menu' }}</span>
-      <button
-        type="button"
-        class="mobile-drawer__bar-close"
-        data-drawer-close
-        aria-label="{{ section.settings.menu_close_label | default: 'Close menu' | escape }}"
-      >
-        <span class="svg-wrapper" aria-hidden="true">
-          {{- 'icon-close.svg' | inline_asset_content -}}
-        </span>
-      </button>
-    </div>
-
+    {%- comment -%}
+      No title bar: the drawer opens directly under the site header, whose own
+      hamburger is now the close control, so a second labelled row inside it was
+      just repeating what the header already says.
+    {%- endcomment -%}
     <div class="mobile-drawer__views">
       {%- comment -%} ---------- Level 1 ---------- {%- endcomment -%}
       <div class="mobile-drawer__view" data-drawer-view="main">
@@ -105,14 +104,6 @@
             link: section.settings.bestsellers_link,
             image: section.settings.bestsellers_icon,
             inline_icon: 'icon-star.svg'
-          %}
-
-          {% render 'showcase-mobile-drawer-link',
-            label: section.settings.wishlist_label,
-            fallback_label: 'My Wish List',
-            link: section.settings.wishlist_link,
-            image: section.settings.wishlist_icon,
-            inline_icon: 'icon-heart.svg'
           %}
 
           {% liquid

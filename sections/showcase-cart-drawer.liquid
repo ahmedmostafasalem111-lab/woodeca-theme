@@ -4,8 +4,8 @@
   Rendered on every page from the footer group, which is also what makes it
   re-renderable: quantity changes post to /cart/change.js and then pull this
   section back through the Section Rendering API, so the line prices, subtotal
-  and recommendations all come from Liquid. Nothing here formats money in
-  JavaScript, and the drawer never closes to refresh itself.
+  and totals all come from Liquid. Nothing here formats money in JavaScript, and
+  the drawer never closes to refresh itself.
 
   Full viewport width on mobile, a panel on desktop.
 {% endcomment %}
@@ -15,10 +15,6 @@
   if cart.item_count > 0
     assign has_items = true
   endif
-
-  # Recommendations are seeded from the first line's product, which is the only
-  # cart-related product Liquid can reach without a request.
-  assign seed = cart.items.first.product
 %}
 
 <div
@@ -160,24 +156,6 @@
           {% endfor %}
         </ul>
 
-        {%- comment -%}
-          4 — Recommendations. Fetched by the script from Shopify's own
-          recommendations endpoint so they are real suggestions, not a fixed list.
-        {%- endcomment -%}
-        {% if section.settings.show_recommendations and seed != blank %}
-          <div
-            class="cart-recs"
-            data-cart-recs
-            data-product-id="{{ seed.id }}"
-            data-limit="{{ section.settings.recommendations_limit | default: 4 }}"
-            hidden
-          >
-            <h3 class="cart-recs__heading">
-              {{- section.settings.recommendations_heading | default: 'You may also like' -}}
-            </h3>
-            <div class="cart-recs__track" data-cart-recs-track></div>
-          </div>
-        {% endif %}
       {% else %}
         <div class="cart-drawer__empty">
           <p>{{ section.settings.empty_text | default: 'Your cart is empty.' }}</p>
@@ -469,35 +447,6 @@
     white-space: nowrap;
   }
 
-  /* ---- Recommendations ---- */
-  .cart-recs[hidden] {
-    display: none;
-  }
-
-  .cart-recs {
-    margin-block-start: var(--margin-lg);
-    padding-block-start: var(--padding-md);
-    border-block-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
-  }
-
-  .cart-recs__heading {
-    margin: 0 0 var(--margin-2xs);
-    font-size: var(--font-size--sm);
-    font-weight: 600;
-  }
-
-  .cart-recs__track {
-    display: flex;
-    gap: var(--gap-sm);
-    overflow-x: auto;
-    scrollbar-width: none;
-    scroll-snap-type: x proximity;
-  }
-
-  .cart-recs__track::-webkit-scrollbar {
-    display: none;
-  }
-
   /* ---- Foot ---- */
   .cart-drawer__foot {
     flex: 0 0 auto;
@@ -657,31 +606,6 @@
       "id": "increase_label",
       "label": "Increase accessible label",
       "default": "Increase quantity"
-    },
-    {
-      "type": "header",
-      "content": "Recommendations"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_recommendations",
-      "label": "Show recommendations",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "recommendations_heading",
-      "label": "Heading",
-      "default": "You may also like"
-    },
-    {
-      "type": "range",
-      "id": "recommendations_limit",
-      "label": "Products shown",
-      "min": 2,
-      "max": 8,
-      "step": 1,
-      "default": 4
     },
     {
       "type": "header",

@@ -37,8 +37,6 @@
     --showcase-photo-border: {{ section.settings.photo_search_border_color | default: '#3b7de0' }};
     --showcase-photo-text: {{ section.settings.photo_search_text_color | default: '#1c1c1c' }};
     --showcase-logo-size: {{ section.settings.logo_font_size }};
-    --drawer-bar-background: {{ section.settings.drawer_bar_background | default: '#111111' }};
-    --drawer-bar-text: {{ section.settings.drawer_bar_text | default: '#ffffff' }};
     --showcase-call-background: {{ section.settings.call_background | default: '#e8262d' }};
     --showcase-call-text: {{ section.settings.call_text_color | default: '#ffffff' }};
     --showcase-cart-bubble-background: {{ section.settings.cart_bubble_background | default: '#e8705a' }};
@@ -244,10 +242,7 @@
           </a>
         {% endif %}
 
-        {%- comment -%}
-          Phone sits between account and cart. Only the header icon changed here —
-          wishlist itself still lives on product cards and the mobile tab bar.
-        {%- endcomment -%}
+        {%- comment -%} Phone sits between account and cart. {%- endcomment -%}
         {% if section.settings.show_phone and section.settings.phone_number != blank %}
           {% assign icon_call_href = section.settings.phone_number | remove: ' ' | remove: '(' | remove: ')' | remove: '-' %}
           <a
@@ -872,38 +867,18 @@
     translate: 0 0;
   }
 
-  .mobile-drawer__bar {
+  /*
+    Hamburger doubles as the close control. Both glyphs are in the markup and
+    `aria-expanded` decides which shows, so the icon can never disagree with the
+    drawer's real state.
+  */
+  .showcase-header__drawer-icon--close,
+  .showcase-header__drawer-trigger[aria-expanded='true'] .showcase-header__drawer-icon--open {
+    display: none;
+  }
+
+  .showcase-header__drawer-trigger[aria-expanded='true'] .showcase-header__drawer-icon--close {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex: 0 0 auto;
-    padding: 12px 16px;
-    background-color: var(--drawer-bar-background, #111111);
-    color: var(--drawer-bar-text, #ffffff);
-  }
-
-  .mobile-drawer__bar-title {
-    font-size: 15px;
-    font-weight: 700;
-  }
-
-  .mobile-drawer__bar-close {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    border: none;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-  }
-
-  .mobile-drawer__bar-close .svg-wrapper,
-  .mobile-drawer__bar-close svg {
-    width: 18px;
-    height: 18px;
   }
 
   /* Panels stack here; sub views slide over the main one. */
@@ -1376,11 +1351,6 @@
     },
     {
       "type": "image_picker",
-      "id": "wishlist_icon",
-      "label": "Wish list icon"
-    },
-    {
-      "type": "image_picker",
       "id": "account_icon",
       "label": "Account icon"
     },
@@ -1533,17 +1503,6 @@
       "id": "account_link",
       "label": "Account link",
       "info": "Used only when customer accounts are disabled."
-    },
-    {
-      "type": "text",
-      "id": "wishlist_label",
-      "label": "Wishlist accessible label",
-      "default": "Wishlist"
-    },
-    {
-      "type": "url",
-      "id": "wishlist_link",
-      "label": "Wishlist link"
     },
     {
       "type": "text",

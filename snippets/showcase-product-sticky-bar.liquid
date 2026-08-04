@@ -2,7 +2,7 @@
   Persistent buy bar.
 
   Desktop keeps the condensed identity row that takes over once the hero scrolls
-  past: thumbnail, title with anchor links, price, add to cart and wishlist.
+  past: thumbnail, title with anchor links, price and the buy buttons.
 
   Mobile drops the identity row and pins two full-width buttons — Add To Cart and
   Buy It Now — to the bottom of the viewport, which is the only place a thumb can
@@ -88,19 +88,6 @@
         </button>
       {% endif %}
 
-      <button
-        type="button"
-        class="wishlist-button wishlist-button--sm"
-        ref="wishlistButtons[]"
-        data-wishlist
-        aria-pressed="false"
-        aria-label="{{ section.settings.wishlist_label | default: 'Add to wishlist' | escape }}"
-        on:click="/toggleWishlist"
-      >
-        <span class="svg-wrapper" aria-hidden="true">
-          {{- 'icon-heart.svg' | inline_asset_content -}}
-        </span>
-      </button>
     </div>
   </div>
 </div>
@@ -239,8 +226,7 @@
 
     /* Thumbnail, title and anchor links would crowd out the two buttons. */
     .product-sticky-bar__identity,
-    .product-sticky-bar__price,
-    .product-sticky-bar .wishlist-button {
+    .product-sticky-bar__price {
       display: none;
     }
 

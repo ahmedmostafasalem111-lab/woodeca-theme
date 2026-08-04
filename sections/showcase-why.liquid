@@ -160,6 +160,18 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--gap-lg);
     }
+
+    /*
+      A tenth larger below the desktop breakpoint. Scaled off the merchant's own
+      icon size rather than a second fixed number, so changing the setting still
+      changes both breakpoints together.
+    */
+    .why-feature__icon,
+    .why-feature__icon svg,
+    .why-feature__icon img {
+      width: calc(var(--why-icon-size, 64px) * 1.1);
+      height: calc(var(--why-icon-size, 64px) * 1.1);
+    }
   }
 
   @media screen and (max-width: 749px) {

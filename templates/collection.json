@@ -160,7 +160,6 @@
         "columns_mobile": 2,
         "products_per_page": 24,
         "empty_text": "No products match these filters.",
-        "show_wishlist": true,
         "show_quick_add": true,
         "show_swatches": true,
         "swatch_option_name": "Color",
@@ -173,7 +172,6 @@
         "dimensions_label": "Dimensions (L x W x H), cm",
         "dimensions_namespace": "custom",
         "dimensions_key": "dimensions",
-        "card_badge_text": "",
         "card_stock_text": "",
         "show_promo": true,
         "promo_after_products": 8,
@@ -191,8 +189,6 @@
         "filters_button_text": "#ffffff",
         "toggle_active_color": "#7ec8e8",
         "toggle_active_background": "#d6f0fa",
-        "badge_background": "#e8705a",
-        "badge_text_color": "#ffffff",
         "padding-block-start": 24,
         "padding-block-end": 56
       }

@@ -344,19 +344,6 @@
             </button>
           {% endform %}
 
-          <button
-            type="button"
-            class="wishlist-button"
-            ref="wishlistButtons[]"
-            data-wishlist
-            aria-pressed="false"
-            aria-label="{{ section.settings.wishlist_label | default: 'Add to wishlist' | escape }}"
-            on:click="/toggleWishlist"
-          >
-            <span class="svg-wrapper" aria-hidden="true">
-              {{- 'icon-heart.svg' | inline_asset_content -}}
-            </span>
-          </button>
         </div>
 
         {%- comment -%} ---------- Delivery teaser ---------- {%- endcomment -%}
@@ -708,11 +695,6 @@
     grid-column: 1 / -1;
   }
 
-  /*
-    `end` rather than `stretch`: the form is now taller than the wishlist button
-    because it also holds the quantity control, and stretching would turn the
-    circular button into a tall pill.
-  */
   .product-buybox__actions {
     display: flex;
     align-items: end;
@@ -723,8 +705,7 @@
 
   /*
     `min-width: 0` is what stops this row overflowing: a flex item's default
-    `min-width: auto` refuses to shrink below its content, so the full-width Add
-    To Cart button plus the 60px wishlist circle pushed past the viewport.
+    `min-width: auto` refuses to shrink below its content.
   */
   .product-buybox__form {
     flex-grow: 1;
@@ -747,44 +728,6 @@
   .product-buybox__add:disabled {
     opacity: var(--opacity-50);
     cursor: not-allowed;
-  }
-
-  .wishlist-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: 60px;
-    /*
-      Explicit height, because the row stopped stretching its items once the form
-      grew taller than the button — without it the circle flattened to an ellipse.
-    */
-    height: 60px;
-    padding: 0;
-    border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
-    border-radius: 50%;
-    background-color: transparent;
-    color: var(--color-foreground);
-    cursor: pointer;
-  }
-
-  .wishlist-button--sm {
-    width: 40px;
-    height: 40px;
-  }
-
-  .wishlist-button .svg-wrapper,
-  .wishlist-button svg {
-    width: var(--icon-size-md);
-    height: var(--icon-size-md);
-  }
-
-  .wishlist-button--active {
-    color: var(--product-wishlist-active, #e8342a);
-  }
-
-  .wishlist-button--active svg {
-    fill: currentcolor;
   }
 
   /* ---- Delivery teaser + link rows ---- */
@@ -929,8 +872,7 @@
       Hidden rather than removed from the markup: the form still has to exist for
       the bar's buttons to submit through, and the quantity field posts with it.
     */
-    .product-buybox__actions .product-buybox__add,
-    .product-buybox__actions > .wishlist-button {
+    .product-buybox__actions .product-buybox__add {
       display: none;
     }
 
@@ -1080,12 +1022,6 @@
       "id": "sold_out_label",
       "label": "Sold out label",
       "default": "Sold out"
-    },
-    {
-      "type": "text",
-      "id": "wishlist_label",
-      "label": "Wishlist accessible label",
-      "default": "Add to wishlist"
     },
     {
       "type": "checkbox",

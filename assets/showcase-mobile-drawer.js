@@ -12,6 +12,9 @@ const BODY_LOCK = 'mobile-drawer-locked';
 /** Element focus should return to once the drawer closes. */
 let lastTrigger = null;
 
+/** Pending hide from the close animation, so a re-open can cancel it. */
+let hideTimer;
+
 const focusables = (root) =>
   Array.from(
     root.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')
@@ -59,6 +62,10 @@ function anchorBelowHeader(drawer) {
 
 function openDrawer(drawer, trigger) {
   lastTrigger = trigger ?? null;
+  // A close still animating has a pending timer that would hide the drawer the
+  // moment it fires — which, now that one button does both, is easy to trip by
+  // double-tapping it.
+  clearTimeout(hideTimer);
   anchorBelowHeader(drawer);
   drawer.hidden = false;
   // Next frame, so the transition runs instead of jumping straight to open.
@@ -72,7 +79,7 @@ function closeDrawer(drawer) {
   drawer.classList.remove(OPEN_CLASS);
   document.body.classList.remove(BODY_LOCK);
 
-  for (const t of document.querySelectorAll('[data-drawer-open][aria-expanded="true"]')) {
+  for (const t of document.querySelectorAll('[data-drawer-toggle][aria-expanded="true"]')) {
     t.setAttribute('aria-expanded', 'false');
   }
 
@@ -81,8 +88,9 @@ function closeDrawer(drawer) {
     showView(drawer, 'main');
   };
   // Wait for the slide-out unless motion is reduced.
+  clearTimeout(hideTimer);
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) done();
-  else setTimeout(done, 260);
+  else hideTimer = setTimeout(done, 260);
 
   lastTrigger?.focus();
   lastTrigger = null;
@@ -92,13 +100,16 @@ document.addEventListener('click', (event) => {
   const target = /** @type {HTMLElement | null} */ (event.target);
   if (!target?.closest) return;
 
-  const opener = target.closest('[data-drawer-open]');
-  if (opener) {
-    const id = opener.getAttribute('aria-controls');
+  const toggle = target.closest('[data-drawer-toggle]');
+  if (toggle) {
+    const id = toggle.getAttribute('aria-controls');
     const drawer = id && document.getElementById(id);
     if (drawer) {
       event.preventDefault();
-      openDrawer(drawer, opener);
+      // Same button both ways; `aria-expanded` is the single source of truth,
+      // and the icon morph is driven off it in CSS.
+      if (drawer.classList.contains(OPEN_CLASS)) closeDrawer(drawer);
+      else openDrawer(drawer, toggle);
     }
     return;
   }

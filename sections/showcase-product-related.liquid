@@ -58,7 +58,6 @@
           image: variant.featured_image,
           url: variant.url,
           stock_text: section.settings.card_stock_text,
-          show_wishlist: true,
           show_quick_add: true
         %}
       </div>
@@ -71,7 +70,6 @@
       <div>
         {% render 'showcase-product-card',
           product: related,
-          show_wishlist: true,
           show_quick_add: true,
           show_swatches: section.settings.show_swatches,
           show_reviews: section.settings.show_reviews
@@ -104,7 +102,6 @@
     <div>
       {% render 'showcase-product-card',
         product: related,
-        show_wishlist: true,
         show_quick_add: true,
         show_swatches: section.settings.show_swatches,
         show_reviews: section.settings.show_reviews

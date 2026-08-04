@@ -4,7 +4,7 @@ import { Component } from '@theme/component';
  * Product page hero.
  *
  * Owns the thumbnail gallery, mobile dot pagination, option pickers, quantity
- * stepper, the instalment and video dialogs, wishlist, share, and Buy It Now.
+ * stepper, the instalment and video dialogs, share, and Buy It Now.
  *
  * Variant selection resolves against the matrix rendered by the option picker,
  * which already carries money formatted by Liquid — so switching a variant costs
@@ -49,7 +49,6 @@ import { Component } from '@theme/component';
  * @property {HTMLDialogElement} [instalmentDialog]
  * @property {HTMLDialogElement} [inspirationDialog]
  * @property {HTMLElement[]} [inspirationStages]
- * @property {HTMLElement[]} [wishlistButtons]
  *
  * @extends {Component<Refs>}
  */
@@ -350,19 +349,6 @@ class ShowcaseProductComponent extends Component {
     for (const video of dialog.querySelectorAll('video')) video.pause();
     for (const stage of this.refs.inspirationStages ?? []) stage.hidden = true;
   };
-
-  /** @param {Event} event */
-  toggleWishlist(event) {
-    const button = /** @type {HTMLElement} */ (event.target)?.closest('[data-wishlist]');
-    if (!(button instanceof HTMLElement)) return;
-
-    const nowActive = button.getAttribute('aria-pressed') !== 'true';
-    // Both the hero and buy-bar buttons represent the same state.
-    for (const candidate of this.refs.wishlistButtons ?? []) {
-      candidate.setAttribute('aria-pressed', String(nowActive));
-      candidate.classList.toggle('wishlist-button--active', nowActive);
-    }
-  }
 
   async share() {
     const url = window.location.href;

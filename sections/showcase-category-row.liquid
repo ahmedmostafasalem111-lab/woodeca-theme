@@ -59,6 +59,7 @@
     content: tiles,
     columns: section.settings.columns,
     columns_mobile: section.settings.columns_mobile,
+    peek: section.settings.peek_mobile,
     show_arrows: section.settings.show_arrows,
     show_progress: section.settings.show_progress,
     gap: 'var(--gap-md)',
@@ -170,7 +171,17 @@
       "min": 2,
       "max": 5,
       "step": 1,
-      "default": 3
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "peek_mobile",
+      "label": "Next tile peek on mobile",
+      "min": 0,
+      "max": 0.9,
+      "step": 0.1,
+      "default": 0.5,
+      "info": "Added to the count above. 2 tiles plus 0.5 shows two and a half."
     },
     {
       "type": "range",

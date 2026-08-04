@@ -72,9 +72,7 @@
         <div>
           {% render 'showcase-product-card',
             product: product,
-            badge: section.settings.default_badge,
             stock_text: section.settings.default_stock_text,
-            show_wishlist: section.settings.show_wishlist,
             show_quick_add: section.settings.show_quick_add
           %}
         </div>
@@ -88,11 +86,9 @@
             price: block.settings.price,
             compare_price: block.settings.compare_price,
             image: block.settings.image,
-            badge: block.settings.badge,
             stock_text: block.settings.stock_text,
             stock_level: block.settings.stock_level,
             url: block.settings.url,
-            show_wishlist: section.settings.show_wishlist,
             show_quick_add: section.settings.show_quick_add
           %}
         </div>
@@ -104,6 +100,7 @@
     content: carousel_items,
     columns: section.settings.columns,
     columns_mobile: section.settings.columns_mobile,
+    peek: section.settings.peek_mobile,
     show_arrows: section.settings.show_arrows,
     show_progress: section.settings.show_progress,
     gap: 'var(--gap-lg)',
@@ -211,12 +208,6 @@
     },
     {
       "type": "text",
-      "id": "default_badge",
-      "label": "Badge text for collection products",
-      "info": "Applied to every card when pulling from a collection. Leave blank to hide."
-    },
-    {
-      "type": "text",
       "id": "default_stock_text",
       "label": "Stock text for collection products"
     },
@@ -240,7 +231,17 @@
       "min": 1,
       "max": 3,
       "step": 1,
-      "default": 2
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "peek_mobile",
+      "label": "Next card peek on mobile",
+      "min": 0,
+      "max": 0.9,
+      "step": 0.1,
+      "default": 0.8,
+      "info": "Added to the count above. 1 card plus 0.8 shows one and most of the next."
     },
     {
       "type": "checkbox",
@@ -252,12 +253,6 @@
       "type": "checkbox",
       "id": "show_progress",
       "label": "Show scroll progress bar",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "show_wishlist",
-      "label": "Show wishlist heart on cards",
       "default": true
     },
     {
@@ -395,12 +390,6 @@
         },
         {
           "type": "text",
-          "id": "badge",
-          "label": "Badge text",
-          "info": "Leave blank to hide the badge."
-        },
-        {
-          "type": "text",
           "id": "stock_text",
           "label": "Stock status text",
           "default": "In stock: 1 pc."
@@ -428,10 +417,9 @@
     {
       "name": "Product carousel",
       "blocks": [
-        { "type": "product", "settings": { "badge": "A great deal" } },
         { "type": "product", "settings": { "title": "Lorem ipsum sit amet 100x55", "price": "18,690", "compare_price": "23,090" } },
         { "type": "product", "settings": { "title": "Consectetur adipiscing chair", "price": "16,820", "compare_price": "20,890", "stock_text": "In stock: more than 20 pcs." } },
-        { "type": "product", "settings": { "title": "Dolor sit amet desk 160x107", "price": "28,040", "compare_price": "32,990", "badge": "A great deal", "stock_text": "In stock: 3 pcs.", "stock_level": "low" } },
+        { "type": "product", "settings": { "title": "Dolor sit amet desk 160x107", "price": "28,040", "compare_price": "32,990", "stock_text": "In stock: 3 pcs.", "stock_level": "low" } },
         { "type": "product", "settings": { "title": "Elit sed do eiusmod 90x200", "price": "31,890", "compare_price": "", "stock_text": "In stock: 8 pcs." } },
         { "type": "product", "settings": { "title": "Tempor incididunt ut labore", "price": "43,990", "compare_price": "", "stock_text": "In stock: 2 pcs." } }
       ]
