@@ -1,0 +1,211 @@
+{
+  "sections": {
+    "hero": {
+      "type": "showcase-hero",
+      "blocks": {
+        "slide_1": {
+          "type": "slide",
+          "settings": {
+            "eyebrow": "",
+            "heading": "",
+            "subheading": "",
+            "link_text": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": ["slide_1"],
+      "settings": {
+        "carousel_label": "Page hero",
+        "height": 520,
+        "height_mobile": 420,
+        "heading_size": "var(--font-size--5xl)",
+        "autoplay": false,
+        "show_arrows": false,
+        "show_dots": false,
+        "section_width": "full-width",
+        "text_color": "#ffffff",
+        "overlay_color": "#000000",
+        "overlay_opacity": 40
+      }
+    },
+    "advantages": {
+      "type": "showcase-why",
+      "blocks": {
+        "adv_1": { "type": "feature", "settings": { "icon": "store", "title": "", "description": "" } },
+        "adv_2": { "type": "feature", "settings": { "icon": "pin", "title": "", "description": "" } },
+        "adv_3": { "type": "feature", "settings": { "icon": "truck", "title": "", "description": "" } },
+        "adv_4": { "type": "feature", "settings": { "icon": "chat", "title": "", "description": "" } },
+        "adv_5": { "type": "feature", "settings": { "icon": "card", "title": "", "description": "" } },
+        "adv_6": { "type": "feature", "settings": { "icon": "star", "title": "", "description": "" } }
+      },
+      "block_order": ["adv_1", "adv_2", "adv_3", "adv_4", "adv_5", "adv_6"],
+      "settings": {
+        "heading": "",
+        "columns": 6,
+        "mobile_layout": "carousel",
+        "show_mission": false,
+        "section_width": "page-width",
+        "padding-block-start": 48,
+        "padding-block-end": 32
+      }
+    },
+    "intro": {
+      "type": "showcase-media-promo",
+      "settings": {
+        "show_section": true,
+        "media_position": "end",
+        "image_ratio": "4 / 3",
+        "eyebrow": "",
+        "heading": "",
+        "body": "",
+        "button_label": "",
+        "button_link": "#designer-enquiry",
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "terms": {
+      "type": "showcase-info-cards",
+      "blocks": {
+        "term_1": { "type": "card", "settings": { "heading": "", "subtext": "" } },
+        "term_2": { "type": "card", "settings": { "heading": "", "subtext": "" } },
+        "term_3": { "type": "card", "settings": { "heading": "", "subtext": "" } }
+      },
+      "block_order": ["term_1", "term_2", "term_3"],
+      "settings": {
+        "heading": "",
+        "columns": 3,
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "cta_before_carousel": {
+      "type": "showcase-cta-band",
+      "settings": {
+        "heading": "",
+        "subheading": "",
+        "button_label": "",
+        "button_link": "#designer-enquiry",
+        "alignment": "center",
+        "section_width": "page-width",
+        "background_color": "#f6f6f6",
+        "padding-block-start": 40,
+        "padding-block-end": 40
+      }
+    },
+    "picks": {
+      "type": "showcase-product-carousel",
+      "settings": {
+        "heading": "",
+        "description": "",
+        "products_limit": 12,
+        "columns": 4,
+        "columns_mobile": 1,
+        "peek_mobile": 0.8,
+        "show_arrows": true,
+        "show_progress": true,
+        "show_quick_add": true,
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "cta_after_carousel": {
+      "type": "showcase-cta-band",
+      "settings": {
+        "heading": "",
+        "subheading": "",
+        "button_label": "",
+        "button_link": "#designer-enquiry",
+        "alignment": "space-between",
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "samples": {
+      "type": "showcase-media-promo",
+      "settings": {
+        "show_section": false,
+        "media_position": "start",
+        "image_ratio": "3 / 2",
+        "eyebrow": "",
+        "heading": "",
+        "body": "",
+        "button_label": "",
+        "button_link": "#designer-enquiry",
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "projects": {
+      "type": "showcase-info-cards",
+      "blocks": {
+        "proj_1": { "type": "card", "settings": { "heading": "", "subtext": "" } },
+        "proj_2": { "type": "card", "settings": { "heading": "", "subtext": "" } },
+        "proj_3": { "type": "card", "settings": { "heading": "", "subtext": "" } }
+      },
+      "block_order": ["proj_1", "proj_2", "proj_3"],
+      "settings": {
+        "heading": "",
+        "columns": 3,
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "cta_final": {
+      "type": "showcase-cta-band",
+      "settings": {
+        "heading": "",
+        "subheading": "",
+        "button_label": "",
+        "button_link": "#designer-enquiry",
+        "alignment": "center",
+        "section_width": "page-width",
+        "background_color": "#f6f6f6",
+        "padding-block-start": 40,
+        "padding-block-end": 40
+      }
+    },
+    "enquiry": {
+      "type": "showcase-enquiry-form",
+      "settings": {
+        "anchor_id": "designer-enquiry",
+        "heading": "",
+        "body": "",
+        "subject": "Designer programme enquiry",
+        "name_label": "Name",
+        "phone_label": "Phone",
+        "email_label": "Email",
+        "message_label": "Tell us about your practice",
+        "submit_label": "Register your interest",
+        "consent_text": "",
+        "success_text": "Thanks — we will be in touch shortly.",
+        "direct_label": "",
+        "phone_number": "",
+        "email_address": "",
+        "section_width": "page-width",
+        "padding-block-start": 56,
+        "padding-block-end": 72
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "advantages",
+    "intro",
+    "terms",
+    "cta_before_carousel",
+    "picks",
+    "cta_after_carousel",
+    "samples",
+    "projects",
+    "cta_final",
+    "enquiry"
+  ]
+}

@@ -1,0 +1,469 @@
+{% comment %}
+  Trade enquiry form — name, phone, email, message.
+
+  Deliberately generic rather than designer-specific: the same section is meant
+  to serve the designers page and a future B2B / trade page, so the heading, the
+  intro, the button label and the subject line are all settings. Nothing here
+  names a programme.
+
+  Uses Shopify's native `{% form 'contact' %}`, which posts to the shop's own
+  contact endpoint — no app, no third-party endpoint, and submissions arrive by
+  email like any other contact form. The subject setting is passed as a hidden
+  field so a store receiving both designer and B2B enquiries can tell them apart.
+
+  `anchor_id` is what a hero or CTA band links to, so those sections need no
+  knowledge of this one beyond the id the merchant types.
+{% endcomment %}
+
+{% liquid
+  assign anchor = section.settings.anchor_id | default: 'enquiry'
+  assign form_id = 'EnquiryForm-' | append: section.id
+%}
+
+<div
+  id="{{ anchor }}"
+  class="section section--{{ section.settings.section_width }} enquiry spacing-style"
+  style="
+    {% render 'spacing-padding', settings: section.settings %}
+    {% if section.settings.text_color != blank %}
+      --color-foreground: {{ section.settings.text_color }};
+      --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+    {% endif %}
+    --enquiry-accent: {{ section.settings.accent_color | default: '#1c1c1c' }};
+    --enquiry-surface: {{ section.settings.surface_color | default: '#f6f6f6' }};
+  "
+>
+  <div class="enquiry__inner">
+    <div class="enquiry__intro">
+      {% if section.settings.heading != blank %}
+        <h2 class="enquiry__heading">{{ section.settings.heading }}</h2>
+      {% endif %}
+
+      {% if section.settings.body != blank %}
+        <div class="enquiry__body">{{ section.settings.body }}</div>
+      {% endif %}
+
+      {%- comment -%}
+        Direct line for anyone who would rather not fill in a form. Both rows
+        hide themselves when their setting is empty, so the block never renders
+        a dead `tel:` or `mailto:`.
+      {%- endcomment -%}
+      {% if section.settings.phone_number != blank or section.settings.email_address != blank %}
+        <div class="enquiry__direct">
+          {% if section.settings.direct_label != blank %}
+            <p class="enquiry__direct-label">{{ section.settings.direct_label }}</p>
+          {% endif %}
+
+          {% if section.settings.phone_number != blank %}
+            {% assign enquiry_tel = section.settings.phone_number
+              | remove: ' '
+              | remove: '('
+              | remove: ')'
+              | remove: '-'
+            %}
+            <a href="tel:{{ enquiry_tel }}" class="enquiry__direct-link">
+              <span class="svg-wrapper" aria-hidden="true">
+                {{- 'icon-phone.svg' | inline_asset_content -}}
+              </span>
+              {{ section.settings.phone_number }}
+            </a>
+          {% endif %}
+
+          {% if section.settings.email_address != blank %}
+            <a href="mailto:{{ section.settings.email_address }}" class="enquiry__direct-link">
+              <span class="svg-wrapper" aria-hidden="true">
+                {{- 'icon-mail.svg' | inline_asset_content -}}
+              </span>
+              {{ section.settings.email_address }}
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="enquiry__panel">
+      {% form 'contact', id: form_id, class: 'enquiry__form' %}
+        {%- comment -%}
+          Shopify re-renders the page after a post with `form.posted_successfully?`
+          set, so the confirmation replaces the fields rather than sitting above a
+          form the visitor has already sent.
+        {%- endcomment -%}
+        {% if form.posted_successfully? %}
+          <p class="enquiry__success" role="status">
+            {{ section.settings.success_text | default: 'Thanks — we will be in touch shortly.' }}
+          </p>
+        {% else %}
+          {% if form.errors %}
+            <div class="enquiry__errors" role="alert">
+              {{ form.errors | default_errors }}
+            </div>
+          {% endif %}
+
+          {%- comment -%}
+            Lets the shop tell one enquiry stream from another without a second
+            inbox or a separate form section.
+          {%- endcomment -%}
+          {% if section.settings.subject != blank %}
+            <input type="hidden" name="contact[subject]" value="{{ section.settings.subject | escape }}">
+          {% endif %}
+
+          <div class="enquiry__field">
+            <label class="enquiry__label" for="{{ form_id }}-name">
+              {{- section.settings.name_label | default: 'Name' -}}
+            </label>
+            <input
+              type="text"
+              id="{{ form_id }}-name"
+              name="contact[name]"
+              class="enquiry__input"
+              autocomplete="name"
+              required
+            >
+          </div>
+
+          <div class="enquiry__field">
+            <label class="enquiry__label" for="{{ form_id }}-phone">
+              {{- section.settings.phone_label | default: 'Phone' -}}
+            </label>
+            <input
+              type="tel"
+              id="{{ form_id }}-phone"
+              name="contact[phone]"
+              class="enquiry__input"
+              autocomplete="tel"
+            >
+          </div>
+
+          <div class="enquiry__field">
+            <label class="enquiry__label" for="{{ form_id }}-email">
+              {{- section.settings.email_label | default: 'Email' -}}
+            </label>
+            <input
+              type="email"
+              id="{{ form_id }}-email"
+              name="contact[email]"
+              class="enquiry__input"
+              autocomplete="email"
+              required
+            >
+          </div>
+
+          <div class="enquiry__field">
+            <label class="enquiry__label" for="{{ form_id }}-message">
+              {{- section.settings.message_label | default: 'Message' -}}
+            </label>
+            <textarea
+              id="{{ form_id }}-message"
+              name="contact[body]"
+              class="enquiry__input enquiry__textarea"
+              rows="4"
+            ></textarea>
+          </div>
+
+          {% if section.settings.consent_text != blank %}
+            <p class="enquiry__consent">{{ section.settings.consent_text }}</p>
+          {% endif %}
+
+          <button type="submit" class="enquiry__submit">
+            {{- section.settings.submit_label | default: 'Send enquiry' -}}
+          </button>
+        {% endif %}
+      {% endform %}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .enquiry__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--gap-2xl);
+    align-items: start;
+  }
+
+  .enquiry__heading {
+    margin: 0 0 var(--margin-md);
+    font-size: var(--font-size--2xl);
+    line-height: var(--line-height--heading-tight);
+  }
+
+  .enquiry__body {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+    font-size: var(--font-size--md);
+    line-height: 1.6;
+  }
+
+  .enquiry__body > :first-child {
+    margin-block-start: 0;
+  }
+
+  .enquiry__body > :last-child {
+    margin-block-end: 0;
+  }
+
+  .enquiry__direct {
+    margin-block-start: var(--margin-xl);
+  }
+
+  .enquiry__direct-label {
+    margin: 0 0 var(--margin-2xs);
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--sm);
+  }
+
+  .enquiry__direct-link {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    color: var(--color-foreground);
+    font-size: var(--font-size--md);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .enquiry__direct-link + .enquiry__direct-link {
+    margin-block-start: var(--margin-2xs);
+  }
+
+  .enquiry__direct-link svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .enquiry__panel {
+    padding: var(--padding-xl);
+    border-radius: var(--style-border-radius-inputs, 8px);
+    background-color: var(--enquiry-surface, #f6f6f6);
+  }
+
+  .enquiry__field + .enquiry__field {
+    margin-block-start: var(--margin-md);
+  }
+
+  .enquiry__label {
+    display: block;
+    margin-block-end: 6px;
+    font-size: var(--font-size--sm);
+    font-weight: 500;
+  }
+
+  .enquiry__input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: 6px;
+    background-color: var(--color-background, #ffffff);
+    color: var(--color-foreground);
+    /* Below 16px iOS zooms the page when the field takes focus. */
+    font-size: 16px;
+  }
+
+  .enquiry__input:focus-visible {
+    outline: 2px solid var(--enquiry-accent, #1c1c1c);
+    outline-offset: -1px;
+  }
+
+  .enquiry__textarea {
+    resize: vertical;
+  }
+
+  .enquiry__consent {
+    margin: var(--margin-md) 0 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+    line-height: 1.5;
+  }
+
+  .enquiry__submit {
+    width: 100%;
+    margin-block-start: var(--margin-lg);
+    padding: var(--padding-md) var(--padding-xl);
+    border: none;
+    border-radius: 999px;
+    background-color: var(--enquiry-accent, #1c1c1c);
+    color: #ffffff;
+    font-size: var(--font-size--md);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .enquiry__success {
+    margin: 0;
+    font-size: var(--font-size--md);
+  }
+
+  .enquiry__errors {
+    margin-block-end: var(--margin-md);
+    color: #c0392b;
+    font-size: var(--font-size--sm);
+  }
+
+  @media screen and (max-width: 989px) {
+    .enquiry__inner {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--gap-xl);
+    }
+
+    .enquiry__panel {
+      padding: var(--padding-lg);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Enquiry form",
+  "tag": "section",
+  "class": "section-enquiry",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor id",
+      "default": "enquiry",
+      "info": "Point a hero or CTA button at #this-id to scroll here."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "Intro text"
+    },
+    {
+      "type": "text",
+      "id": "subject",
+      "label": "Email subject",
+      "info": "Sent as a hidden field so you can tell enquiry types apart in your inbox."
+    },
+    {
+      "type": "header",
+      "content": "Fields"
+    },
+    {
+      "type": "text",
+      "id": "name_label",
+      "label": "Name label",
+      "default": "Name"
+    },
+    {
+      "type": "text",
+      "id": "phone_label",
+      "label": "Phone label",
+      "default": "Phone"
+    },
+    {
+      "type": "text",
+      "id": "email_label",
+      "label": "Email label",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "message_label",
+      "label": "Message label",
+      "default": "Message"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit button",
+      "default": "Send enquiry"
+    },
+    {
+      "type": "richtext",
+      "id": "consent_text",
+      "label": "Consent note"
+    },
+    {
+      "type": "text",
+      "id": "success_text",
+      "label": "Success message",
+      "default": "Thanks — we will be in touch shortly."
+    },
+    {
+      "type": "header",
+      "content": "Direct contact"
+    },
+    {
+      "type": "text",
+      "id": "direct_label",
+      "label": "Direct contact label"
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "Phone number",
+      "info": "Leave blank to hide the row."
+    },
+    {
+      "type": "text",
+      "id": "email_address",
+      "label": "Email address",
+      "info": "Leave blank to hide the row."
+    },
+    {
+      "type": "header",
+      "content": "Layout and colors"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Button color",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "surface_color",
+      "label": "Form panel background",
+      "default": "#f6f6f6"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    }
+  ],
+  "presets": [{ "name": "Enquiry form" }]
+}
+{% endschema %}

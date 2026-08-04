@@ -1,0 +1,221 @@
+{% comment %}
+  A heading and one button on a tinted band.
+
+  Built to be placed several times on the same page — the designers page repeats
+  its call to action before the product carousel, after it, and again at the end
+  — so every string and colour is a setting and the section carries no identity
+  of its own.
+
+  The link is a plain text field rather than a url picker on purpose: the usual
+  destination here is an anchor on the same page, like `#enquiry`, which a url
+  picker will not offer.
+{% endcomment %}
+
+<div
+  class="section-background"
+  {% if section.settings.background_color != blank %}
+    style="background-color: {{ section.settings.background_color }};"
+  {% endif %}
+></div>
+
+<div
+  class="section section--{{ section.settings.section_width }} cta-band spacing-style"
+  style="
+    {% render 'spacing-padding', settings: section.settings %}
+    {% if section.settings.text_color != blank %}
+      --color-foreground: {{ section.settings.text_color }};
+      --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+    {% endif %}
+    --cta-band-button: {{ section.settings.button_background | default: '#1c1c1c' }};
+    --cta-band-button-text: {{ section.settings.button_text_color | default: '#ffffff' }};
+  "
+>
+  {% if section.settings.heading != blank or section.settings.button_label != blank %}
+    <div class="cta-band__inner cta-band__inner--{{ section.settings.alignment | default: 'center' }}">
+      <div class="cta-band__text">
+        {% if section.settings.heading != blank %}
+          <h2 class="cta-band__heading">{{ section.settings.heading }}</h2>
+        {% endif %}
+
+        {% if section.settings.subheading != blank %}
+          <p class="cta-band__subheading">{{ section.settings.subheading }}</p>
+        {% endif %}
+      </div>
+
+      {% if section.settings.button_label != blank %}
+        <a href="{{ section.settings.button_link | default: '#' }}" class="cta-band__button">
+          {{- section.settings.button_label -}}
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .cta-band__inner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-lg);
+  }
+
+  .cta-band__inner--center {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .cta-band__inner--space-between {
+    justify-content: space-between;
+    text-align: start;
+  }
+
+  .cta-band__text {
+    min-width: 0;
+  }
+
+  .cta-band__heading {
+    margin: 0;
+    font-size: var(--font-size--2xl);
+    line-height: var(--line-height--heading-tight);
+  }
+
+  .cta-band__subheading {
+    margin: var(--margin-2xs) 0 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+    font-size: var(--font-size--md);
+  }
+
+  .cta-band__button {
+    flex: 0 0 auto;
+    padding: var(--padding-md) var(--padding-2xl);
+    border-radius: 999px;
+    background-color: var(--cta-band-button, #1c1c1c);
+    color: var(--cta-band-button-text, #ffffff);
+    font-size: var(--font-size--md);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  @media screen and (max-width: 989px) {
+    .cta-band__inner {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--gap-md);
+      text-align: center;
+    }
+
+    .cta-band__heading {
+      font-size: var(--font-size--xl);
+    }
+
+    .cta-band__button {
+      text-align: center;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "CTA band",
+  "tag": "section",
+  "class": "section-cta-band",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "info": "Leave blank to hide the button."
+    },
+    {
+      "type": "text",
+      "id": "button_link",
+      "label": "Button link",
+      "info": "A full URL, or an anchor on this page such as #enquiry."
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "Alignment",
+      "options": [
+        { "value": "center", "label": "Centered" },
+        { "value": "space-between", "label": "Heading left, button right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Layout and colors"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Band background"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "presets": [{ "name": "CTA band" }]
+}
+{% endschema %}

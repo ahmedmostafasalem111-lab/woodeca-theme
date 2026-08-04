@@ -36,7 +36,12 @@
       {% endif %}
 
       {% if features.size > 0 %}
-        <div class="showcase-why__grid">
+        {%- comment -%}
+          `mobile_layout` is opt-in and defaults to the grid, so every existing
+          placement of this section keeps the layout it already had. The carousel
+          variant only changes behaviour below the mobile breakpoint.
+        {%- endcomment -%}
+        <div class="showcase-why__grid showcase-why__grid--mobile-{{ section.settings.mobile_layout | default: 'grid' }}">
           {% for block in features %}
             <div class="why-feature" {{ block.shopify_attributes }}>
               <span class="svg-wrapper why-feature__icon" aria-hidden="true">
@@ -155,7 +160,33 @@
   }
 
   @media screen and (max-width: 989px) {
-    .showcase-why__grid {
+    /*
+      One card plus a peek of the next, swiped rather than stacked. Uses the same
+      native scroll-snap mechanic as the other rows on the site — no library, and
+      the dots below are the affordance.
+    */
+    .showcase-why__grid--mobile-carousel {
+      display: flex;
+      grid-template-columns: none;
+      gap: var(--gap-md);
+      margin-inline: calc(var(--page-margin, 16px) * -1);
+      padding-inline: var(--page-margin, 16px);
+      scroll-padding-inline-start: var(--page-margin, 16px);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .showcase-why__grid--mobile-carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .showcase-why__grid--mobile-carousel > .why-feature {
+      flex: 0 0 calc(100% - 22%);
+      scroll-snap-align: start;
+    }
+
+    .showcase-why__grid--mobile-grid {
       /* Two per row on tablet and phone, same stacking order. */
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--gap-lg);
@@ -229,6 +260,17 @@
       "max": 6,
       "step": 1,
       "default": 4
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
+      "options": [
+        { "value": "grid", "label": "Two per row" },
+        { "value": "carousel", "label": "Swipeable row" }
+      ],
+      "default": "grid",
+      "info": "A swipeable row suits longer value propositions; two per row suits short badges."
     },
     {
       "type": "range",

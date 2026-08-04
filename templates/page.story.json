@@ -1,0 +1,113 @@
+{
+  "sections": {
+    "hero": {
+      "type": "showcase-hero",
+      "blocks": {
+        "slide_1": {
+          "type": "slide",
+          "settings": {
+            "eyebrow": "",
+            "heading": "",
+            "subheading": "",
+            "link_text": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": ["slide_1"],
+      "settings": {
+        "carousel_label": "Page hero",
+        "height": 560,
+        "height_mobile": 440,
+        "heading_size": "var(--font-size--5xl)",
+        "autoplay": false,
+        "show_arrows": false,
+        "show_dots": false,
+        "section_width": "full-width",
+        "text_color": "#ffffff",
+        "overlay_color": "#000000",
+        "overlay_opacity": 35
+      }
+    },
+    "problem": {
+      "type": "showcase-media-promo",
+      "settings": {
+        "show_section": true,
+        "media_position": "start",
+        "image_ratio": "4 / 3",
+        "eyebrow": "",
+        "heading": "",
+        "body": "",
+        "button_label": "",
+        "section_width": "page-width",
+        "padding-block-start": 56,
+        "padding-block-end": 24
+      }
+    },
+    "answer": {
+      "type": "showcase-media-promo",
+      "settings": {
+        "show_section": true,
+        "media_position": "end",
+        "image_ratio": "4 / 3",
+        "eyebrow": "",
+        "heading": "",
+        "body": "",
+        "button_label": "",
+        "section_width": "page-width",
+        "padding-block-start": 24,
+        "padding-block-end": 56
+      }
+    },
+    "reasons": {
+      "type": "showcase-why",
+      "blocks": {
+        "reason_1": { "type": "feature", "settings": { "icon": "store", "title": "", "description": "" } },
+        "reason_2": { "type": "feature", "settings": { "icon": "card", "title": "", "description": "" } },
+        "reason_3": { "type": "feature", "settings": { "icon": "shield", "title": "", "description": "" } },
+        "reason_4": { "type": "feature", "settings": { "icon": "truck", "title": "", "description": "" } },
+        "reason_5": { "type": "feature", "settings": { "icon": "star", "title": "", "description": "" } }
+      },
+      "block_order": ["reason_1", "reason_2", "reason_3", "reason_4", "reason_5"],
+      "settings": {
+        "heading": "",
+        "columns": 5,
+        "mobile_layout": "carousel",
+        "show_mission": false,
+        "section_width": "page-width",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    },
+    "values": {
+      "type": "showcase-media-promo",
+      "settings": {
+        "show_section": false,
+        "media_position": "start",
+        "image_ratio": "3 / 2",
+        "eyebrow": "",
+        "heading": "",
+        "body": "",
+        "button_label": "",
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "closing": {
+      "type": "showcase-cta-band",
+      "settings": {
+        "heading": "",
+        "subheading": "",
+        "button_label": "",
+        "button_link": "",
+        "alignment": "center",
+        "section_width": "page-width",
+        "background_color": "#f6f6f6",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    }
+  },
+  "order": ["hero", "problem", "answer", "reasons", "values", "closing"]
+}
