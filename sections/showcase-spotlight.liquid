@@ -10,6 +10,27 @@
   # scroll inside a box that tracks it. Falls back to a landscape ratio when no
   # image is picked and the placeholder SVG is shown instead.
   assign spotlight_ratio = section.settings.image.aspect_ratio | default: 1.45
+
+  # Mobile used to hardcode a square, which threw away the ratio above and left
+  # the banner noticeably taller than the reference. 'auto' now keeps the image's
+  # own proportion, exactly as desktop does; the presets are for a deliberately
+  # different mobile crop.
+  assign mobile_ratio = spotlight_ratio
+  case section.settings.mobile_image_ratio
+    when '1/1'
+      assign mobile_ratio = 1
+    when '4/3'
+      assign mobile_ratio = 1.3333
+    when '3/2'
+      assign mobile_ratio = 1.5
+    when '16/9'
+      assign mobile_ratio = 1.7778
+  endcase
+
+  # Overlap is a share of the banner's height, not a fixed pixel pull, so the
+  # cards sit at the same point on the photo at every phone width. The banner is
+  # full-bleed, so its height is 100vw ÷ ratio.
+  assign overlap_percent = section.settings.mobile_overlap | default: -12
 %}
 
 <div
@@ -33,14 +54,20 @@
     --spotlight-cta-text: {{ section.settings.cta_text_color | default: '#ffffff' }};
     --spotlight-thumb-background: {{ section.settings.thumb_background | default: '#f2f2f0' }};
     --spotlight-image-ratio: {{ spotlight_ratio }};
+    --spotlight-mobile-ratio: {{ mobile_ratio }};
     --spotlight-image-position: {{ section.settings.image_position | default: '50% 50%' }};
-    --spotlight-overlap: {{ section.settings.mobile_overlap | default: 0 }}px;
+    {%- comment -%}
+      Resolved here rather than in the stylesheet so the percentage and the ratio
+      meet in one place: a share of the banner's height, where the banner is
+      full-bleed and therefore 100vw wide.
+    {%- endcomment -%}
+    --spotlight-overlap: calc({{ overlap_percent }} / 100 * 100vw / {{ mobile_ratio }});
     {%- comment -%}
       Two separate variables, each declared exactly once and read by exactly one
       breakpoint. A single variable re-declared per breakpoint meant the inner
       list's value shadowed the section's for the item that reads it.
     {%- endcomment -%}
-    --spotlight-card-width: {{ section.settings.mobile_card_width | default: 43 }}%;
+    --spotlight-card-width: {{ section.settings.mobile_card_width | default: 37 }}%;
     --spotlight-card-width-tablet: {{ section.settings.tablet_card_width | default: 32 }}%;
   "
 >
@@ -135,14 +162,18 @@
               {% endif %}
             </div>
 
+            {%- comment -%}
+              Price leads, then the name — the reference's order, and the one
+              that puts the number where the eye lands first in a scrolling row.
+            {%- endcomment -%}
             <div class="spotlight-item__info">
+              <p class="spotlight-item__price">{{ item_price }}</p>
               <a
                 href="{{ item_url }}"
                 class="spotlight-item__title"
               >
                 {{- item_title -}}
               </a>
-              <p class="spotlight-item__price">{{ item_price }}</p>
 
               {% if section.settings.add_to_cart_label != blank %}
                 {% if item_variant_id != null %}
@@ -288,9 +319,16 @@
     so however many products the merchant adds — 4 or 12 — the box stays the height of
     the photo and the overflow scrolls instead of squeezing the cards.
   */
+  /*
+    `min-width: 0` matters as much as the height one: as a grid item this column
+    defaults to `min-width: auto`, which refuses to shrink below the card row's
+    content width. The `1fr` track then blew out past the section — 638px inside
+    a 486px section — taking the progress bar's percentage width with it.
+  */
   .showcase-spotlight__list-column {
     position: relative;
     min-height: 0;
+    min-width: 0;
   }
 
   .showcase-spotlight__list {
@@ -580,19 +618,21 @@
       height. 56vw is ~210px at 375px wide.
     */
     /*
-      Square on mobile, matching the reference. The image is absolutely positioned
-      so it contributes no height — with `height: 100%` in normal flow it resolves
-      against an indefinite parent, falls back to the photo's natural height and
-      overrides the aspect-ratio, which is what produced the wide letterbox strip.
+      Landscape, from the picked image's own ratio — the square this used to
+      hardcode discarded that setting and made the banner far taller than the
+      reference. The image is absolutely positioned so it contributes no height:
+      with `height: 100%` in normal flow it resolves against an indefinite parent,
+      falls back to the photo's natural height and overrides the aspect-ratio,
+      which is what produced the wide letterbox strip.
     */
     .showcase-spotlight__media {
       position: relative;
       min-height: 0;
       max-height: none;
       height: auto;
-      aspect-ratio: 1 / 1;
+      aspect-ratio: var(--spotlight-mobile-ratio, 1.45);
       align-self: start;
-      /* Cancels the page gutter so the square reaches both edges. */
+      /* Cancels the page gutter so the banner reaches both edges. */
       margin-inline: calc(var(--page-margin, 16px) * -1);
       border-radius: 0;
       overflow: hidden;
@@ -610,15 +650,23 @@
     }
 
     /*
-      Flush against the image bottom by default, so the two read as one block.
-      The overlap setting can pull the row up over the photo's lower edge.
+      The row is pulled up over the photo's lower edge by `--spotlight-overlap`;
+      `position: relative` with a raised z-index is what lets the opaque cards
+      paint on top of it rather than under.
+
+      The rail bleeds to both edges like the banner, but keeps a gutter's worth of
+      inline padding so the first card still lines up with the heading above it.
+      Cards then scroll out under the screen edges instead of stopping short of
+      them. `scroll-padding` keeps that alignment when a card snaps back.
     */
     .showcase-spotlight__list {
       position: relative;
       z-index: 1;
-      gap: 9px;
+      gap: 18px;
       margin-block-start: var(--spotlight-overlap, 0px);
-      padding-inline: 0;
+      margin-inline: calc(var(--page-margin, 16px) * -1);
+      padding-inline: var(--page-margin, 16px);
+      scroll-padding-inline-start: var(--page-margin, 16px);
       padding-block-end: 0;
       overscroll-behavior-x: contain;
       scrollbar-width: none;
@@ -716,12 +764,22 @@
       outline-offset: 1px;
     }
 
-    /* Matches the reference's small centred indicator. */
+    /*
+      A proportional scrollbar spanning most of the viewport, not a fixed stub —
+      the thumb is already sized and positioned from the scroll fraction by
+      showcase-spotlight-progress.js, so the track just needs the room to show it.
+    */
     .showcase-spotlight__progress {
       display: block;
-      width: 62px;
-      height: 4px;
-      margin-block-start: 12px;
+      /*
+        A share of the viewport, not of the column, so it matches the reference's
+        proportion regardless of the page gutter. Capped at the column width so
+        it can never be the thing that overflows.
+      */
+      width: min(87vw, 100%);
+      max-width: none;
+      height: 3px;
+      margin-block-start: 14px;
     }
 
     .showcase-spotlight__cta {
@@ -789,7 +847,21 @@
         { "value": "100% 100%", "label": "Bottom right" }
       ],
       "default": "50% 50%",
-      "info": "Which part of the photo to keep when the mobile square crops it."
+      "info": "Which part of the photo to keep when the mobile banner crops it."
+    },
+    {
+      "type": "select",
+      "id": "mobile_image_ratio",
+      "label": "Banner shape on phones",
+      "options": [
+        { "value": "auto", "label": "Match the image" },
+        { "value": "16/9", "label": "Wide (16:9)" },
+        { "value": "3/2", "label": "Landscape (3:2)" },
+        { "value": "4/3", "label": "Landscape (4:3)" },
+        { "value": "1/1", "label": "Square" }
+      ],
+      "default": "auto",
+      "info": "\"Match the image\" uses the picked photo's own proportions, as the desktop banner does."
     },
     {
       "type": "range",
@@ -799,8 +871,8 @@
       "max": 60,
       "step": 1,
       "unit": "%",
-      "default": 43,
-      "info": "Percentage of the row width. Around 43 shows two cards plus a peek of the third."
+      "default": 37,
+      "info": "Percentage of the row width. Around 37 shows two cards plus a clear peek of the third."
     },
     {
       "type": "range",
@@ -817,12 +889,12 @@
       "type": "range",
       "id": "mobile_overlap",
       "label": "Overlap product row onto image",
-      "min": -60,
+      "min": -30,
       "max": 0,
-      "step": 4,
-      "unit": "px",
-      "default": 0,
-      "info": "Mobile only. 0 sits the cards flush against the image; negative pulls them over it."
+      "step": 1,
+      "unit": "%",
+      "default": -12,
+      "info": "Mobile only, as a share of the banner's height, so it holds at every phone width. 0 sits the cards flush against the image; negative pulls them over it."
     },
     {
       "type": "range",
