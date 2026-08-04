@@ -1,0 +1,305 @@
+{% doc %}
+  Full-screen mobile search.
+
+  Replaces the old disclosure panel, which dropped a bar over the page and left
+  the page behind it competing for attention. This takes over the viewport: field
+  at the top, suggestions and live results beneath.
+
+  Results come from Shopify's own `/search/suggest` endpoint, so there is no
+  second index to keep in sync and no third-party search library. Merchant-set
+  popular queries show until the shopper types.
+
+  @param {object} section - The header section, for placeholder and query settings.
+
+  @example
+  {% render 'showcase-search-overlay', section: section %}
+{% enddoc %}
+
+{% assign popular_queries = section.settings.popular_queries | split: ',' %}
+
+<button
+  type="button"
+  class="showcase-header__icon-button showcase-search-overlay__trigger"
+  data-search-open
+  aria-expanded="false"
+  aria-controls="SearchOverlay-{{ section.id }}"
+  aria-label="{{ section.settings.search_submit_label | default: 'Search' | escape }}"
+>
+  <span class="svg-wrapper" aria-hidden="true">
+    {{- 'icon-search.svg' | inline_asset_content -}}
+  </span>
+</button>
+
+<div
+  class="search-overlay"
+  id="SearchOverlay-{{ section.id }}"
+  data-search-overlay
+  data-search-suggest-url="{{ routes.predictive_search_url | default: '/search/suggest' }}"
+  data-empty-text="{{ section.settings.search_empty_text | default: 'No matches yet. Try a different word.' | escape }}"
+  hidden
+>
+  <div class="search-overlay__bar">
+    <form
+      action="{{ routes.search_url }}"
+      method="get"
+      role="search"
+      class="search-overlay__form"
+    >
+      <span class="svg-wrapper search-overlay__glass" aria-hidden="true">
+        {{- 'icon-search.svg' | inline_asset_content -}}
+      </span>
+      <label class="visually-hidden" for="SearchOverlayInput-{{ section.id }}">
+        {{- section.settings.search_placeholder | default: 'Search' -}}
+      </label>
+      <input
+        type="search"
+        id="SearchOverlayInput-{{ section.id }}"
+        name="q"
+        class="search-overlay__input"
+        placeholder="{{ section.settings.search_placeholder | escape }}"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+        data-search-input
+      >
+      <input type="hidden" name="options[prefix]" value="last">
+    </form>
+
+    <button
+      type="button"
+      class="search-overlay__close"
+      data-search-close
+      aria-label="{{ section.settings.search_close_label | default: 'Close search' | escape }}"
+    >
+      <span class="svg-wrapper" aria-hidden="true">
+        {{- 'icon-close.svg' | inline_asset_content -}}
+      </span>
+    </button>
+  </div>
+
+  <div class="search-overlay__body">
+    {% if popular_queries.size > 0 %}
+      <div class="search-overlay__popular" data-search-popular>
+        {% if section.settings.popular_heading != blank %}
+          <h2 class="search-overlay__heading">{{ section.settings.popular_heading }}</h2>
+        {% endif %}
+        <ul class="search-overlay__chips" role="list">
+          {% for query in popular_queries %}
+            {% assign trimmed = query | strip %}
+            {% if trimmed != blank %}
+              <li>
+                <a
+                  href="{{ routes.search_url }}?q={{ trimmed | url_encode }}"
+                  class="search-overlay__chip"
+                >
+                  {{- trimmed -}}
+                </a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {%- comment -%}
+      Filled by the suggest endpoint. `aria-live` is polite so a screen reader
+      announces the count once the shopper stops typing rather than per keystroke.
+    {%- endcomment -%}
+    <div
+      class="search-overlay__results"
+      data-search-results
+      aria-live="polite"
+      aria-busy="false"
+    ></div>
+  </div>
+</div>
+
+{% stylesheet %}
+  /* Trigger is the mobile-only magnifier; desktop keeps its inline search bar. */
+  .showcase-search-overlay__trigger {
+    display: none;
+  }
+
+  .search-overlay[hidden] {
+    display: none;
+  }
+
+  .search-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2147482500;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-background, #ffffff);
+    opacity: 0;
+    transition: opacity 160ms var(--animation-easing, ease);
+  }
+
+  .search-overlay--open {
+    opacity: 1;
+  }
+
+  .search-overlay__bar {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    flex: 0 0 auto;
+    padding: var(--padding-sm) var(--page-margin, 16px);
+    border-block-end: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    /* Clears the notch when the overlay covers the status bar. */
+    padding-block-start: calc(var(--padding-sm) + env(safe-area-inset-top, 0px));
+  }
+
+  .search-overlay__form {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-overlay__glass {
+    position: absolute;
+    inset-inline-start: 12px;
+    display: flex;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    pointer-events: none;
+  }
+
+  .search-overlay__glass svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .search-overlay__input {
+    width: 100%;
+    height: 42px;
+    padding-inline: 38px var(--padding-sm);
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-15));
+    border-radius: 999px;
+    background-color: var(--showcase-search-background, #f2f2f0);
+    color: var(--color-foreground);
+    font-size: 16px; /* Below 16px iOS zooms the page on focus. */
+  }
+
+  .search-overlay__input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .search-overlay__close {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-foreground);
+    cursor: pointer;
+  }
+
+  .search-overlay__close svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .search-overlay__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: var(--padding-md) var(--page-margin, 16px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .search-overlay__heading {
+    margin: 0 0 var(--margin-2xs);
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+  }
+
+  .search-overlay__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-2xs);
+    margin: 0 0 var(--margin-lg);
+    padding: 0;
+    list-style: none;
+  }
+
+  .search-overlay__chip {
+    display: inline-flex;
+    padding: 6px 14px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-15));
+    border-radius: 999px;
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    text-decoration: none;
+  }
+
+  .search-overlay__result {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    padding-block: var(--padding-2xs);
+    color: var(--color-foreground);
+    text-decoration: none;
+  }
+
+  .search-overlay__result + .search-overlay__result {
+    border-block-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-8));
+  }
+
+  .search-overlay__result-image {
+    flex: 0 0 auto;
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5));
+    object-fit: contain;
+  }
+
+  .search-overlay__result-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .search-overlay__result-title {
+    font-size: var(--font-size--sm);
+    /* Long furniture names must not push the price off the row. */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .search-overlay__result-price {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+  }
+
+  .search-overlay__empty {
+    padding-block: var(--padding-lg);
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--sm);
+    text-align: center;
+  }
+
+  .search-overlay-locked {
+    overflow: hidden;
+  }
+
+  @media screen and (max-width: 989px) {
+    .showcase-search-overlay__trigger {
+      display: flex;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .search-overlay {
+      transition: none;
+    }
+  }
+{% endstylesheet %}

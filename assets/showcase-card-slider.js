@@ -1,8 +1,9 @@
 /**
- * Image paging for the showcase product card.
+ * Image paging and colour swapping for the showcase product card.
  *
- * The track is a native scroll-snap container, so mobile swiping needs no JS at
- * all — this only drives the desktop arrows and keeps the dots in step.
+ * The track is a native scroll-snap container, so swiping needs no JavaScript at
+ * all — there are no arrow buttons, and this file only keeps the dots in step
+ * with the scroll position and handles the colour swatches.
  *
  * Delegated from the document so cards added by the collection grid's "Show more"
  * work without re-binding.
@@ -23,38 +24,57 @@ function syncDots(media) {
 }
 
 /**
- * @param {Element} media
- * @param {number} direction -1 for previous, 1 for next
+ * Points the card's lead photo at the chosen colour.
+ *
+ * Only the first image is swapped: the rest of the slider is the product's full
+ * gallery, which is not per-colour, so rewriting all of it would misrepresent
+ * the other shots. The track is rewound so the swapped image is the one on show.
+ *
+ * @param {HTMLElement} swatch
  */
-function page(media, direction) {
+function applySwatch(swatch) {
+  const card = swatch.closest('.showcase-card');
+  const media = card?.querySelector('.showcase-card__media');
+  if (!media) return;
+
+  const image = media.querySelector('img.showcase-card__image');
+  const src = swatch.dataset.swatchImage;
+
+  if (image instanceof HTMLImageElement && src) {
+    // srcset would otherwise win over the new src at the current viewport.
+    image.removeAttribute('srcset');
+    image.src = src;
+  }
+
   const track = media.querySelector('[data-card-slides]');
-  if (!(track instanceof HTMLElement)) return;
+  if (track instanceof HTMLElement) {
+    track.scrollTo({ left: 0, behavior: 'auto' });
+    syncDots(media);
+  }
 
-  const width = track.clientWidth || 1;
-  const count = track.children.length;
-  const current = Math.round(track.scrollLeft / width);
-  // Wrap, so paging past either end continues rather than dead-ending.
-  const next = (current + direction + count) % count;
+  for (const sibling of swatch.parentElement?.querySelectorAll('[data-card-swatch]') ?? []) {
+    sibling.setAttribute('aria-pressed', String(sibling === swatch));
+  }
 
-  track.scrollTo({ left: next * width, behavior: 'smooth' });
+  // The quick-add button posts a variant id, so it has to follow the colour.
+  const variantId = swatch.dataset.swatchVariant;
+  const quickAdd = card?.querySelector('[data-cart-add]');
+  if (quickAdd instanceof HTMLElement && variantId) quickAdd.dataset.variantId = variantId;
 }
 
 document.addEventListener('click', (event) => {
   const target = /** @type {HTMLElement | null} */ (event.target);
-  const control = target?.closest?.('[data-card-slide-prev], [data-card-slide-next]');
-  if (!control) return;
+  const swatch = target?.closest?.('[data-card-swatch]');
+  if (!(swatch instanceof HTMLElement)) return;
 
-  const media = control.closest('.showcase-card__media');
-  if (!media) return;
-
-  // The slides are links; paging must never navigate to the product page.
+  // The swatch sits inside the card's link region on some layouts.
   event.preventDefault();
   event.stopPropagation();
 
-  page(media, control.hasAttribute('data-card-slide-next') ? 1 : -1);
+  applySwatch(swatch);
 });
 
-// Scroll fires for both arrow paging and touch swiping, so one listener covers both.
+// Scroll fires for touch swiping and for the programmatic rewind above.
 document.addEventListener(
   'scroll',
   (event) => {

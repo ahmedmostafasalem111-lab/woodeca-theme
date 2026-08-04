@@ -201,28 +201,11 @@
         {% endfor %}
       </div>
 
-      <button
-        type="button"
-        class="showcase-card__slide-arrow showcase-card__slide-arrow--prev"
-        data-card-slide-prev
-        aria-label="Previous image of {{ card_title | escape }}"
-      >
-        <span class="svg-wrapper" aria-hidden="true">
-          {{- 'icon-chevron-left.svg' | inline_asset_content -}}
-        </span>
-      </button>
-
-      <button
-        type="button"
-        class="showcase-card__slide-arrow showcase-card__slide-arrow--next"
-        data-card-slide-next
-        aria-label="Next image of {{ card_title | escape }}"
-      >
-        <span class="svg-wrapper" aria-hidden="true">
-          {{- 'icon-chevron-right.svg' | inline_asset_content -}}
-        </span>
-      </button>
-
+      {%- comment -%}
+        Dots only. The track is a native scroll-snap container, so swiping needs
+        no JavaScript and no arrow buttons — the dots are the whole affordance,
+        and they stay visible rather than appearing on hover.
+      {%- endcomment -%}
       <div class="showcase-card__slide-dots" data-card-slide-dots aria-hidden="true">
         {% for slide_image in card_slider_images %}
           <span class="showcase-card__slide-dot{% if forloop.first %} showcase-card__slide-dot--active{% endif %}"></span>
@@ -258,7 +241,7 @@
         aria-label="Add {{ card_title | escape }} to wishlist"
       >
         <span class="svg-wrapper" aria-hidden="true">
-          {{- 'icon-heart.svg' | inline_asset_content -}}
+          {{- 'icon-heart-thin.svg' | inline_asset_content -}}
         </span>
       </button>
     {% endif %}
@@ -319,16 +302,58 @@
     {% if colour_option != null %}
       <div class="showcase-card__swatches">
         {% for option_value in colour_option.values limit: swatch_limit %}
-          <span class="showcase-card__swatch">
+          {%- comment -%}
+            Three sources, in descending order of fidelity:
+              1. the swatch Shopify holds against the option value,
+              2. the matching variant's own photo, cropped into the circle,
+              3. a neutral disc, only when a value has neither.
+
+            Source 2 is what makes these render at all in this store — no option
+            value here has swatch data, but every variant has an image. It also
+            supplies the image the card swaps to when the swatch is pressed.
+          {%- endcomment -%}
+          {% liquid
+            assign swatch_variant = null
+            for candidate in product.variants
+              if candidate.title == option_value.name or candidate.options contains option_value.name
+                if swatch_variant == null
+                  assign swatch_variant = candidate
+                endif
+              endif
+            endfor
+
+            assign swatch_image = swatch_variant.featured_image
+            assign swap_src = null
+            if swatch_image != blank
+              assign swap_src = swatch_image | image_url: width: 600
+            endif
+          %}
+          <button
+            type="button"
+            class="showcase-card__swatch"
+            data-card-swatch
+            {% if swap_src != blank %}
+              data-swatch-image="{{ swap_src }}"
+            {% endif %}
+            {% if swatch_variant != null %}
+              data-swatch-variant="{{ swatch_variant.id }}"
+            {% endif %}
+            aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+            title="{{ option_value.name | escape }}"
+            aria-label="{{ option_value.name | escape }}"
+          >
             {% if option_value.swatch != blank %}
               {% render 'swatch', swatch: option_value.swatch, mode: 'unscaled', label: option_value.name %}
+            {% elsif swatch_image != blank %}
+              {{
+                swatch_image
+                | image_url: width: 80
+                | image_tag: loading: 'lazy', class: 'showcase-card__swatch-img', alt: ''
+              }}
             {% else %}
-              <span
-                class="showcase-card__swatch-fallback"
-                title="{{ option_value.name | escape }}"
-              ></span>
+              <span class="showcase-card__swatch-fallback"></span>
             {% endif %}
-          </span>
+          </button>
         {% endfor %}
 
         {% if swatch_overflow > 0 %}
@@ -433,102 +458,51 @@
     scroll-snap-align: start;
   }
 
-  .showcase-card__slide-arrow {
-    position: absolute;
-    top: 50%;
-    translate: 0 -50%;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border: none;
-    border-radius: 50%;
-    background-color: rgb(255 255 255 / 0.85);
-    color: var(--color-foreground);
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity var(--animation-speed) var(--animation-easing);
-  }
-
-  .showcase-card__slide-arrow--prev {
-    inset-inline-start: var(--padding-2xs);
-  }
-
-  .showcase-card__slide-arrow--next {
-    inset-inline-end: var(--padding-2xs);
-  }
-
-  .showcase-card__slide-arrow .svg-wrapper,
-  .showcase-card__slide-arrow svg {
-    width: var(--icon-size-xs);
-    height: var(--icon-size-xs);
-  }
-
-  /* Arrows only on real pointers, and only while the card is hovered. */
-  @media (hover: hover) and (pointer: fine) {
-    .showcase-card:hover .showcase-card__slide-arrow {
-      opacity: 1;
-    }
-  }
-
+  /*
+    Dots are the only slider control and are always visible — they double as the
+    "there are more photos" hint, which a hover-revealed control cannot do on a
+    touchscreen. Nothing here changes size on interaction.
+  */
   .showcase-card__slide-dots {
     position: absolute;
     inset-inline: 0;
-    bottom: var(--padding-2xs);
+    bottom: 8px;
     z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    opacity: 0;
-    transition: opacity var(--animation-speed) var(--animation-easing);
+    gap: 5px;
   }
 
   .showcase-card__slide-dot {
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-30));
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-25));
+    transition: background-color var(--animation-speed) var(--animation-easing);
   }
 
   .showcase-card__slide-dot--active {
     background-color: var(--color-foreground);
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .showcase-card:hover .showcase-card__slide-dots {
-      opacity: 1;
-    }
-  }
-
-  /* No hover on touch, so dots stay visible as the swipe affordance. */
-  @media (hover: none), (pointer: coarse) {
-    .showcase-card__slide-dots {
-      opacity: 1;
-    }
-
-    .showcase-card__slide-arrow {
-      display: none;
-    }
-  }
-
   /*
-    Product photo is inset so it reads as a catalogue shot rather than a bleed image.
-    92% is 15% larger than the previous 80%; the media box itself is unchanged.
+    The photo fills its tile, as on the reference card, with only enough inset to
+    keep the product clear of the dots and the heart. `contain` still means a
+    portrait and a landscape shot sit at the same optical size.
   */
   .showcase-card__image {
-    width: 92%;
-    height: 92%;
+    width: 100%;
+    height: 100%;
+    padding: 6% 6% 10%;
     object-fit: contain;
     mix-blend-mode: multiply;
   }
 
   .showcase-card__image--placeholder {
-    width: 92%;
-    height: 92%;
+    width: 100%;
+    height: 100%;
+    padding: 6%;
     fill: rgb(var(--color-foreground-rgb) / var(--opacity-20));
   }
 
@@ -545,10 +519,16 @@
     white-space: nowrap;
   }
 
+  /*
+    Pulled tight into the top-right corner. The touch target stays at the full
+    44px for accessibility, so the offsets are negative — the box overhangs the
+    tile while the glyph itself sits where the reference puts it.
+  */
   .showcase-card__wishlist {
     position: absolute;
-    top: var(--padding-2xs);
-    right: var(--padding-2xs);
+    top: -2px;
+    right: -2px;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -563,8 +543,8 @@
 
   .showcase-card__wishlist .svg-wrapper,
   .showcase-card__wishlist svg {
-    width: var(--icon-size-md);
-    height: var(--icon-size-md);
+    width: 21px;
+    height: 21px;
   }
 
   .showcase-card__quick-add {
@@ -572,15 +552,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     border: none;
     border-radius: 50%;
     background-color: var(--showcase-card-quick-add-background, var(--color-foreground));
     color: var(--showcase-card-quick-add-icon, var(--color-background));
     cursor: pointer;
-    transition: transform var(--animation-speed) var(--animation-timing-bounce);
+    transition:
+      transform var(--animation-speed) var(--animation-timing-bounce),
+      background-color var(--animation-speed) var(--animation-easing);
   }
 
   .showcase-card__quick-add:hover {
@@ -589,8 +571,8 @@
 
   .showcase-card__quick-add .svg-wrapper,
   .showcase-card__quick-add svg {
-    width: var(--icon-size-sm);
-    height: var(--icon-size-sm);
+    width: 15px;
+    height: 15px;
   }
 
   /* Both icons are rendered; the state class decides which one shows. */
@@ -603,8 +585,20 @@
     display: flex;
   }
 
+  /*
+    Confirmed state: a solid green disc with a heavier tick, so it reads at
+    32px. The stroke is set here rather than inherited, because the shared
+    icon uses the theme's thin default.
+  */
   .showcase-card__quick-add--added {
-    background-color: var(--showcase-card-quick-add-added-background, #2e7d32);
+    background-color: var(--showcase-card-quick-add-added-background, #22a45d);
+    color: #ffffff;
+  }
+
+  .showcase-card__quick-add--added svg {
+    width: 17px;
+    height: 17px;
+    stroke-width: 2.4;
   }
 
   .showcase-card__quick-add--busy {
@@ -763,9 +757,22 @@
   .showcase-card__swatch {
     display: inline-flex;
     flex: 0 0 auto;
-    width: var(--showcase-card-swatch-size, 18px);
-    height: var(--showcase-card-swatch-size, 18px);
-    --swatch-size: var(--showcase-card-swatch-size, 18px);
+    width: var(--showcase-card-swatch-size, 20px);
+    height: var(--showcase-card-swatch-size, 20px);
+    --swatch-size: var(--showcase-card-swatch-size, 20px);
+
+    padding: 0;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-15));
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    overflow: hidden;
+    transition: box-shadow var(--animation-speed) var(--animation-easing);
+  }
+
+  /* Ring sits outside the circle so it never crops the colour underneath. */
+  .showcase-card__swatch[aria-pressed='true'] {
+    box-shadow: 0 0 0 2px var(--color-background), 0 0 0 3px var(--color-foreground);
   }
 
   /* Pin the shared swatch snippet to the same diameter regardless of its own sizing. */
@@ -776,12 +783,18 @@
     min-height: 0;
   }
 
+  /* Variant photo standing in for a colour chip: crop to fill, never letterbox. */
+  .showcase-card__swatch-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
   .showcase-card__swatch-fallback {
     display: block;
-    width: 16px;
-    height: 16px;
-    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
-    border-radius: 50%;
+    width: 100%;
+    height: 100%;
     background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10));
   }
 

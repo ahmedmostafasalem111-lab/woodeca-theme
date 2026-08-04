@@ -1,0 +1,744 @@
+{% comment %}
+  Slide-in cart.
+
+  Rendered on every page from the footer group, which is also what makes it
+  re-renderable: quantity changes post to /cart/change.js and then pull this
+  section back through the Section Rendering API, so the line prices, subtotal
+  and recommendations all come from Liquid. Nothing here formats money in
+  JavaScript, and the drawer never closes to refresh itself.
+
+  Full viewport width on mobile, a panel on desktop.
+{% endcomment %}
+
+{% liquid
+  assign has_items = false
+  if cart.item_count > 0
+    assign has_items = true
+  endif
+
+  # Recommendations are seeded from the first line's product, which is the only
+  # cart-related product Liquid can reach without a request.
+  assign seed = cart.items.first.product
+%}
+
+<div
+  class="cart-drawer"
+  id="CartDrawer"
+  data-cart-drawer
+  data-countdown-minutes="{{ section.settings.countdown_minutes | default: 10 }}"
+  style="
+    --cart-accent: {{ section.settings.accent_color | default: '#e8342a' }};
+    --cart-continue-background: {{ section.settings.continue_color | default: '#1c1c1c' }};
+  "
+  hidden
+>
+  <div class="cart-drawer__overlay" data-cart-close></div>
+
+  <div
+    class="cart-drawer__panel"
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ section.settings.heading | default: 'Your cart' | escape }}"
+  >
+    {%- comment -%} 1 — Header {%- endcomment -%}
+    <div class="cart-drawer__head">
+      <h2 class="cart-drawer__title">
+        {{ section.settings.heading | default: 'Your cart' }}
+        <span class="cart-drawer__count">({{ cart.item_count }})</span>
+      </h2>
+      <button
+        type="button"
+        class="cart-drawer__close"
+        data-cart-close
+        aria-label="{{ section.settings.close_label | default: 'Close cart' | escape }}"
+      >
+        <span class="svg-wrapper" aria-hidden="true">
+          {{- 'icon-close.svg' | inline_asset_content -}}
+        </span>
+      </button>
+    </div>
+
+    {%- comment -%}
+      2 — Urgency banner. Rendered only when there is something to lose, and the
+      countdown itself is written by the script so the markup carries no stale
+      time from a cached render.
+    {%- endcomment -%}
+    {% if section.settings.show_countdown and has_items %}
+      <p class="cart-urgency">
+        <span class="svg-wrapper cart-urgency__icon" aria-hidden="true">
+          {{- 'icon-fire.svg' | inline_asset_content -}}
+        </span>
+        <span>
+          {{ section.settings.countdown_text | default: 'Products are limited, checkout within' }}
+          <strong data-cart-countdown>—</strong>
+        </span>
+      </p>
+    {% endif %}
+
+    <div class="cart-drawer__body">
+      {% if has_items %}
+        {%- comment -%} 3 — Line items {%- endcomment -%}
+        <ul class="cart-lines" role="list">
+          {% for line in cart.items %}
+            <li class="cart-line" data-cart-line="{{ forloop.index }}">
+              <a href="{{ line.url }}" class="cart-line__media">
+                {% if line.image != blank %}
+                  {{
+                    line.image
+                    | image_url: width: 200
+                    | image_tag: loading: 'lazy', class: 'cart-line__image', alt: line.title
+                  }}
+                {% endif %}
+              </a>
+
+              <div class="cart-line__detail">
+                <div class="cart-line__top">
+                  <a href="{{ line.url }}" class="cart-line__title">{{ line.product.title }}</a>
+                  <button
+                    type="button"
+                    class="cart-line__remove"
+                    data-cart-remove
+                    data-line="{{ forloop.index }}"
+                    aria-label="{{ section.settings.remove_label | default: 'Remove' | escape }} {{ line.product.title | escape }}"
+                  >
+                    <span class="svg-wrapper" aria-hidden="true">
+                      {{- 'icon-close.svg' | inline_asset_content -}}
+                    </span>
+                  </button>
+                </div>
+
+                {%- comment -%}
+                  Whatever options this product actually has, on one line. Default
+                  -titled variants have nothing worth printing, so they print nothing.
+                {%- endcomment -%}
+                {% unless line.product.has_only_default_variant %}
+                  <p class="cart-line__variant">
+                    {% for option in line.options_with_values %}
+                      {{- option.value -}}
+                      {%- unless forloop.last %} · {% endunless -%}
+                    {% endfor %}
+                  </p>
+                {% endunless %}
+
+                {% if line.selling_plan_allocation != blank %}
+                  <p class="cart-line__variant">{{ line.selling_plan_allocation.selling_plan.name }}</p>
+                {% endif %}
+
+                <div class="cart-line__bottom">
+                  <div class="cart-quantity">
+                    <button
+                      type="button"
+                      class="cart-quantity__step"
+                      data-cart-step="-1"
+                      data-line="{{ forloop.index }}"
+                      aria-label="{{ section.settings.decrease_label | default: 'Decrease quantity' | escape }}"
+                    >
+                      <span class="svg-wrapper" aria-hidden="true">
+                        {{- 'icon-minus.svg' | inline_asset_content -}}
+                      </span>
+                    </button>
+                    <span class="cart-quantity__value">{{ line.quantity }}</span>
+                    <button
+                      type="button"
+                      class="cart-quantity__step"
+                      data-cart-step="1"
+                      data-line="{{ forloop.index }}"
+                      aria-label="{{ section.settings.increase_label | default: 'Increase quantity' | escape }}"
+                    >
+                      <span class="svg-wrapper" aria-hidden="true">
+                        {{- 'icon-plus.svg' | inline_asset_content -}}
+                      </span>
+                    </button>
+                  </div>
+
+                  <span class="cart-line__price">
+                    {{- line.final_line_price | money -}}
+                  </span>
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+
+        {%- comment -%}
+          4 — Recommendations. Fetched by the script from Shopify's own
+          recommendations endpoint so they are real suggestions, not a fixed list.
+        {%- endcomment -%}
+        {% if section.settings.show_recommendations and seed != blank %}
+          <div
+            class="cart-recs"
+            data-cart-recs
+            data-product-id="{{ seed.id }}"
+            data-limit="{{ section.settings.recommendations_limit | default: 4 }}"
+            hidden
+          >
+            <h3 class="cart-recs__heading">
+              {{- section.settings.recommendations_heading | default: 'You may also like' -}}
+            </h3>
+            <div class="cart-recs__track" data-cart-recs-track></div>
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="cart-drawer__empty">
+          <p>{{ section.settings.empty_text | default: 'Your cart is empty.' }}</p>
+          <a href="{{ routes.all_products_collection_url }}" class="cart-drawer__empty-link">
+            {{- section.settings.empty_cta | default: 'Start shopping' -}}
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
+    {% if has_items %}
+      {%- comment -%} 5 — Subtotal and actions {%- endcomment -%}
+      <div class="cart-drawer__foot">
+        <div class="cart-drawer__subtotal">
+          <span>{{ section.settings.subtotal_label | default: 'Subtotal' }}</span>
+          <strong>{{ cart.total_price | money }}</strong>
+        </div>
+
+        <div class="cart-drawer__actions">
+          <button type="button" class="cart-drawer__continue" data-cart-close>
+            {{- section.settings.continue_label | default: 'Continue Shopping' -}}
+          </button>
+          <form action="{{ routes.cart_url }}" method="post" class="cart-drawer__checkout-form">
+            <button type="submit" name="checkout" class="cart-drawer__checkout">
+              {{- section.settings.checkout_label | default: 'Check Out' -}}
+            </button>
+          </form>
+        </div>
+
+        {%- comment -%} 6 — Reassurance {%- endcomment -%}
+        {% if section.settings.reassurance_text != blank %}
+          <p class="cart-drawer__reassurance">
+            <span class="svg-wrapper" aria-hidden="true">
+              {{- 'icon-return.svg' | inline_asset_content -}}
+            </span>
+            {{ section.settings.reassurance_text }}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script src="{{ 'showcase-cart-drawer.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  .cart-drawer-locked {
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  .cart-drawer[hidden] {
+    display: none;
+  }
+
+  .cart-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+  }
+
+  .cart-drawer__overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgb(0 0 0 / 0.45);
+    opacity: 0;
+    transition: opacity 240ms var(--animation-easing, ease);
+  }
+
+  .cart-drawer--open .cart-drawer__overlay {
+    opacity: 1;
+  }
+
+  /*
+    Full viewport width on phones, as specified — a narrow panel would leave the
+    line items cramped once the quantity stepper and price share a row. Desktop
+    gets a panel, because a full-width cart on a 1600px screen is unusable.
+  */
+  .cart-drawer__panel {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-background, #ffffff);
+    translate: 100% 0;
+    transition: translate 240ms var(--animation-easing, ease);
+  }
+
+  .cart-drawer--open .cart-drawer__panel {
+    translate: 0 0;
+  }
+
+  .cart-drawer__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 0 0 auto;
+    padding: var(--padding-md) var(--padding-lg);
+    border-block-end: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    padding-block-start: calc(var(--padding-md) + env(safe-area-inset-top, 0px));
+  }
+
+  .cart-drawer__title {
+    margin: 0;
+    font-size: var(--font-size--lg);
+    font-weight: 700;
+  }
+
+  .cart-drawer__count {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-weight: 400;
+  }
+
+  .cart-drawer__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .cart-drawer__close svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .cart-urgency {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    flex: 0 0 auto;
+    margin: 0;
+    padding: var(--padding-2xs) var(--padding-lg);
+    background-color: rgb(232 52 42 / 0.08);
+    color: var(--cart-accent, #e8342a);
+    font-size: var(--font-size--xs);
+  }
+
+  .cart-urgency__icon {
+    flex: 0 0 auto;
+    display: flex;
+  }
+
+  .cart-urgency__icon svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .cart-drawer__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: var(--padding-md) var(--padding-lg);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .cart-lines {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cart-line {
+    display: flex;
+    gap: var(--gap-sm);
+    padding-block: var(--padding-md);
+  }
+
+  .cart-line + .cart-line {
+    border-block-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-8));
+  }
+
+  .cart-line__media {
+    flex: 0 0 auto;
+    width: 84px;
+    height: 84px;
+    border-radius: 8px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5));
+    overflow: hidden;
+  }
+
+  .cart-line__image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+  }
+
+  .cart-line__detail {
+    flex: 1 1 auto;
+    /* Without this the long product title refuses to wrap and overflows. */
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-3xs);
+  }
+
+  .cart-line__top {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--gap-2xs);
+  }
+
+  .cart-line__title {
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    font-weight: 500;
+    line-height: 1.35;
+    text-decoration: none;
+  }
+
+  .cart-line__remove {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    cursor: pointer;
+  }
+
+  .cart-line__remove svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .cart-line__variant {
+    margin: 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+  }
+
+  .cart-line__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-2xs);
+    margin-block-start: auto;
+    padding-block-start: var(--padding-2xs);
+  }
+
+  .cart-quantity {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-15));
+    border-radius: 6px;
+  }
+
+  .cart-quantity__step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .cart-quantity__step svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .cart-quantity__value {
+    min-width: 26px;
+    font-size: var(--font-size--sm);
+    text-align: center;
+  }
+
+  .cart-line__price {
+    font-size: var(--font-size--sm);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* ---- Recommendations ---- */
+  .cart-recs[hidden] {
+    display: none;
+  }
+
+  .cart-recs {
+    margin-block-start: var(--margin-lg);
+    padding-block-start: var(--padding-md);
+    border-block-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .cart-recs__heading {
+    margin: 0 0 var(--margin-2xs);
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+  }
+
+  .cart-recs__track {
+    display: flex;
+    gap: var(--gap-sm);
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+  }
+
+  .cart-recs__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ---- Foot ---- */
+  .cart-drawer__foot {
+    flex: 0 0 auto;
+    padding: var(--padding-md) var(--padding-lg);
+    border-block-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    padding-block-end: calc(var(--padding-md) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .cart-drawer__subtotal {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-block-end: var(--margin-sm);
+    font-size: var(--font-size--md);
+  }
+
+  .cart-drawer__subtotal strong {
+    font-size: var(--font-size--lg);
+  }
+
+  .cart-drawer__actions {
+    display: flex;
+    gap: var(--gap-2xs);
+  }
+
+  .cart-drawer__checkout-form {
+    flex: 1 1 0;
+    margin: 0;
+  }
+
+  .cart-drawer__continue,
+  .cart-drawer__checkout {
+    width: 100%;
+    padding: var(--padding-sm) var(--padding-md);
+    border: none;
+    border-radius: 999px;
+    color: #ffffff;
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .cart-drawer__continue {
+    flex: 1 1 0;
+    background-color: var(--cart-continue-background, #1c1c1c);
+  }
+
+  .cart-drawer__checkout {
+    background-color: var(--cart-accent, #e8342a);
+  }
+
+  .cart-drawer__reassurance {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-3xs);
+    margin: var(--margin-sm) 0 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+    text-align: center;
+  }
+
+  .cart-drawer__reassurance svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .cart-drawer__empty {
+    padding-block: var(--padding-2xl);
+    text-align: center;
+  }
+
+  .cart-drawer__empty-link {
+    color: var(--cart-accent, #e8342a);
+  }
+
+  @media screen and (min-width: 990px) {
+    .cart-drawer__panel {
+      width: min(440px, 100%);
+      box-shadow: -4px 0 24px rgb(0 0 0 / 0.12);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cart-drawer__panel,
+    .cart-drawer__overlay {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "tag": "aside",
+  "class": "section-cart-drawer",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Your cart"
+    },
+    {
+      "type": "text",
+      "id": "close_label",
+      "label": "Close accessible label",
+      "default": "Close cart"
+    },
+    {
+      "type": "header",
+      "content": "Urgency banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_countdown",
+      "label": "Show countdown",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "countdown_text",
+      "label": "Countdown text",
+      "default": "Products are limited, checkout within"
+    },
+    {
+      "type": "range",
+      "id": "countdown_minutes",
+      "label": "Countdown length",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "unit": "m",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Line items"
+    },
+    {
+      "type": "text",
+      "id": "remove_label",
+      "label": "Remove accessible label",
+      "default": "Remove"
+    },
+    {
+      "type": "text",
+      "id": "decrease_label",
+      "label": "Decrease accessible label",
+      "default": "Decrease quantity"
+    },
+    {
+      "type": "text",
+      "id": "increase_label",
+      "label": "Increase accessible label",
+      "default": "Increase quantity"
+    },
+    {
+      "type": "header",
+      "content": "Recommendations"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_recommendations",
+      "label": "Show recommendations",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "recommendations_heading",
+      "label": "Heading",
+      "default": "You may also like"
+    },
+    {
+      "type": "range",
+      "id": "recommendations_limit",
+      "label": "Products shown",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Footer"
+    },
+    {
+      "type": "text",
+      "id": "subtotal_label",
+      "label": "Subtotal label",
+      "default": "Subtotal"
+    },
+    {
+      "type": "text",
+      "id": "continue_label",
+      "label": "Continue button",
+      "default": "Continue Shopping"
+    },
+    {
+      "type": "text",
+      "id": "checkout_label",
+      "label": "Checkout button",
+      "default": "Check Out"
+    },
+    {
+      "type": "text",
+      "id": "reassurance_text",
+      "label": "Reassurance line",
+      "default": "14-day exchange or refund on any product"
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Empty cart text",
+      "default": "Your cart is empty."
+    },
+    {
+      "type": "text",
+      "id": "empty_cta",
+      "label": "Empty cart link",
+      "default": "Start shopping"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Checkout button",
+      "default": "#e8342a"
+    },
+    {
+      "type": "color",
+      "id": "continue_color",
+      "label": "Continue button",
+      "default": "#1c1c1c"
+    }
+  ]
+}
+{% endschema %}

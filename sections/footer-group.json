@@ -163,10 +163,35 @@
         "feedback_background": "#333333",
         "feedback_text_color": "#ffffff"
       }
+    },
+    "showcase_cart_drawer": {
+      "type": "showcase-cart-drawer",
+      "settings": {
+        "heading": "Your cart",
+        "close_label": "Close cart",
+        "show_countdown": true,
+        "countdown_text": "Products are limited, checkout within",
+        "countdown_minutes": 10,
+        "remove_label": "Remove",
+        "decrease_label": "Decrease quantity",
+        "increase_label": "Increase quantity",
+        "show_recommendations": true,
+        "recommendations_heading": "You may also like",
+        "recommendations_limit": 4,
+        "subtotal_label": "Subtotal",
+        "continue_label": "Continue Shopping",
+        "checkout_label": "Check Out",
+        "reassurance_text": "14-day exchange or refund on any product",
+        "empty_text": "Your cart is empty.",
+        "empty_cta": "Start shopping",
+        "accent_color": "#e8342a",
+        "continue_color": "#1c1c1c"
+      }
     }
   },
   "order": [
     "site_footer",
-    "showcase_floating_widgets"
+    "showcase_floating_widgets",
+    "showcase_cart_drawer"
   ]
 }

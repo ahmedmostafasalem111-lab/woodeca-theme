@@ -144,20 +144,12 @@
       {%- endcomment -%}
       {% render 'showcase-mobile-drawer', section: section %}
 
-      {%- comment -%} Mobile-only: search disclosure {%- endcomment -%}
-      <details class="showcase-header__mobile-search">
-        <summary
-          class="showcase-header__icon-button"
-          aria-label="{{ section.settings.search_submit_label | default: 'Search' | escape }}"
-        >
-          <span class="svg-wrapper" aria-hidden="true">
-            {{- 'icon-search.svg' | inline_asset_content -}}
-          </span>
-        </summary>
-        <div class="showcase-header__mobile-search-panel">
-          {% render 'showcase-search-form', section: section, id_suffix: 'mobile' %}
-        </div>
-      </details>
+      {%- comment -%}
+        Mobile-only: full-screen search. Replaces the old <details> panel, which
+        dropped a bar over the page and left the page behind it competing for
+        attention — and which also overflowed the viewport while closed.
+      {%- endcomment -%}
+      {% render 'showcase-search-overlay', section: section %}
 
       <a
         href="{{ routes.root_url }}"
@@ -305,9 +297,14 @@
           </a>
         {% endif %}
 
+        {%- comment -%}
+          Still a real link, so it works without JavaScript and can be opened in
+          a new tab; the drawer script intercepts the plain click.
+        {%- endcomment -%}
         <a
           href="{{ routes.cart_url }}"
           class="showcase-header__icon-button showcase-header__cart"
+          data-cart-open
           aria-label="{{ section.settings.cart_label | default: 'Cart' | escape }}"
         >
           <span class="svg-wrapper" aria-hidden="true">
@@ -353,6 +350,12 @@
     fetchpriority="low"
   ></script>
 {% endif %}
+
+<script
+  src="{{ 'showcase-search-overlay.js' | asset_url }}"
+  type="module"
+  fetchpriority="low"
+></script>
 
 <script
   src="{{ 'showcase-mobile-drawer.js' | asset_url }}"
@@ -759,7 +762,6 @@
 
   /* ---------- Mobile-only pieces, hidden on desktop ---------- */
   .showcase-header__drawer-trigger,
-  .showcase-header__mobile-search,
   .showcase-header__icon-button--mobile {
     display: none;
   }
@@ -776,12 +778,6 @@
 
     .showcase-header__drawer-trigger {
       display: flex;
-      flex-shrink: 0;
-    }
-
-    .showcase-header__mobile-search {
-      display: block;
-      position: relative;
       flex-shrink: 0;
     }
 
@@ -816,19 +812,6 @@
     .showcase-header__icon-button {
       width: 36px;
       height: 36px;
-    }
-
-    /* Search expands into a full-width strip below the condensed row. */
-    .showcase-header__mobile-search-panel {
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 0;
-      z-index: var(--layer-raised);
-      width: min(92vw, 520px);
-      padding: var(--padding-sm);
-      border-radius: var(--style-border-radius-popover, 8px);
-      background-color: var(--color-background, #fff);
-      box-shadow: var(--shadow-popover);
     }
 
   }
@@ -1486,6 +1469,31 @@
       "id": "search_submit_label",
       "label": "Search button accessible label",
       "default": "Search"
+    },
+    {
+      "type": "text",
+      "id": "search_close_label",
+      "label": "Close search accessible label",
+      "default": "Close search"
+    },
+    {
+      "type": "text",
+      "id": "popular_heading",
+      "label": "Popular searches heading",
+      "default": "Popular searches"
+    },
+    {
+      "type": "text",
+      "id": "popular_queries",
+      "label": "Popular searches",
+      "info": "Comma separated. Shown in the mobile search screen until the shopper types.",
+      "default": "Sofas, Beds, T.V Units, Wardrobes, Dining tables"
+    },
+    {
+      "type": "text",
+      "id": "search_empty_text",
+      "label": "No results text",
+      "default": "No matches yet. Try a different word."
     },
     {
       "type": "checkbox",

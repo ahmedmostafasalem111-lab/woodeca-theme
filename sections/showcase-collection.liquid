@@ -62,7 +62,7 @@
       aria-label="{{ section.settings.breadcrumbs_label | default: 'Breadcrumb' | escape }}"
     >
       <a href="{{ routes.root_url }}">
-        {{- section.settings.breadcrumb_home_label | default: 'Online store' }} {{ shop.name -}}
+        {{- section.settings.breadcrumb_home_label | default: 'Home' -}}
       </a>
       <span aria-hidden="true">/</span>
       <span aria-current="page">{{ collection.title }}</span>
@@ -710,8 +710,7 @@
       "type": "text",
       "id": "breadcrumb_home_label",
       "label": "Breadcrumb home label",
-      "default": "Online store",
-      "info": "The shop name is appended automatically."
+      "default": "Home"
     },
     {
       "type": "text",
