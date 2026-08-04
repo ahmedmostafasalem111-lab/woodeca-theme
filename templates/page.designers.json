@@ -7,10 +7,10 @@
           "type": "slide",
           "settings": {
             "eyebrow": "",
-            "heading": "",
-            "subheading": "",
-            "link_text": "",
-            "link": ""
+            "heading": "Partner with Woodeca",
+            "subheading": "Furnish full projects at factory-direct pricing, backed by a dedicated account manager and reliable delivery across Egypt.",
+            "link_text": "Register your interest",
+            "link": "#designer-enquiry"
           }
         }
       },
@@ -32,12 +32,54 @@
     "advantages": {
       "type": "showcase-why",
       "blocks": {
-        "adv_1": { "type": "feature", "settings": { "icon": "store", "title": "", "description": "" } },
-        "adv_2": { "type": "feature", "settings": { "icon": "pin", "title": "", "description": "" } },
-        "adv_3": { "type": "feature", "settings": { "icon": "truck", "title": "", "description": "" } },
-        "adv_4": { "type": "feature", "settings": { "icon": "chat", "title": "", "description": "" } },
-        "adv_5": { "type": "feature", "settings": { "icon": "card", "title": "", "description": "" } },
-        "adv_6": { "type": "feature", "settings": { "icon": "star", "title": "", "description": "" } }
+        "adv_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "store",
+            "title": "Full catalogue access",
+            "description": "Every Woodeca collection, available for project specification."
+          }
+        },
+        "adv_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "chat",
+            "title": "Dedicated account manager",
+            "description": "One point of contact from first brief to final delivery."
+          }
+        },
+        "adv_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Reliable delivery",
+            "description": "Clear timelines you can build a project schedule around."
+          }
+        },
+        "adv_4": {
+          "type": "feature",
+          "settings": {
+            "icon": "card",
+            "title": "Trade pricing",
+            "description": "Preferential rates on every order, scaled to project size."
+          }
+        },
+        "adv_5": {
+          "type": "feature",
+          "settings": {
+            "icon": "star",
+            "title": "Custom specification",
+            "description": "Fabric, finish, and dimension options beyond the standard catalogue."
+          }
+        },
+        "adv_6": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Fast quoting",
+            "description": "Get pricing back quickly enough to keep your client moving."
+          }
+        }
       },
       "block_order": ["adv_1", "adv_2", "adv_3", "adv_4", "adv_5", "adv_6"],
       "settings": {
@@ -57,8 +99,8 @@
         "media_position": "end",
         "image_ratio": "4 / 3",
         "eyebrow": "",
-        "heading": "",
-        "body": "",
+        "heading": "Designed for the way you work",
+        "body": "<p>We know a project only comes together when the furniture keeps pace with the design. That's why we work directly with designers and architects — full catalogue access, trade pricing, and a single point of contact who understands project timelines, not just individual orders.</p>",
         "button_label": "",
         "button_link": "#designer-enquiry",
         "section_width": "page-width",
@@ -69,13 +111,31 @@
     "terms": {
       "type": "showcase-info-cards",
       "blocks": {
-        "term_1": { "type": "card", "settings": { "heading": "", "subtext": "" } },
-        "term_2": { "type": "card", "settings": { "heading": "", "subtext": "" } },
-        "term_3": { "type": "card", "settings": { "heading": "", "subtext": "" } }
+        "term_1": {
+          "type": "card",
+          "settings": {
+            "heading": "Full project furnishing",
+            "subtext": "From a single statement piece to a complete space, specified and delivered as one order."
+          }
+        },
+        "term_2": {
+          "type": "card",
+          "settings": {
+            "heading": "Trade pricing on every order",
+            "subtext": "Preferential rates that scale with project size, agreed upfront."
+          }
+        },
+        "term_3": {
+          "type": "card",
+          "settings": {
+            "heading": "One dedicated contact",
+            "subtext": "A single account manager who follows your project through, not a rotating support queue."
+          }
+        }
       },
       "block_order": ["term_1", "term_2", "term_3"],
       "settings": {
-        "heading": "",
+        "heading": "How the partnership works",
         "columns": 3,
         "section_width": "page-width",
         "padding-block-start": 32,
@@ -85,9 +145,9 @@
     "cta_before_carousel": {
       "type": "showcase-cta-band",
       "settings": {
-        "heading": "",
+        "heading": "Ready to start a project?",
         "subheading": "",
-        "button_label": "",
+        "button_label": "Register your interest",
         "button_link": "#designer-enquiry",
         "alignment": "center",
         "section_width": "page-width",
@@ -99,7 +159,7 @@
     "picks": {
       "type": "showcase-product-carousel",
       "settings": {
-        "heading": "",
+        "heading": "This season's picks for designers",
         "description": "",
         "products_limit": 12,
         "columns": 4,
@@ -116,9 +176,9 @@
     "cta_after_carousel": {
       "type": "showcase-cta-band",
       "settings": {
-        "heading": "",
+        "heading": "Ready to start a project?",
         "subheading": "",
-        "button_label": "",
+        "button_label": "Register your interest",
         "button_link": "#designer-enquiry",
         "alignment": "space-between",
         "section_width": "page-width",
@@ -161,9 +221,9 @@
     "cta_final": {
       "type": "showcase-cta-band",
       "settings": {
-        "heading": "",
+        "heading": "Ready to start a project?",
         "subheading": "",
-        "button_label": "",
+        "button_label": "Register your interest",
         "button_link": "#designer-enquiry",
         "alignment": "center",
         "section_width": "page-width",
@@ -176,13 +236,13 @@
       "type": "showcase-enquiry-form",
       "settings": {
         "anchor_id": "designer-enquiry",
-        "heading": "",
-        "body": "",
-        "subject": "Designer programme enquiry",
+        "heading": "Let's talk about your project",
+        "body": "<p>Tell us what you're working on and a member of our team will be in touch.</p>",
+        "subject": "Designer enquiry — Woodeca",
         "name_label": "Name",
         "phone_label": "Phone",
         "email_label": "Email",
-        "message_label": "Tell us about your practice",
+        "message_label": "Tell us about your project",
         "submit_label": "Register your interest",
         "consent_text": "",
         "success_text": "Thanks — we will be in touch shortly.",

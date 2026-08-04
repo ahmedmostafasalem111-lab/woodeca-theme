@@ -7,8 +7,8 @@
           "type": "slide",
           "settings": {
             "eyebrow": "",
-            "heading": "",
-            "subheading": "",
+            "heading": "Welcome to Woodeca",
+            "subheading": "Furniture within a reach.",
             "link_text": "",
             "link": ""
           }
@@ -36,8 +36,8 @@
         "media_position": "start",
         "image_ratio": "4 / 3",
         "eyebrow": "",
-        "heading": "",
-        "body": "",
+        "heading": "The old way of buying furniture",
+        "body": "<p>Furniture shopping in Egypt usually means the same trade-off: showroom markups, middlemen adding their cut at every step, or waiting weeks to even see a price. None of that gets you closer to a home that actually feels like yours.</p>",
         "button_label": "",
         "section_width": "page-width",
         "padding-block-start": 56,
@@ -51,8 +51,8 @@
         "media_position": "end",
         "image_ratio": "4 / 3",
         "eyebrow": "",
-        "heading": "",
-        "body": "",
+        "heading": "The Woodeca way",
+        "body": "<p>We build and sell directly — no middlemen, no showroom markup. That means factory-direct pricing on every piece, without cutting the corners that usually come with \"cheap\" furniture. You get the real price, and we get to focus on making furniture worth having in your home.</p>",
         "button_label": "",
         "section_width": "page-width",
         "padding-block-start": 24,
@@ -62,15 +62,50 @@
     "reasons": {
       "type": "showcase-why",
       "blocks": {
-        "reason_1": { "type": "feature", "settings": { "icon": "store", "title": "", "description": "" } },
-        "reason_2": { "type": "feature", "settings": { "icon": "card", "title": "", "description": "" } },
-        "reason_3": { "type": "feature", "settings": { "icon": "shield", "title": "", "description": "" } },
-        "reason_4": { "type": "feature", "settings": { "icon": "truck", "title": "", "description": "" } },
-        "reason_5": { "type": "feature", "settings": { "icon": "star", "title": "", "description": "" } }
+        "reason_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "card",
+            "title": "Factory-direct pricing",
+            "description": "No middlemen, no markup — you pay for the furniture, not the supply chain."
+          }
+        },
+        "reason_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "store",
+            "title": "Always open",
+            "description": "Shop online anytime, and reach a real person when you need one."
+          }
+        },
+        "reason_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Built to last",
+            "description": "Quality checked before it ever leaves Borg El Arab."
+          }
+        },
+        "reason_4": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Delivered across Egypt",
+            "description": "Straight to your door, wherever you are."
+          }
+        },
+        "reason_5": {
+          "type": "feature",
+          "settings": {
+            "icon": "star",
+            "title": "A style for every home",
+            "description": "No two homes are the same — find yours in our range."
+          }
+        }
       },
       "block_order": ["reason_1", "reason_2", "reason_3", "reason_4", "reason_5"],
       "settings": {
-        "heading": "",
+        "heading": "Why people choose Woodeca",
         "columns": 5,
         "mobile_layout": "carousel",
         "show_mission": false,
@@ -97,10 +132,10 @@
     "closing": {
       "type": "showcase-cta-band",
       "settings": {
-        "heading": "",
-        "subheading": "",
-        "button_label": "",
-        "button_link": "",
+        "heading": "Sound like your style?",
+        "subheading": "Browse the collection and find the pieces that belong in your home.",
+        "button_label": "Shop Now",
+        "button_link": "/collections/all",
         "alignment": "center",
         "section_width": "page-width",
         "background_color": "#f6f6f6",
