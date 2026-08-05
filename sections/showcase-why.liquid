@@ -44,14 +44,23 @@
         <div class="showcase-why__grid showcase-why__grid--mobile-{{ section.settings.mobile_layout | default: 'grid' }}">
           {% for block in features %}
             <div class="why-feature" {{ block.shopify_attributes }}>
-              <span class="svg-wrapper why-feature__icon" aria-hidden="true">
-                {% if block.settings.icon_image != blank %}
-                  {{ block.settings.icon_image | image_url: width: 200 | image_tag: loading: 'lazy', alt: '' }}
-                {% else %}
-                  {% assign icon_file = 'icon-' | append: block.settings.icon | append: '.svg' %}
-                  {{- icon_file | inline_asset_content -}}
-                {% endif %}
-              </span>
+              {%- comment -%}
+                Numbering is opt-in, for the places this grid describes a sequence
+                rather than a set of unrelated benefits. It replaces the icon
+                rather than sitting beside it, so the row keeps one visual rhythm.
+              {%- endcomment -%}
+              {% if section.settings.show_numbers %}
+                <span class="why-feature__number" aria-hidden="true">{{ forloop.index }}</span>
+              {% else %}
+                <span class="svg-wrapper why-feature__icon" aria-hidden="true">
+                  {% if block.settings.icon_image != blank %}
+                    {{ block.settings.icon_image | image_url: width: 200 | image_tag: loading: 'lazy', alt: '' }}
+                  {% else %}
+                    {% assign icon_file = 'icon-' | append: block.settings.icon | append: '.svg' %}
+                    {{- icon_file | inline_asset_content -}}
+                  {% endif %}
+                </span>
+              {% endif %}
 
               {% if block.settings.title != blank %}
                 <p class="why-feature__title">{{ block.settings.title }}</p>
@@ -112,6 +121,20 @@
     align-items: center;
     gap: var(--gap-xs);
     text-align: center;
+  }
+
+  /* Sized off the same variable as the icon it replaces, so a numbered row and
+     an icon row line up at exactly the same height. */
+  .why-feature__number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--why-icon-size, 64px);
+    height: var(--why-icon-size, 64px);
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: 50%;
+    font-size: var(--font-size--lg);
+    font-weight: 600;
   }
 
   .why-feature__icon,
@@ -260,6 +283,13 @@
       "max": 6,
       "step": 1,
       "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_numbers",
+      "label": "Number the features",
+      "default": false,
+      "info": "Replaces each icon with its position. Use where the row describes a sequence of steps."
     },
     {
       "type": "select",

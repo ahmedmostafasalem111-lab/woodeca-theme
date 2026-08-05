@@ -1,0 +1,249 @@
+{
+  "sections": {
+    "hero": {
+      "type": "showcase-hero",
+      "blocks": {
+        "slide_1": {
+          "type": "slide",
+          "settings": {
+            "eyebrow": "",
+            "heading": "",
+            "subheading": "",
+            "link_text": "",
+            "link": "#b2b-enquiry"
+          }
+        }
+      },
+      "block_order": ["slide_1"],
+      "settings": {
+        "carousel_label": "Page hero",
+        "height": 520,
+        "height_mobile": 420,
+        "heading_size": "var(--font-size--5xl)",
+        "autoplay": false,
+        "show_arrows": false,
+        "show_dots": false,
+        "section_width": "full-width",
+        "text_color": "#ffffff",
+        "overlay_color": "#000000",
+        "overlay_opacity": 40
+      }
+    },
+    "segments": {
+      "type": "showcase-info-cards",
+      "blocks": {
+        "seg_1": { "type": "card", "settings": { "heading": "Hotels & Hospitality", "subtext": "" } },
+        "seg_2": { "type": "card", "settings": { "heading": "Offices & Coworking", "subtext": "" } },
+        "seg_3": { "type": "card", "settings": { "heading": "Restaurants & Cafés", "subtext": "" } },
+        "seg_4": { "type": "card", "settings": { "heading": "Retail Fit-Out", "subtext": "" } }
+      },
+      "block_order": ["seg_1", "seg_2", "seg_3", "seg_4"],
+      "settings": {
+        "show_section": true,
+        "heading": "",
+        "columns": 4,
+        "section_width": "page-width",
+        "padding-block-start": 48,
+        "padding-block-end": 32
+      }
+    },
+    "benefits": {
+      "type": "showcase-why",
+      "blocks": {
+        "ben_1": { "type": "feature", "settings": { "icon": "store", "title": "", "description": "" } },
+        "ben_2": { "type": "feature", "settings": { "icon": "card", "title": "", "description": "" } },
+        "ben_3": { "type": "feature", "settings": { "icon": "truck", "title": "", "description": "" } },
+        "ben_4": { "type": "feature", "settings": { "icon": "shield", "title": "", "description": "" } },
+        "ben_5": { "type": "feature", "settings": { "icon": "chat", "title": "", "description": "" } },
+        "ben_6": { "type": "feature", "settings": { "icon": "star", "title": "", "description": "" } }
+      },
+      "block_order": ["ben_1", "ben_2", "ben_3", "ben_4", "ben_5", "ben_6"],
+      "settings": {
+        "heading": "",
+        "columns": 6,
+        "show_numbers": false,
+        "mobile_layout": "carousel",
+        "show_mission": false,
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "intro": {
+      "type": "showcase-media-promo",
+      "settings": {
+        "show_section": true,
+        "media_position": "end",
+        "image_ratio": "4 / 3",
+        "eyebrow": "",
+        "heading": "",
+        "body": "",
+        "button_label": "",
+        "button_link": "#b2b-enquiry",
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "manufacturing": {
+      "type": "showcase-media-promo",
+      "settings": {
+        "show_section": true,
+        "media_position": "start",
+        "image_ratio": "3 / 2",
+        "eyebrow": "",
+        "heading": "",
+        "body": "",
+        "button_label": "",
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "cta_mid": {
+      "type": "showcase-cta-band",
+      "settings": {
+        "heading": "",
+        "subheading": "",
+        "button_label": "",
+        "button_link": "#b2b-enquiry",
+        "alignment": "center",
+        "section_width": "page-width",
+        "background_color": "#f6f6f6",
+        "padding-block-start": 40,
+        "padding-block-end": 40
+      }
+    },
+    "awards": {
+      "type": "showcase-logo-marquee",
+      "settings": {
+        "show_heading": true,
+        "heading": "",
+        "scroll_speed": 40,
+        "direction": "left",
+        "logo_height": 44,
+        "grayscale": true,
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "projects": {
+      "type": "showcase-info-cards",
+      "blocks": {
+        "proj_1": { "type": "card", "settings": { "heading": "", "subtext": "" } },
+        "proj_2": { "type": "card", "settings": { "heading": "", "subtext": "" } },
+        "proj_3": { "type": "card", "settings": { "heading": "", "subtext": "" } }
+      },
+      "block_order": ["proj_1", "proj_2", "proj_3"],
+      "settings": {
+        "show_section": false,
+        "heading": "",
+        "columns": 3,
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "process": {
+      "type": "showcase-why",
+      "blocks": {
+        "step_1": { "type": "feature", "settings": { "title": "", "description": "" } },
+        "step_2": { "type": "feature", "settings": { "title": "", "description": "" } },
+        "step_3": { "type": "feature", "settings": { "title": "", "description": "" } },
+        "step_4": { "type": "feature", "settings": { "title": "", "description": "" } },
+        "step_5": { "type": "feature", "settings": { "title": "", "description": "" } },
+        "step_6": { "type": "feature", "settings": { "title": "", "description": "" } }
+      },
+      "block_order": ["step_1", "step_2", "step_3", "step_4", "step_5", "step_6"],
+      "settings": {
+        "heading": "",
+        "columns": 6,
+        "show_numbers": true,
+        "mobile_layout": "carousel",
+        "show_mission": false,
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "directions": {
+      "type": "showcase-category-row",
+      "blocks": {
+        "dir_1": { "type": "category", "settings": { "label": "", "link": "" } },
+        "dir_2": { "type": "category", "settings": { "label": "", "link": "" } },
+        "dir_3": { "type": "category", "settings": { "label": "", "link": "" } },
+        "dir_4": { "type": "category", "settings": { "label": "", "link": "" } },
+        "dir_5": { "type": "category", "settings": { "label": "", "link": "" } },
+        "dir_6": { "type": "category", "settings": { "label": "", "link": "" } }
+      },
+      "block_order": ["dir_1", "dir_2", "dir_3", "dir_4", "dir_5", "dir_6"],
+      "settings": {
+        "heading": "",
+        "columns": 6,
+        "columns_mobile": 2,
+        "peek_mobile": 0.5,
+        "show_arrows": true,
+        "show_progress": true,
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 32
+      }
+    },
+    "stats": {
+      "type": "showcase-stat-row",
+      "blocks": {
+        "stat_1": { "type": "stat", "settings": { "value": "", "suffix": "", "label": "" } },
+        "stat_2": { "type": "stat", "settings": { "value": "", "suffix": "", "label": "" } },
+        "stat_3": { "type": "stat", "settings": { "value": "", "suffix": "", "label": "" } },
+        "stat_4": { "type": "stat", "settings": { "value": "", "suffix": "", "label": "" } },
+        "stat_5": { "type": "stat", "settings": { "value": "", "suffix": "", "label": "" } },
+        "stat_6": { "type": "stat", "settings": { "value": "", "suffix": "", "label": "" } }
+      },
+      "block_order": ["stat_1", "stat_2", "stat_3", "stat_4", "stat_5", "stat_6"],
+      "settings": {
+        "heading": "",
+        "columns": 6,
+        "section_width": "page-width",
+        "padding-block-start": 40,
+        "padding-block-end": 40
+      }
+    },
+    "enquiry": {
+      "type": "showcase-enquiry-form",
+      "settings": {
+        "anchor_id": "b2b-enquiry",
+        "heading": "",
+        "body": "",
+        "subject": "B2B enquiry — Woodeca",
+        "name_label": "Name",
+        "phone_label": "Phone",
+        "email_label": "Email",
+        "message_label": "Message",
+        "submit_label": "Send enquiry",
+        "consent_text": "",
+        "success_text": "Thanks — we will be in touch shortly.",
+        "direct_label": "",
+        "phone_number": "",
+        "email_address": "",
+        "section_width": "page-width",
+        "padding-block-start": 56,
+        "padding-block-end": 72
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "segments",
+    "benefits",
+    "intro",
+    "manufacturing",
+    "cta_mid",
+    "awards",
+    "projects",
+    "process",
+    "directions",
+    "stats",
+    "enquiry"
+  ]
+}

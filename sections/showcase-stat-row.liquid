@@ -1,0 +1,234 @@
+{% comment %}
+  A row of figures — years trading, projects delivered, square metres, and so on.
+
+  Built rather than borrowed because of one behaviour nothing else has: a stat
+  with no value is not a stat. Each block disappears when its value is empty, and
+  the section removes itself when every value is empty, so the row can ship with
+  its labels written and its numbers still unknown without leaving zeros or gaps
+  on the page.
+{% endcomment %}
+
+{% liquid
+  assign stats = section.blocks | where: 'type', 'stat'
+
+  assign filled = 0
+  for block in stats
+    if block.settings.value != blank
+      assign filled = filled | plus: 1
+    endif
+  endfor
+%}
+
+{% if filled > 0 %}
+  <div
+    class="section-background"
+    {% if section.settings.background_color != blank %}
+      style="background-color: {{ section.settings.background_color }};"
+    {% endif %}
+  ></div>
+
+  <div
+    class="section section--{{ section.settings.section_width }} stat-row spacing-style"
+    style="
+      {% render 'spacing-padding', settings: section.settings %}
+      {% if section.settings.text_color != blank %}
+        --color-foreground: {{ section.settings.text_color }};
+        --color-foreground-rgb: {{ section.settings.text_color.rgb }};
+      {% endif %}
+      --stat-columns: {{ section.settings.columns }};
+      --stat-value-color: {{ section.settings.value_color | default: '#1c1c1c' }};
+    "
+  >
+    {% if section.settings.heading != blank %}
+      <h2 class="stat-row__heading">{{ section.settings.heading }}</h2>
+    {% endif %}
+
+    <dl class="stat-row__grid">
+      {% for block in stats %}
+        {% if block.settings.value == blank %}
+          {% continue %}
+        {% endif %}
+
+        <div class="stat" {{ block.shopify_attributes }}>
+          <dt class="stat__value">
+            {{- block.settings.value -}}
+            {%- if block.settings.suffix != blank -%}
+              <span class="stat__suffix">{{ block.settings.suffix }}</span>
+            {%- endif -%}
+          </dt>
+          {% if block.settings.label != blank %}
+            <dd class="stat__label">{{ block.settings.label }}</dd>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </dl>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .stat-row__heading {
+    margin: 0 0 var(--margin-xl);
+    font-size: var(--font-size--2xl);
+    text-align: center;
+  }
+
+  /*
+    `auto-fit` rather than a fixed count: because empty stats are skipped, the
+    number actually rendered is not known until render time, and a fixed track
+    count would leave holes in the row.
+  */
+  .stat-row__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--gap-xl) var(--gap-lg);
+    margin: 0;
+    padding: 0;
+  }
+
+  .stat {
+    min-width: 0;
+    text-align: center;
+  }
+
+  .stat__value {
+    color: var(--stat-value-color, #1c1c1c);
+    font-size: var(--font-size--3xl);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .stat__suffix {
+    font-size: 0.6em;
+    font-weight: 600;
+  }
+
+  .stat__label {
+    margin: var(--margin-2xs) 0 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--sm);
+    line-height: 1.4;
+  }
+
+  @media screen and (max-width: 989px) {
+    .stat-row__grid {
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: var(--gap-lg) var(--gap-md);
+    }
+
+    .stat__value {
+      font-size: var(--font-size--2xl);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Stat row",
+  "tag": "section",
+  "class": "section-stat-row",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "max_blocks": 8,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "A stat with no value is hidden, and the whole row disappears when every value is empty. Write the labels now and fill the numbers in when you have them."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Stats per row on desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Layout and colors"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color"
+    },
+    {
+      "type": "color",
+      "id": "value_color",
+      "label": "Figure color",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Stat",
+      "settings": [
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Figure",
+          "info": "Leave blank to hide this stat."
+        },
+        {
+          "type": "text",
+          "id": "suffix",
+          "label": "Suffix",
+          "info": "Shown smaller beside the figure, e.g. + or m²."
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label"
+        }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Stat row" }]
+}
+{% endschema %}

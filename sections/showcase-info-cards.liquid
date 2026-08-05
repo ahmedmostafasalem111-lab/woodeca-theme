@@ -2,8 +2,13 @@
   Content/info image cards. Each card is a full-bleed image with a bottom-left text
   overlay and no visible button — the whole card is the link. Three per row on
   desktop, swipeable with a peek of the next card on mobile.
+
+  `show_section` lets a placement whose content has not been written yet be
+  switched off rather than deleted and rebuilt later. It defaults to on, so every
+  existing placement is unaffected.
 {% endcomment %}
 
+{% if section.settings.show_section %}
 <div
   class="section-background"
   {% if section.settings.background_color != blank %}
@@ -71,6 +76,7 @@
     next_label: 'Next cards'
   %}
 </div>
+{% endif %}
 
 {% stylesheet %}
   .showcase-info__heading {
@@ -159,6 +165,13 @@
     "groups": ["header", "footer"]
   },
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_section",
+      "label": "Show this section",
+      "default": true,
+      "info": "Turn off to hide the block without deleting its content."
+    },
     {
       "type": "text",
       "id": "heading",
