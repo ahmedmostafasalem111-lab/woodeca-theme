@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero": {
@@ -6,15 +15,15 @@
         "a1": {
           "type": "assurance",
           "settings": {
-            "icon": "shield",
-            "text": "3 Year Warranty"
+            "text": "3 Year Warranty",
+            "icon": "shield"
           }
         },
         "a3": {
           "type": "assurance",
           "settings": {
-            "icon": "return",
-            "text": "Exchange & Return within 14 Days"
+            "text": "Exchange & Return within 14 Days",
+            "icon": "return"
           }
         },
         "p1": {
@@ -106,7 +115,6 @@
         "delivery_anchor_label": "Delivery and assembly",
         "show_delivery_teaser": false,
         "delivery_teaser_text": "Delivery available across all served areas",
-        "accent_color": "#e8342a",
         "metafield_namespace": "custom"
       }
     },
@@ -291,9 +299,9 @@
         "heading": "You may also like",
         "enable_tabs": false,
         "source_a": "recommendations",
-        "card_stock_text": "In stock",
         "columns": 4,
-        "columns_mobile": 2
+        "columns_mobile": 2,
+        "card_stock_text": "In stock"
       }
     },
     "reviews": {
