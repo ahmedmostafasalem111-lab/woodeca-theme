@@ -379,6 +379,25 @@
     flex-direction: column;
   }
 
+  /*
+    Below 390px the icon + text no longer fit side by side in a half-width
+    column: "hello@woodeca.com" alone is ~139px and pushed 375px screens 2px
+    wide. Stacking the icon over its text keeps both rows side by side and
+    every value on one line; wrapping inside a word stays a last resort for
+    even narrower screens.
+  */
+  @media (max-width: 389px) {
+    .footer-contact__row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .footer-contact__text {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+
   .footer-contact__label {
     color: var(--footer-heading-color);
     font-size: var(--font-size--sm);
