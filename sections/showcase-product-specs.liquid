@@ -54,7 +54,15 @@
 
   # The other two tabs. Description is the product's own body; care instructions
   # are a metafield, so a product without either simply shows fewer tabs.
-  assign care_text = product.metafields[ns]['care_instructions']
+  # Rich text metafields must go through metafield_tag; printed directly they
+  # output their raw JSON. Visibility is decided from the rendered text so a
+  # field saved empty (`{"type":"root","children":[]}`) hides the tab too.
+  assign care_field = product.metafields[ns]['care_instructions']
+  assign care_text = ''
+  if care_field != blank
+    assign care_text = care_field | metafield_tag
+  endif
+  assign care_plain = care_text | strip_html | strip
 
   assign has_specs_tab = render_section
   assign has_description_tab = false
@@ -62,7 +70,7 @@
     assign has_description_tab = true
   endif
   assign has_care_tab = false
-  if care_text != blank
+  if care_plain != blank
     assign has_care_tab = true
   endif
 
