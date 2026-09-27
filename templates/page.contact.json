@@ -136,11 +136,35 @@
         "border_radius": 0,
         "padding-block-start": 32,
         "padding-block-end": 84
+      },
+      "disabled": true
+    },
+    "enquiry": {
+      "type": "showcase-enquiry-form",
+      "settings": {
+        "anchor_id": "contact-enquiry",
+        "heading": "Send us a message",
+        "body": "",
+        "subject": "Contact enquiry — Woodeca",
+        "name_label": "Name",
+        "phone_label": "Phone",
+        "email_label": "Email",
+        "message_label": "Message",
+        "submit_label": "Send message",
+        "consent_text": "",
+        "success_text": "Thanks — we will be in touch shortly.",
+        "direct_label": "",
+        "phone_number": "",
+        "email_address": "",
+        "section_width": "page-width",
+        "padding-block-start": 32,
+        "padding-block-end": 72
       }
     }
   },
   "order": [
     "main",
+    "enquiry",
     "form"
   ]
 }
