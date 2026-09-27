@@ -284,7 +284,8 @@
   fetchpriority="low"
 ></script>
 
-{% if section.settings.show_image_slider %}
+{%- comment -%} Also drives the colour swatches, so it loads whenever either is on. {%- endcomment -%}
+{% if section.settings.show_image_slider or section.settings.show_swatches %}
   <script
     src="{{ 'showcase-card-slider.js' | asset_url }}"
     type="module"

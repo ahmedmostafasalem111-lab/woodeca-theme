@@ -60,6 +60,16 @@ function applySwatch(swatch) {
   const variantId = swatch.dataset.swatchVariant;
   const quickAdd = card?.querySelector('[data-cart-add]');
   if (quickAdd instanceof HTMLElement && variantId) quickAdd.dataset.variantId = variantId;
+
+  // Every way into the product page carries the colour, so it opens on the
+  // variant the shopper just picked instead of the product's default.
+  if (card && variantId) {
+    for (const link of card.querySelectorAll('a[href*="/products/"]')) {
+      const url = new URL(link.getAttribute('href') ?? '', window.location.origin);
+      url.searchParams.set('variant', variantId);
+      link.setAttribute('href', `${url.pathname}${url.search}${url.hash}`);
+    }
+  }
 }
 
 document.addEventListener('click', (event) => {
