@@ -244,6 +244,45 @@ document.addEventListener('showcase:cart:open', async () => {
   openDrawer();
 });
 
+/*
+  Stock Horizon product cards — search results, the 404 page, cart-page
+  recommendations and their quick-add modal — add through Horizon's product
+  form, which announces the add with the standard cart-lines-update event.
+  Open this drawer for those adds too, so every add-to-cart on the site lands
+  in the same place. Imported dynamically so a failure to load the events
+  module can only cost this bridge, never the drawer itself.
+*/
+import('@shopify/events')
+  .then(({ StandardEvents }) => {
+    document.addEventListener(StandardEvents.cartLinesUpdate, onHorizonCartUpdate);
+  })
+  .catch((error) => console.warn('[showcase-cart-drawer] cart events unavailable', error));
+
+/** @param {Event & { action?: string, promise?: Promise<{ detail?: { didError?: boolean } }> }} event */
+function onHorizonCartUpdate(event) {
+  if (event.action !== 'add') return;
+  // The cart page re-renders itself; a drawer over it would only duplicate it.
+  if (window.location.pathname.replace(/\/$/, '').endsWith('/cart')) return;
+
+  // Let a quick-add modal finish closing (and restore focus) before the
+  // drawer takes over.
+  const sourceModal = event.target instanceof Element ? event.target.closest('dialog:modal') : null;
+
+  event.promise
+    ?.then(({ detail } = {}) => {
+      if (detail?.didError) return;
+      const show = () => refreshDrawer().then(openDrawer);
+      if (sourceModal instanceof HTMLDialogElement && sourceModal.open) {
+        sourceModal.addEventListener('close', show, { once: true });
+      } else {
+        show();
+      }
+    })
+    .catch(() => {
+      // Horizon reports its own add errors inside the form.
+    });
+}
+
 /** Pulls the drawer section fresh, so it reflects the add that just happened. */
 async function refreshDrawer() {
   try {

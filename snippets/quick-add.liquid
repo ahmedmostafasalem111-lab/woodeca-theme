@@ -127,12 +127,16 @@
   {% endif %}
 
   {% if render_choose %}
-    <button
+    {%- comment -%}
+      Woodeca: "Choose" goes to the product page instead of opening Horizon's
+      quick-add modal. The modal fills itself from Horizon's product section
+      (`[data-product-grid-content]`), which this theme's showcase product page
+      does not render, so it could only ever open empty. The product page
+      resolves the options and adds through the showcase cart drawer.
+    {%- endcomment -%}
+    <a
       class="button quick-add__button quick-add__button--choose add-to-cart-button"
-      {% comment %} type="submit" is the default, so we explicitly set it to "button" to prevent the ProductFormComponent.handleSubmit from being triggered {% endcomment %}
-      type="button"
-      name="add"
-      on:click="quick-add-component/handleClick"
+      href="{{ product.url }}"
     >
       <span
         aria-hidden="true"
@@ -141,7 +145,7 @@
         {{- 'icon-add-to-cart.svg' | inline_asset_content -}}
       </span>
       {{- choose_options_text -}}
-    </button>
+    </a>
   {% endif %}
 </quick-add-component>
 

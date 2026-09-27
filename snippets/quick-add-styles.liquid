@@ -55,7 +55,8 @@
     opacity: 1;
   }
 
-  button.quick-add__button {
+  /* `a` too: Woodeca renders "Choose" as a link to the product page (see quick-add.liquid). */
+  :is(button, a).quick-add__button {
     --quick-add-collapsed-width: var(--button-size-md);
     --quick-add-icon-width: calc(var(--button-size-md) - 4px);
     --quick-add-expanded-width: max-content;
@@ -171,7 +172,7 @@
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    button.quick-add__button {
+    :is(button, a).quick-add__button {
       transition-property: scale, translate, opacity, width;
       transition-duration: var(--animation-speed);
       transition-timing-function: var(--ease-out-cubic);

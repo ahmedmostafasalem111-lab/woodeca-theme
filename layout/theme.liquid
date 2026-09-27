@@ -143,7 +143,12 @@
       </footer>
     </div>
 
-    {% render 'cart-drawer', render_wrapper: true %}
+    {%- comment -%}
+      Horizon's cart drawer is not rendered: the showcase cart drawer (footer
+      group) handles every add-to-cart, including Horizon's product forms.
+      `sections/cart-drawer-section` stays in place as the Section Rendering
+      API target for Horizon's /cart endpoints.
+    {%- endcomment -%}
     {% render 'theme-drawer' %}
 
     {% if settings.quick_add or settings.mobile_quick_add %}
