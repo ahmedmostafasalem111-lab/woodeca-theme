@@ -731,6 +731,13 @@
   }
 
   .showcase-card__swatch {
+    /*
+      Containing block for the shared swatch snippet's visually-hidden label.
+      Without it that absolutely positioned label resolves against an ancestor
+      outside the card's scroll row, escapes the row's clip, and widens the
+      whole page on phones.
+    */
+    position: relative;
     display: inline-flex;
     flex: 0 0 auto;
     width: var(--showcase-card-swatch-size, 20px);

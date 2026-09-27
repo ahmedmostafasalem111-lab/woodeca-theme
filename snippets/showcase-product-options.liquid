@@ -206,6 +206,12 @@
 
   /* Text pill — the fallback for any option Shopify has no swatch for. */
   .product-option__chip {
+    /*
+      Containing block for the swatch snippet's visually-hidden label, which the
+      shared swatch sizing stretches to 100% of its containing block. Unpositioned,
+      that was the whole section, and the label widened the page on phones.
+    */
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
