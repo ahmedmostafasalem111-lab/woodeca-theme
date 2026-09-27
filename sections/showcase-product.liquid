@@ -202,14 +202,14 @@
         {%- endcomment -%}
         <div class="product-price-row">
           <span class="product-price-row__current" ref="priceTarget">
-            {{- selected_variant.price | money -}}
+            {%- render 'showcase-money', amount: selected_variant.price -%}
           </span>
           <s
             class="product-price-row__compare"
             ref="compareTarget"
             {% unless has_compare %}hidden{% endunless %}
           >
-            {{- selected_variant.compare_at_price | money -}}
+            {%- render 'showcase-money', amount: selected_variant.compare_at_price -%}
           </s>
           {% if section.settings.tax_note != blank %}
             <span class="product-price-row__tax">{{ section.settings.tax_note }}</span>

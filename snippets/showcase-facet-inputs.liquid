@@ -38,14 +38,14 @@
         <input
           type="hidden"
           name="{{ other_filter.min_value.param_name }}"
-          value="{{ other_filter.min_value.value | money_without_currency | replace: ',', '' }}"
+          value="{{ other_filter.min_value.value | divided_by: 100 }}"
         >
       {% endif %}
       {% if other_filter.max_value.value != null %}
         <input
           type="hidden"
           name="{{ other_filter.max_value.param_name }}"
-          value="{{ other_filter.max_value.value | money_without_currency | replace: ',', '' }}"
+          value="{{ other_filter.max_value.value | divided_by: 100.0 | ceil }}"
         >
       {% endif %}
     {% else %}
@@ -64,7 +64,7 @@
     <div class="facet-range">
       <label class="facet-range__field">
         <span class="visually-hidden">{{ filter.label }} minimum</span>
-        <span aria-hidden="true">{{ cart.currency.symbol }}</span>
+        <span aria-hidden="true">{{ cart.currency.iso_code }}</span>
         <input
           type="number"
           class="facet-range__input"
@@ -74,7 +74,7 @@
           max="{{ filter.range_max | divided_by: 100 | ceil }}"
           placeholder="0"
           {% if filter.min_value.value != null %}
-            value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"
+            value="{{ filter.min_value.value | divided_by: 100 }}"
           {% endif %}
         >
       </label>
@@ -83,7 +83,7 @@
 
       <label class="facet-range__field">
         <span class="visually-hidden">{{ filter.label }} maximum</span>
-        <span aria-hidden="true">{{ cart.currency.symbol }}</span>
+        <span aria-hidden="true">{{ cart.currency.iso_code }}</span>
         <input
           type="number"
           class="facet-range__input"
@@ -93,7 +93,7 @@
           max="{{ filter.range_max | divided_by: 100 | ceil }}"
           placeholder="{{ filter.range_max | divided_by: 100 | ceil }}"
           {% if filter.max_value.value != null %}
-            value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"
+            value="{{ filter.max_value.value | divided_by: 100.0 | ceil }}"
           {% endif %}
         >
       </label>

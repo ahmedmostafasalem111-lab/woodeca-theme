@@ -32,15 +32,15 @@
         on:keydown="/removeFilter?form="
       >
         {%- if filter.min_value.value != null and filter.max_value.value != null %}
-          {{- filter.min_value.value | money -}}
+          {%- render 'showcase-money', amount: filter.min_value.value -%}
           –
-          {{- filter.max_value.value | money -}}
+          {%- render 'showcase-money', amount: filter.max_value.value -%}
         {%- elsif filter.min_value.value != null -%}
-          {{ filter.min_value.value | money }}–{{ filter.range_max | money }}
+          {% render 'showcase-money', amount: filter.min_value.value %}–{% render 'showcase-money', amount: filter.range_max %}
         {%- elsif filter.max_value.value != null -%}
-          {{- 0 | money -}}
+          {%- render 'showcase-money', amount: 0 -%}
           –
-          {{- filter.max_value.value | money -}}
+          {%- render 'showcase-money', amount: filter.max_value.value -%}
         {%- endif -%}
         <span class="svg-wrapper svg-wrapper--smaller">
           {{- 'icon-filters-close.svg' | inline_asset_content -}}

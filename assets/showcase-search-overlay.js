@@ -10,6 +10,8 @@
  * a slow early response overwriting a newer one.
  */
 
+import { formatMajorMoney } from '@theme/showcase-money';
+
 const OPEN_CLASS = 'search-overlay--open';
 const BODY_LOCK = 'search-overlay-locked';
 const DEBOUNCE_MS = 220;
@@ -116,7 +118,8 @@ function escapeHtml(value) {
 /** @param {Record<string, any>} product */
 function renderResult(product) {
   const image = product.featured_image?.url ?? product.image ?? '';
-  const price = product.price ?? '';
+  // /search/suggest returns a bare decimal ("10226.00"); format it like every other price.
+  const price = product.price != null && product.price !== '' ? formatMajorMoney(product.price) : '';
 
   return `
     <a class="search-overlay__result" href="${escapeHtml(product.url ?? '#')}">

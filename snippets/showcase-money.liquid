@@ -1,0 +1,44 @@
+{%- doc -%}
+  The one money format for the storefront: "EGP 12,781".
+
+  ISO currency code, a space, comma thousands separators, no decimals. An
+  amount with non-zero cents keeps them (".47") rather than being rounded
+  silently. Everything visible on the storefront formats money through this
+  snippet (or its JS twin, `showcase-money.js`), so the store's admin money
+  format only affects checkout, emails and admin.
+
+  @param {number} amount - Amount in the currency's minor unit, as Shopify stores money.
+
+  @example
+  {% render 'showcase-money', amount: variant.price %}
+{%- enddoc -%}
+{%- liquid
+  assign currency_code = cart.currency.iso_code | default: shop.currency
+  assign minor = amount | default: 0 | round
+  assign sign = ''
+  if minor < 0
+    assign sign = '-'
+    assign minor = minor | abs
+  endif
+
+  assign whole = minor | divided_by: 100
+  assign fraction = minor | modulo: 100
+
+  assign grouped = ''
+  assign reversed_digits = whole | append: '' | split: '' | reverse
+  for digit in reversed_digits
+    assign position = forloop.index0 | modulo: 3
+    if forloop.index0 > 0 and position == 0
+      assign grouped = ',' | prepend: digit | append: grouped
+    else
+      assign grouped = digit | append: grouped
+    endif
+  endfor
+
+  if fraction > 0
+    assign fraction_text = fraction | plus: 100 | append: '' | slice: 1, 2
+    assign grouped = grouped | append: '.' | append: fraction_text
+  endif
+
+  echo sign | append: currency_code | append: ' ' | append: grouped
+-%}

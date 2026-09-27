@@ -57,7 +57,7 @@
 
     <div class="product-sticky-bar__actions">
       <span class="product-sticky-bar__price" ref="stickyPriceTarget">
-        {{- selected_variant.price | money -}}
+        {%- render 'showcase-money', amount: selected_variant.price -%}
       </span>
 
       <button

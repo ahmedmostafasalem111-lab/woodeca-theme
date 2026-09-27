@@ -101,25 +101,35 @@
       [
         {% for variant in product.variants %}
           {% liquid
+            # Monthly figures round UP to whole pounds, so the advertised
+            # instalment is never below the real one.
             assign headline_months = section.settings.instalment_headline_months | default: 6
-            assign headline_rounding = headline_months | minus: 1
-            assign headline_amount = variant.price | plus: headline_rounding | divided_by: headline_months
+            assign headline_amount = variant.price | times: 1.0 | divided_by: headline_months | divided_by: 100 | ceil | times: 100
+
+            capture price_html
+              render 'showcase-money', amount: variant.price
+            endcapture
+            capture instalment_html
+              render 'showcase-money', amount: headline_amount
+            endcapture
+            capture compare_html
+              render 'showcase-money', amount: variant.compare_at_price
+            endcapture
           %}
           {
             "id": {{ variant.id | json }},
             "options": {{ variant.options | json }},
             "available": {{ variant.available | json }},
-            "priceHtml": {{ variant.price | money | json }},
-            "instalmentHtml": {{ headline_amount | money | json }},
+            "priceHtml": {{ price_html | json }},
+            "instalmentHtml": {{ instalment_html | json }},
             "instalments": {
               {% for block in option_plans %}
                 {% liquid
                   assign plan_months = block.settings.months | default: 3
-                  assign plan_rounding = plan_months | minus: 1
-                  assign plan_amount = variant.price | plus: plan_rounding | divided_by: plan_months
+                  assign plan_amount = variant.price | times: 1.0 | divided_by: plan_months | divided_by: 100 | ceil | times: 100
                   assign plan_suffix = section.settings.instalment_short_period | default: 'mo'
                   capture plan_text
-                    echo plan_amount | money
+                    render 'showcase-money', amount: plan_amount
                     echo ' / '
                     echo plan_suffix
                   endcapture
@@ -129,7 +139,7 @@
               {% endfor %}
             },
             "compareHtml": {%- if variant.compare_at_price > variant.price -%}
-                {{ variant.compare_at_price | money | json }}
+                {{ compare_html | json }}
               {%- else -%}
                 null
               {%- endif -%},

@@ -48,27 +48,32 @@
     endif
   endif
 
-  # Determine if currency code should be shown
-  assign use_currency = false
-  if product.handle == product_resource.handle
-    if settings.currency_code_enabled_product_pages
-      assign use_currency = true
-    endif
-  elsif settings.currency_code_enabled_product_cards
-    assign use_currency = true
-  endif
+  # Woodeca: the currency-code settings no longer apply here — every price
+  # uses the storefront money format (showcase-money), which always shows it.
 
-  # Format all prices
-  if use_currency
-    assign price = price | money_with_currency
-    assign compare_at_price = compare_at_price | money_with_currency
-    assign price_min = price_min | money_with_currency
-    assign price_max = price_max | money_with_currency
-  else
-    assign price = price | money
-    assign compare_at_price = compare_at_price | money
-    assign price_min = price_min | money
-    assign price_max = price_max | money
+  # Format all prices — Woodeca: through the storefront's single money format
+  # (`showcase-money`, "EGP 12,781") whatever the currency-code settings say.
+  # Blank values stay blank, as `nil | money` did, so an absent compare-at
+  # price doesn't turn into "EGP 0".
+  if price != blank
+    capture price
+      render 'showcase-money', amount: price
+    endcapture
+  endif
+  if compare_at_price != blank
+    capture compare_at_price
+      render 'showcase-money', amount: compare_at_price
+    endcapture
+  endif
+  if price_min != blank
+    capture price_min
+      render 'showcase-money', amount: price_min
+    endcapture
+  endif
+  if price_max != blank
+    capture price_max
+      render 'showcase-money', amount: price_max
+    endcapture
   endif
 -%}
 
@@ -113,11 +118,9 @@
   {% endif %}
   {%- if selected_variant.unit_price and show_unit_price %}
     {%- liquid
-      if use_currency
-        assign unit_price = selected_variant.unit_price | money_with_currency
-      else
-        assign unit_price = selected_variant.unit_price | money
-      endif
+      capture unit_price
+        render 'showcase-money', amount: selected_variant.unit_price
+      endcapture
     -%}
     {% render 'unit-price', price: unit_price, measurement: selected_variant.unit_price_measurement %}
   {%- endif -%}

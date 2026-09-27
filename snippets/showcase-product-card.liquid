@@ -49,9 +49,13 @@
     assign card_title = product.title
     assign card_url = product.url
     assign card_image = product.featured_image
-    assign card_price = product.price | money
+    capture card_price
+      render 'showcase-money', amount: product.price
+    endcapture
     if product.compare_at_price > product.price
-      assign card_compare_price = product.compare_at_price | money
+      capture card_compare_price
+        render 'showcase-money', amount: product.compare_at_price
+      endcapture
     endif
     unless product.available
       assign resolved_stock_level = 'out'

@@ -148,7 +148,7 @@
                   </div>
 
                   <span class="cart-line__price">
-                    {{- line.final_line_price | money -}}
+                    {%- render 'showcase-money', amount: line.final_line_price -%}
                   </span>
                 </div>
               </div>
@@ -171,7 +171,7 @@
       <div class="cart-drawer__foot">
         <div class="cart-drawer__subtotal">
           <span>{{ section.settings.subtotal_label | default: 'Subtotal' }}</span>
-          <strong>{{ cart.total_price | money }}</strong>
+          <strong>{% render 'showcase-money', amount: cart.total_price %}</strong>
         </div>
 
         <div class="cart-drawer__actions">

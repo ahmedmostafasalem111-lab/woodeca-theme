@@ -103,7 +103,9 @@
             assign item_product = block.settings.product
             if item_product != blank
               assign item_title = item_product.title
-              assign item_price = item_product.price | money
+              capture item_price
+                render 'showcase-money', amount: item_product.price
+              endcapture
               assign item_image = item_product.featured_image
               assign item_url = item_product.url
             else

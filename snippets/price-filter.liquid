@@ -35,7 +35,8 @@
     >
       <span class="facets__label">{{ filter.label }}</span>
       <facet-status-component class="facets__status">
-        <template ref="moneyFormat">{{ shop.money_format }}</template>
+        {%- comment -%} Woodeca: the storefront money format (showcase-money) for the status text, not the admin format. {%- endcomment -%}
+        <template ref="moneyFormat">{{ cart.currency.iso_code }} {% raw %}{{amount_no_decimals}}{% endraw %}</template>
 
         <span
           class="hide-when-empty"
@@ -45,16 +46,16 @@
         >
           {%- if filter.min_value.value != null or filter.max_value.value != null %}
             {%- if filter.min_value.value != null and filter.max_value.value != null %}
-              {{- filter.min_value.value | money | strip_html -}}
+              {%- render 'showcase-money', amount: filter.min_value.value -%}
               –
-              {{- filter.max_value.value | money | strip_html -}}
+              {%- render 'showcase-money', amount: filter.max_value.value -%}
             {%- elsif filter.min_value.value != null -%}
-              {{ filter.min_value.value | money | strip_html }}–{{ filter.range_max | money | strip_html }}
+              {% render 'showcase-money', amount: filter.min_value.value %}–{% render 'showcase-money', amount: filter.range_max %}
 
             {%- elsif filter.max_value.value != null -%}
-              {{- 0 | money | strip_html -}}
+              {%- render 'showcase-money', amount: 0 -%}
               –
-              {{- filter.max_value.value | money | strip_html -}}
+              {%- render 'showcase-money', amount: filter.max_value.value -%}
             {%- endif -%}
           {%- endif -%}
         </span>
@@ -80,7 +81,7 @@
           {%- endif %}
         "
         id="facet-inputs-{{ filter.param_name | escape | replace: '.', '-' }}"
-        data-money-format="{{ shop.money_format | strip_html }}"
+        data-money-format="{% raw %}{{amount_no_decimals}}{% endraw %}"
         data-currency="{{ localization.country.currency.iso_code }}"
         on:change="/updatePriceFilterAndResults"
       >
@@ -110,7 +111,7 @@
                 class="field__label price-facet__label"
                 for="{{ filter.label | escape }}-GTE-{{ id_prefix }}"
               >
-                {{ cart.currency.symbol }}
+                {{ cart.currency.iso_code }}
               </label>
             </div>
 
@@ -137,7 +138,7 @@
                 class="field__label price-facet__label"
                 for="{{ filter.label | escape }}-LTE-{{ id_prefix }}"
               >
-                {{ cart.currency.symbol }}
+                {{ cart.currency.iso_code }}
               </label>
             </div>
           </div>
@@ -151,7 +152,7 @@
             {%- endif %}
           "
         >
-          {%- assign formatted_highest_price = filter.range_max | money -%}
+          {%- capture formatted_highest_price -%}{% render 'showcase-money', amount: filter.range_max %}{%- endcapture -%}
           {{ 'content.price_filter_html' | t: price: formatted_highest_price }}
         </div>
 

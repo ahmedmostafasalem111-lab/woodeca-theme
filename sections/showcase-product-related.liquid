@@ -50,7 +50,7 @@
         {% continue %}
       {% endif %}
       {%- comment -%} Filters aren't allowed on render arguments, so format first. {%- endcomment -%}
-      {% assign variant_price = variant.price | money %}
+      {% capture variant_price %}{% render 'showcase-money', amount: variant.price %}{% endcapture %}
       <div>
         {% render 'showcase-product-card',
           title: variant.title,

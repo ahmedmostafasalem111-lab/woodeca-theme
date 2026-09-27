@@ -28,8 +28,8 @@
 
   # Integer division rounds down, which would understate the payment; adding
   # months-1 first rounds up so the sum of instalments always covers the price.
-  assign rounding = headline_months | minus: 1
-  assign headline_amount = base_price | plus: rounding | divided_by: headline_months
+  # Round UP to whole pounds: the advertised instalment is never below the real one.
+  assign headline_amount = base_price | times: 1.0 | divided_by: headline_months | divided_by: 100 | ceil | times: 100
 %}
 
 {% if section.settings.show_instalments and base_price > 0 and plans.size > 0 %}
@@ -48,7 +48,7 @@
         <span class="instalment-bar__headline">
           {{ section.settings.instalment_prefix | default: 'Starting From' }}
           <span class="instalment-bar__amount" ref="instalmentHeadline">
-            {{- headline_amount | money -}}
+            {%- render 'showcase-money', amount: headline_amount -%}
           </span>
           <span class="instalment-bar__period">
             /{{ section.settings.instalment_period_label | default: 'Month' }}
@@ -124,8 +124,7 @@
           {% for block in plans %}
             {% liquid
               assign months = block.settings.months | default: 3
-              assign plan_rounding = months | minus: 1
-              assign monthly = base_price | plus: plan_rounding | divided_by: months
+              assign monthly = base_price | times: 1.0 | divided_by: months | divided_by: 100 | ceil | times: 100
             %}
             <tr {{ block.shopify_attributes }}>
               <th scope="row">
@@ -139,7 +138,7 @@
                 ref="instalmentRows[]"
                 data-instalment-months="{{ months }}"
               >
-                {{- monthly | money }} / {{ section.settings.instalment_short_period | default: 'mo' -}}
+                {%- render 'showcase-money', amount: monthly %} / {{ section.settings.instalment_short_period | default: 'mo' -}}
               </td>
             </tr>
           {% endfor %}
