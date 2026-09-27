@@ -215,7 +215,8 @@
         "columns": 3,
         "section_width": "page-width",
         "padding-block-start": 32,
-        "padding-block-end": 32
+        "padding-block-end": 32,
+        "show_section": false
       }
     },
     "cta_final": {
