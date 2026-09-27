@@ -20,6 +20,7 @@ import { Component } from '@theme/component';
  * @property {string | null} compareHtml
  * @property {number | null} savePercent
  * @property {string | null} image
+ * @property {number | null} [mediaId]
  * @property {string} [instalmentHtml]
  * @property {Record<string, string>} [instalments]
  *
@@ -28,6 +29,7 @@ import { Component } from '@theme/component';
  * @property {HTMLElement[]} [thumbs]
  * @property {HTMLElement[]} [dots]
  * @property {HTMLElement} [scroller]
+ * @property {HTMLElement[]} [slides]
  * @property {HTMLInputElement[]} [optionInputs]
  * @property {HTMLElement[]} [optionValueLabels]
  * @property {HTMLScriptElement} [variantData]
@@ -69,6 +71,7 @@ class ShowcaseProductComponent extends Component {
     // which would leave the video playing with its audio audible.
     this.refs.inspirationDialog?.addEventListener('close', this.#onInspirationClose);
     this.#readVariants();
+    this.#showLinkedVariantMedia();
     this.#watchStickyBar();
   }
 
@@ -211,6 +214,8 @@ class ShowcaseProductComponent extends Component {
       if (thumbImg instanceof HTMLImageElement) thumbImg.src = variant.image;
     }
 
+    this.#showMedia(variant.mediaId);
+
     for (const button of [addButton, stickyAddButton, buyNowButton]) {
       if (button) button.disabled = !variant.available;
     }
@@ -226,6 +231,54 @@ class ShowcaseProductComponent extends Component {
     const url = new URL(window.location.href);
     url.searchParams.set('variant', String(variant.id));
     window.history.replaceState({}, '', url);
+  }
+
+  /**
+   * Brings the variant's own photo into view in the parts of the gallery the
+   * desktop `mainImage` swap doesn't reach: the active thumbnail, and on phones
+   * the swipe track, where `mainImage` is hidden. Dots follow through the
+   * track's scroll listener.
+   *
+   * @param {number | null | undefined} mediaId
+   * @param {boolean} [instant] - Jump without animating, for the initial render.
+   */
+  #showMedia(mediaId, instant = false) {
+    if (mediaId == null) return;
+    const key = String(mediaId);
+
+    for (const thumb of this.refs.thumbs ?? []) {
+      const isActive = thumb.dataset.mediaId === key;
+      thumb.classList.toggle('product-thumb--active', isActive);
+      thumb.setAttribute('aria-current', String(isActive));
+    }
+
+    const { scroller, slides } = this.refs;
+    const index = (slides ?? []).findIndex((slide) => slide.dataset.mediaId === key);
+    // A hidden track (desktop) has no width to scroll by.
+    if (!scroller || index < 0 || scroller.clientWidth === 0) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    scroller.scrollTo({
+      left: index * scroller.clientWidth,
+      behavior: instant || reduceMotion ? 'auto' : 'smooth',
+    });
+  }
+
+  /**
+   * A shared `?variant=` link renders that variant's price and options on the
+   * server, but the gallery always starts on the product's first photo. Show the
+   * linked variant's photo instead. A plain product URL keeps the merchant's
+   * chosen lead image.
+   */
+  #showLinkedVariantMedia() {
+    if (!new URL(window.location.href).searchParams.has('variant')) return;
+
+    const id = this.refs.variantInput?.value;
+    const variant = this.#variants.find((candidate) => String(candidate.id) === id);
+    if (!variant) return;
+
+    if (variant.image && this.refs.mainImage) this.refs.mainImage.src = variant.image;
+    requestAnimationFrame(() => this.#showMedia(variant.mediaId, true));
   }
 
   /**

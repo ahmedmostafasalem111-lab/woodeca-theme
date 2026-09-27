@@ -88,6 +88,7 @@
               type="button"
               class="product-thumb{% if forloop.first %} product-thumb--active{% endif %}"
               ref="thumbs[]"
+              data-media-id="{{ image.id }}"
               data-full="{{ image | image_url: width: 1400 }}"
               data-alt="{{ image.alt | default: product.title | escape }}"
               aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
@@ -139,7 +140,7 @@
             ref="scroller"
           >
             {% for image in media_list %}
-              <div class="product-gallery__slide">
+              <div class="product-gallery__slide" ref="slides[]" data-media-id="{{ image.id }}">
                 {{
                   image
                   | image_url: width: 1200

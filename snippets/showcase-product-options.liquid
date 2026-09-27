@@ -139,6 +139,11 @@
               {%- else -%}
                 null
               {%- endif -%},
+            "mediaId": {%- if variant.featured_media != blank -%}
+                {{ variant.featured_media.id | json }}
+              {%- else -%}
+                null
+              {%- endif -%},
             "image": {%- if variant.featured_image != blank -%}
                 {{ variant.featured_image | image_url: width: 1400 | json }}
               {%- else -%}
