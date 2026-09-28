@@ -16,6 +16,15 @@
   assign speed = section.settings.scroll_speed | default: 30
 %}
 
+{%- comment -%} QA-014: an empty section renders nothing — no padded wrapper, no gap. {%- endcomment -%}
+{%- liquid
+  assign has_content = false
+  assign marquee_logos = section.blocks | where: 'type', 'logo'
+  if marquee_logos.size > 0
+    assign has_content = true
+  endif
+-%}
+{% if has_content %}
 <div
   class="section section--{{ section.settings.section_width }} logo-marquee spacing-style"
   style="
@@ -84,6 +93,8 @@
     </div>
   {% endif %}
 </div>
+
+{% endif %}
 
 {% stylesheet %}
   .logo-marquee__row {

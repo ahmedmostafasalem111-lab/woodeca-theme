@@ -11,6 +11,14 @@
   picker will not offer.
 {% endcomment %}
 
+{%- comment -%} QA-014: an empty section renders nothing — no padded wrapper, no gap. {%- endcomment -%}
+{%- liquid
+  assign has_content = false
+  if section.settings.heading != blank or section.settings.subheading != blank or section.settings.button_label != blank
+    assign has_content = true
+  endif
+-%}
+{% if has_content %}
 <div
   class="section-background"
   {% if section.settings.background_color != blank %}
@@ -50,6 +58,8 @@
     </div>
   {% endif %}
 </div>
+
+{% endif %}
 
 {% stylesheet %}
   .cta-band__inner {

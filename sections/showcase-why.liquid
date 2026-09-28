@@ -12,6 +12,22 @@
   assign features = section.blocks | where: 'type', 'feature'
 %}
 
+{%- comment -%} QA-014: an empty section renders nothing — no padded wrapper, no gap. {%- endcomment -%}
+{%- liquid
+  # Icons or step numbers alone aren't content: a feature needs a title or a
+  # description, and the section needs a heading or one such feature.
+  assign has_content = false
+  if section.settings.heading != blank
+    assign has_content = true
+  endif
+  for block in section.blocks
+    if block.settings.title != blank or block.settings.description != blank
+      assign has_content = true
+      break
+    endif
+  endfor
+-%}
+{% if has_content %}
 <div
   class="section section--{{ section.settings.section_width }} showcase-why spacing-style"
   style="
@@ -80,6 +96,8 @@
     <div class="showcase-why__mission">{{ section.settings.mission }}</div>
   {% endif %}
 </div>
+
+{% endif %}
 
 {% stylesheet %}
   .showcase-why {

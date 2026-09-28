@@ -8,7 +8,20 @@
   existing placement is unaffected.
 {% endcomment %}
 
-{% if section.settings.show_section %}
+{%- comment -%} QA-014: an empty section renders nothing — no padded wrapper, no gap. {%- endcomment -%}
+{%- liquid
+  assign has_content = false
+  if section.settings.heading != blank
+    assign has_content = true
+  endif
+  for block in section.blocks
+    if block.settings.image != blank or block.settings.heading != blank or block.settings.subtext != blank
+      assign has_content = true
+      break
+    endif
+  endfor
+-%}
+{% if section.settings.show_section and has_content %}
 <div
   class="section-background"
   {% if section.settings.background_color != blank %}

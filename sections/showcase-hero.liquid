@@ -8,6 +8,18 @@
   for an edge-to-edge banner.
 {% endcomment %}
 
+{%- comment -%} QA-014: an empty section renders nothing — no padded wrapper, no gap. {%- endcomment -%}
+{%- liquid
+  # Nothing to show without an image or any text on at least one slide.
+  assign has_content = false
+  for block in section.blocks
+    if block.settings.image != blank or block.settings.eyebrow != blank or block.settings.heading != blank or block.settings.subheading != blank or block.settings.link_text != blank
+      assign has_content = true
+      break
+    endif
+  endfor
+-%}
+{% if has_content %}
 <showcase-hero-component
   class="showcase-hero section section--{{ section.settings.section_width }}"
   {% if section.settings.autoplay %}
@@ -132,6 +144,8 @@
   src="{{ 'showcase-hero.js' | asset_url }}"
   type="module"
 ></script>
+
+{% endif %}
 
 {% stylesheet %}
   .showcase-hero {

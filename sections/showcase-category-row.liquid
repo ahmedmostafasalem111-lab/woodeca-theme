@@ -4,6 +4,20 @@
   and swipes.
 {% endcomment %}
 
+{%- comment -%} QA-014: an empty section renders nothing — no padded wrapper, no gap. {%- endcomment -%}
+{%- liquid
+  assign has_content = false
+  if section.settings.heading != blank
+    assign has_content = true
+  endif
+  for block in section.blocks
+    if block.settings.image != blank or block.settings.label != blank
+      assign has_content = true
+      break
+    endif
+  endfor
+-%}
+{% if has_content %}
 <div
   class="section-background"
   {% if section.settings.background_color != blank %}
@@ -68,6 +82,8 @@
     next_label: 'Next categories'
   %}
 </div>
+
+{% endif %}
 
 {% stylesheet %}
   .showcase-category-row__heading {
