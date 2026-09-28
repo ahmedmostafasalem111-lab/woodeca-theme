@@ -328,7 +328,9 @@ document.addEventListener('submit', async (event) => {
     const response = await fetch(`${root()}cart/add.js`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ items: [item] }),
+      // Ask for the drawer section in the same request: the drawer can then
+      // open on the add's own response instead of a second round trip.
+      body: JSON.stringify({ items: [item], sections: SECTION_ID }),
     });
 
     if (response.status === 422) {
@@ -341,7 +343,10 @@ document.addEventListener('submit', async (event) => {
     }
     if (!response.ok) throw new Error(`cart/add.js responded ${response.status}`);
 
-    await refreshDrawer();
+    const payload = await response.json().catch(() => null);
+    const html = payload?.sections?.[SECTION_ID];
+    if (html) replaceDrawer(html);
+    else await refreshDrawer();
     openDrawer();
   } catch (error) {
     console.error('[showcase-cart-drawer] add', error);
@@ -367,8 +372,12 @@ document.addEventListener('showcase:cart:limit', async (event) => {
 });
 
 // Opened by the card and product-page add-to-cart handlers once the add succeeds.
-document.addEventListener('showcase:cart:open', async () => {
-  await refreshDrawer();
+// Callers that already have the rendered drawer (they asked for it with their
+// add request) pass it as `detail.html`, saving a round trip.
+document.addEventListener('showcase:cart:open', async (event) => {
+  const html = /** @type {CustomEvent<{ html?: string }>} */ (event).detail?.html;
+  if (html) replaceDrawer(html);
+  else await refreshDrawer();
   openDrawer();
 });
 

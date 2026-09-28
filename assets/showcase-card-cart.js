@@ -20,44 +20,6 @@ const CONFIRM_MS = 2000;
 /** Per-button revert timers, so a rapid second add restarts rather than stacks. */
 const revertTimers = new WeakMap();
 
-/** Refresh every header cart bubble from the authoritative cart payload. */
-async function syncCartCount() {
-  try {
-    const response = await fetch(`${window.Shopify?.routes?.root ?? '/'}cart.js`, {
-      headers: { Accept: 'application/json' },
-    });
-    if (!response.ok) return;
-
-    const cart = await response.json();
-    const count = cart.item_count ?? 0;
-
-    for (const node of document.querySelectorAll('.showcase-header__cart-count')) {
-      node.textContent = String(count);
-      node.hidden = count === 0;
-    }
-
-    // Let the theme's own cart components refresh if they are listening.
-    document.dispatchEvent(new CustomEvent('cart:updated', { detail: { cart }, bubbles: true }));
-  } catch {
-    // A failed count refresh should never undo a successful add.
-  }
-}
-
-/**
- * The header only renders a bubble when the cart is non-empty, so the first add
- * of a session has no node to update. Create one next to the cart icon.
- */
-function ensureCartBubble() {
-  if (document.querySelector('.showcase-header__cart-count')) return;
-
-  const cartLink = document.querySelector('.showcase-header__cart');
-  if (!cartLink) return;
-
-  const bubble = document.createElement('span');
-  bubble.className = 'showcase-header__cart-count';
-  cartLink.appendChild(bubble);
-}
-
 async function addToCart(button) {
   const variantId = button.dataset.variantId;
   if (!variantId || button.classList.contains(BUSY_CLASS)) return;
@@ -69,7 +31,9 @@ async function addToCart(button) {
     const response = await fetch(`${window.Shopify?.routes?.root ?? '/'}cart/add.js`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ items: [{ id: Number(variantId), quantity: 1 }] }),
+      // The drawer section comes back with the add, so the drawer can open on
+      // this one response (and sync the header badge from it).
+      body: JSON.stringify({ items: [{ id: Number(variantId), quantity: 1 }], sections: 'showcase-cart-drawer' }),
     });
 
     if (!response.ok) {
@@ -108,11 +72,15 @@ async function addToCart(button) {
       }, CONFIRM_MS)
     );
 
-    ensureCartBubble();
-    await syncCartCount();
+    const payload = await response.json().catch(() => null);
 
     // Hand off to the drawer, which renders the updated cart and opens itself.
-    document.dispatchEvent(new CustomEvent('showcase:cart:open', { bubbles: true }));
+    document.dispatchEvent(
+      new CustomEvent('showcase:cart:open', {
+        detail: { html: payload?.sections?.['showcase-cart-drawer'] },
+        bubbles: true,
+      })
+    );
   } catch (error) {
     // Stay in the default state so the shopper can retry, and say what happened
     // rather than showing a success state for a product that was never added.
