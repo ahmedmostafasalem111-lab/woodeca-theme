@@ -34,8 +34,6 @@
     --showcase-promo-size: {{ section.settings.promo_font_size }};
     --showcase-nav-size: {{ section.settings.nav_font_size }};
     --showcase-search-background: {{ section.settings.search_background_color | default: '#f2f2f0' }};
-    --showcase-photo-border: {{ section.settings.photo_search_border_color | default: '#3b7de0' }};
-    --showcase-photo-text: {{ section.settings.photo_search_text_color | default: '#1c1c1c' }};
     --showcase-logo-size: {{ section.settings.logo_font_size }};
     --showcase-call-background: {{ section.settings.call_background | default: '#e8262d' }};
     --showcase-call-text: {{ section.settings.call_text_color | default: '#ffffff' }};
@@ -1511,23 +1509,6 @@
       "default": "No matches yet. Try a different word."
     },
     {
-      "type": "checkbox",
-      "id": "show_photo_search",
-      "label": "Show \"Search by photo\" button",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "photo_search_label",
-      "label": "Photo search label",
-      "default": "Search by photo"
-    },
-    {
-      "type": "url",
-      "id": "photo_search_link",
-      "label": "Photo search link"
-    },
-    {
       "type": "header",
       "content": "Action icons"
     },
@@ -1672,18 +1653,6 @@
       "id": "search_background_color",
       "label": "Search field background",
       "default": "#f2f2f0"
-    },
-    {
-      "type": "color",
-      "id": "photo_search_border_color",
-      "label": "Photo search border",
-      "default": "#3b7de0"
-    },
-    {
-      "type": "color",
-      "id": "photo_search_text_color",
-      "label": "Photo search text",
-      "default": "#1c1c1c"
     },
     {
       "type": "color",

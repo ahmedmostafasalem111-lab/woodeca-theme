@@ -1,6 +1,6 @@
 {% doc %}
-  Renders the header search field (pill input with a magnifier on the right edge)
-  plus the optional "Search by photo" pill button. Rendered twice by the header —
+  Renders the header search field (pill input with a magnifier on the right edge).
+  Rendered twice by the header —
   inline on desktop and inside the mobile disclosure — so the markup lives here.
 
   @param {object} section - The header section, for placeholder and photo-search settings.
@@ -70,18 +70,6 @@
       </div>
     {% endif %}
   </form>
-
-  {% if section.settings.show_photo_search %}
-    <a
-      href="{{ section.settings.photo_search_link | default: '#' }}"
-      class="showcase-search__photo"
-    >
-      <span class="svg-wrapper" aria-hidden="true">
-        {{- 'icon-camera.svg' | inline_asset_content -}}
-      </span>
-      <span class="showcase-search__photo-label">{{ section.settings.photo_search_label }}</span>
-    </a>
-  {% endif %}
 </div>
 
 {% stylesheet %}
@@ -172,36 +160,5 @@
   .showcase-search__submit svg {
     width: var(--icon-size-sm);
     height: var(--icon-size-sm);
-  }
-
-  /* Photo-search pill sits alongside the input. */
-  .showcase-search__photo {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--gap-3xs);
-    flex-shrink: 0;
-    padding: var(--padding-2xs) var(--padding-md);
-    border: var(--style-border-width-inputs) solid var(--showcase-photo-border, #3b7de0);
-    border-radius: 999px;
-    color: var(--showcase-photo-text, var(--color-foreground));
-    font-size: var(--font-size--sm);
-    text-decoration: none;
-    white-space: nowrap;
-  }
-
-  .showcase-search__photo .svg-wrapper,
-  .showcase-search__photo svg {
-    width: var(--icon-size-sm);
-    height: var(--icon-size-sm);
-  }
-
-  @media screen and (max-width: 989px) {
-    .showcase-search__photo-label {
-      display: none;
-    }
-
-    .showcase-search__photo {
-      padding-inline: var(--padding-2xs);
-    }
   }
 {% endstylesheet %}
