@@ -39,8 +39,10 @@
             # First slide is above the fold, the rest can defer.
             if forloop.first
               assign slide_loading = 'eager'
+              assign slide_priority = 'high'
             else
               assign slide_loading = 'lazy'
+              assign slide_priority = 'auto'
             endif
           %}
           <div class="showcase-hero__media">
@@ -48,7 +50,7 @@
               {{
                 block.settings.image
                 | image_url: width: 2400
-                | image_tag: class: 'showcase-hero__image', loading: slide_loading, alt: block.settings.heading
+                | image_tag: class: 'showcase-hero__image', loading: slide_loading, fetchpriority: slide_priority, alt: block.settings.heading, sizes: '100vw', widths: '480, 750, 1000, 1400, 1920, 2400'
               }}
             {% else %}
               {{ 'lifestyle-1' | placeholder_svg_tag: 'showcase-hero__image showcase-hero__image--placeholder' }}

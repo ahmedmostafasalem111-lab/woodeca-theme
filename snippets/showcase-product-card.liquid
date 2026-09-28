@@ -193,7 +193,7 @@
             {{
               slide_image
               | image_url: width: 600
-              | image_tag: loading: slide_loading, class: 'showcase-card__image', alt: card_title
+              | image_tag: loading: slide_loading, class: 'showcase-card__image', alt: card_title, sizes: '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw', widths: '200, 300, 400, 500, 600'
             }}
           </a>
         {% endfor %}
@@ -220,7 +220,7 @@
           {{
             card_image
             | image_url: width: 600
-            | image_tag: loading: 'lazy', class: 'showcase-card__image', alt: card_title
+            | image_tag: loading: 'lazy', class: 'showcase-card__image', alt: card_title, sizes: '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw', widths: '200, 300, 400, 500, 600'
           }}
         {% else %}
           {{ 'product-apparel-1' | placeholder_svg_tag: 'showcase-card__image showcase-card__image--placeholder' }}
@@ -357,7 +357,7 @@
               {{
                 swatch_image
                 | image_url: width: 80
-                | image_tag: loading: 'lazy', class: 'showcase-card__swatch-img', alt: ''
+                | image_tag: loading: 'lazy', class: 'showcase-card__swatch-img', alt: '', sizes: '20px', widths: '40, 60, 80'
               }}
             {% else %}
               <span class="showcase-card__swatch-fallback"></span>

@@ -62,13 +62,13 @@
                     {{
                       block.settings.image
                       | image_url: width: 400
-                      | image_tag: loading: 'lazy', class: 'logo-marquee__logo', alt: block.settings.alt
+                      | image_tag: loading: 'lazy', class: 'logo-marquee__logo', alt: block.settings.alt, sizes: '136px', widths: '136, 272, 400'
                     }}
                   {% else %}
                     {{
                       block.settings.image
                       | image_url: width: 400
-                      | image_tag: loading: 'lazy', class: 'logo-marquee__logo', alt: ''
+                      | image_tag: loading: 'lazy', class: 'logo-marquee__logo', alt: '', sizes: '136px', widths: '136, 272, 400'
                     }}
                   {% endif %}
                 {% else %}

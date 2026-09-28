@@ -46,7 +46,7 @@
             {{
               block.settings.image
               | image_url: width: 900
-              | image_tag: loading: 'lazy', class: 'collection-card__image', alt: block.settings.title
+              | image_tag: loading: 'lazy', class: 'collection-card__image', alt: block.settings.title, sizes: '(min-width: 750px) 31vw, 72vw', widths: '300, 450, 600, 750, 900'
             }}
           {% else %}
             {{ 'lifestyle-1' | placeholder_svg_tag: 'collection-card__image collection-card__image--placeholder' }}

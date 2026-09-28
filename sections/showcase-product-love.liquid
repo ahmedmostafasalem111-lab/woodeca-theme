@@ -54,7 +54,7 @@
               {{
                 slide.image
                 | image_url: width: 800
-                | image_tag: loading: 'lazy', class: 'love-card__image', alt: slide.heading
+                | image_tag: loading: 'lazy', class: 'love-card__image', alt: slide.heading, sizes: '(min-width: 750px) 38vw, 70vw', widths: '300, 450, 600, 800'
               }}
             </div>
           {% endif %}

@@ -77,7 +77,7 @@
                   {{
                     section.settings.phone_icon
                     | image_url: width: 96
-                    | image_tag: loading: 'lazy', class: 'footer-contact__icon', alt: ''
+                    | image_tag: loading: 'lazy', class: 'footer-contact__icon', alt: '', sizes: '32px', widths: '32, 64, 96'
                   }}
                 {% endif %}
                 <span class="footer-contact__text">
@@ -93,7 +93,7 @@
                   {{
                     section.settings.email_icon
                     | image_url: width: 96
-                    | image_tag: loading: 'lazy', class: 'footer-contact__icon', alt: ''
+                    | image_tag: loading: 'lazy', class: 'footer-contact__icon', alt: '', sizes: '32px', widths: '32, 64, 96'
                   }}
                 {% endif %}
                 <span class="footer-contact__text">
@@ -126,7 +126,7 @@
                   {{
                     section.settings.location_icon
                     | image_url: width: 96
-                    | image_tag: loading: 'lazy', class: 'footer-contact__icon', alt: ''
+                    | image_tag: loading: 'lazy', class: 'footer-contact__icon', alt: '', sizes: '32px', widths: '32, 64, 96'
                   }}
                 {% endif %}
                 <span class="footer-contact__text">
@@ -144,7 +144,7 @@
                   {{
                     section.settings.tax_icon
                     | image_url: width: 96
-                    | image_tag: loading: 'lazy', class: 'footer-contact__icon', alt: ''
+                    | image_tag: loading: 'lazy', class: 'footer-contact__icon', alt: '', sizes: '32px', widths: '32, 64, 96'
                   }}
                 {% endif %}
                 <span class="footer-contact__text">
@@ -212,7 +212,7 @@
             {{
               block.settings.image
               | image_url: width: 240
-              | image_tag: loading: 'lazy', class: 'footer-payment__logo', alt: block.settings.alt
+              | image_tag: loading: 'lazy', class: 'footer-payment__logo', alt: block.settings.alt, sizes: '64px', widths: '64, 128, 192'
             }}
           </span>
         {% endif %}
@@ -239,7 +239,7 @@
               {{
                 block.settings.icon
                 | image_url: width: 60
-                | image_tag: loading: 'lazy', class: 'footer-social__icon', alt: ''
+                | image_tag: loading: 'lazy', class: 'footer-social__icon', alt: '', sizes: '20px', widths: '20, 40, 60'
               }}
             {% endif %}
           </a>

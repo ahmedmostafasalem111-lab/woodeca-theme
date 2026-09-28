@@ -52,7 +52,7 @@
             {{
               block.settings.image
               | image_url: width: 700
-              | image_tag: loading: 'lazy', class: 'gallery-item__image', alt: block.settings.caption
+              | image_tag: loading: 'lazy', class: 'gallery-item__image', alt: block.settings.caption, sizes: '(min-width: 750px) 25vw, 48vw', widths: '250, 350, 500, 700'
             }}
           {% else %}
             {{ 'lifestyle-1' | placeholder_svg_tag: 'gallery-item__image gallery-item__image--placeholder' }}

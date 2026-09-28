@@ -84,8 +84,8 @@
                 {% if line.image != blank %}
                   {{
                     line.image
-                    | image_url: width: 200
-                    | image_tag: loading: 'lazy', class: 'cart-line__image', alt: line.title
+                    | image_url: width: 260
+                    | image_tag: loading: 'lazy', class: 'cart-line__image', alt: line.title, sizes: '84px', widths: '90, 170, 260'
                   }}
                 {% endif %}
               </a>

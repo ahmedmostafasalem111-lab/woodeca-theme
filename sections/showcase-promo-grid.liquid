@@ -45,7 +45,7 @@
                 {{
                   section.settings.heading_icon_image
                   | image_url: width: 96
-                  | image_tag: loading: 'lazy', alt: ''
+                  | image_tag: loading: 'lazy', alt: '', sizes: '48px', widths: '48, 96'
                 }}
               {%- else -%}
                 {{- icon_file | inline_asset_content -}}
@@ -96,7 +96,7 @@
             {{
               block.settings.image
               | image_url: width: 500
-              | image_tag: loading: 'lazy', class: 'promo-tile__image', alt: block.settings.name
+              | image_tag: loading: 'lazy', class: 'promo-tile__image', alt: block.settings.name, sizes: '(min-width: 750px) 16vw, 32vw', widths: '160, 250, 350, 500'
             }}
           {% else %}
             {{ 'product-apparel-2' | placeholder_svg_tag: 'promo-tile__image promo-tile__image--placeholder' }}

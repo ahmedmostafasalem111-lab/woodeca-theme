@@ -49,8 +49,8 @@
             {% if poster != blank %}
               {{
                 poster
-                | image_url: width: 300
-                | image_tag: loading: 'lazy', class: 'product-inspiration__poster', alt: ''
+                | image_url: width: 220
+                | image_tag: loading: 'lazy', class: 'product-inspiration__poster', alt: '', sizes: '72px', widths: '80, 150, 220'
               }}
             {% endif %}
             <span class="svg-wrapper product-inspiration__play" aria-hidden="true">

@@ -17,7 +17,7 @@
 <a href="{{ row_href }}" class="mobile-drawer__row mobile-drawer__row--flat">
   <span class="mobile-drawer__row-icon">
     {% if image != blank %}
-      {{ image | image_url: width: 96 | image_tag: loading: 'lazy', class: 'mobile-drawer__row-img', alt: '' }}
+      {{ image | image_url: width: 96 | image_tag: loading: 'lazy', class: 'mobile-drawer__row-img', alt: '', sizes: '32px', widths: '32, 64, 96' }}
     {% elsif inline_icon != blank %}
       <span class="svg-wrapper" aria-hidden="true">
         {{- inline_icon | inline_asset_content -}}

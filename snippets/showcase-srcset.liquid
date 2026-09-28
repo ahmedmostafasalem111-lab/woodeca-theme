@@ -15,7 +15,8 @@
   assign srcset = ''
   for candidate in candidates
     assign width = candidate | strip | times: 1
-    if image.width == blank or width <= image.width
+    # A rasterised vector (format set) is sharp at any width, so no cap.
+    if image.width == blank or format != blank or width <= image.width
       if format != blank
         assign url = image | image_url: width: width, format: format
       else

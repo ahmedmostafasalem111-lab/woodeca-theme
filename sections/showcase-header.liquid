@@ -154,11 +154,28 @@
         class="showcase-header__logo"
       >
         {% if section.settings.logo_image != blank %}
-          {{
-            section.settings.logo_image
-            | image_url: width: 400
-            | image_tag: class: 'showcase-header__logo-image', alt: section.settings.logo_text
-          }}
+          {%- liquid
+            # An SVG logo is served as-is at any requested width — this store's
+            # is ~700 KB because it wraps a bitmap. Rasterise it to PNG
+            # (transparency kept) at the sizes it is actually shown.
+            assign logo = section.settings.logo_image
+            assign logo_url = logo | image_url
+            assign logo_format = ''
+            if logo_url contains '.svg'
+              assign logo_format = 'png'
+            endif
+          -%}
+          <img
+            class="showcase-header__logo-image"
+            src="{% if logo_format != blank %}{{ logo | image_url: width: 320, format: logo_format }}{% else %}{{ logo | image_url: width: 320 }}{% endif %}"
+            srcset="{% render 'showcase-srcset', image: logo, widths: '112,160,224,320,336,480', format: logo_format %}"
+            sizes="(min-width: 990px) 160px, 112px"
+            alt="{{ section.settings.logo_text | escape }}"
+            {% if logo.width %}
+              width="{{ logo.width }}"
+              height="{{ logo.height }}"
+            {% endif %}
+          >
         {% else %}
           <span class="showcase-header__logo-text">{{ section.settings.logo_text }}</span>
         {% endif %}

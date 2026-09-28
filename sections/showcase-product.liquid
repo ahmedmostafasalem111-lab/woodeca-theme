@@ -104,7 +104,7 @@
               aria-label="{{ section.settings.thumb_label | default: 'View image' | escape }} {{ forloop.index }}"
               on:click="/selectThumb"
             >
-              {{ image | image_url: width: 200 | image_tag: loading: 'lazy', alt: '' }}
+              {{ image | image_url: width: 260 | image_tag: loading: 'lazy', alt: '', sizes: '88px', widths: '90, 180, 260' }}
             </button>
           {% endfor %}
         </div>

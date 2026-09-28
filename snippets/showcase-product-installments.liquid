@@ -97,7 +97,7 @@
               {{
                 block.settings.logo
                 | image_url: width: 200
-                | image_tag: loading: 'lazy', class: 'instalment-provider__logo', alt: block.settings.name
+                | image_tag: loading: 'lazy', class: 'instalment-provider__logo', alt: block.settings.name, sizes: '96px', widths: '100, 200'
               }}
             {% else %}
               <span class="instalment-provider__placeholder">{{ block.settings.name }}</span>
