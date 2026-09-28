@@ -171,20 +171,20 @@
             assign logo = section.settings.logo_image
             assign logo_url = logo | image_url
             assign logo_format = ''
+            assign logo_src = logo | image_url: width: 320
             if logo_url contains '.svg'
               assign logo_format = 'png'
+              assign logo_src = logo | image_url: width: 320, format: 'png'
             endif
           -%}
           <img
             class="showcase-header__logo-image"
-            src="{% if logo_format != blank %}{{ logo | image_url: width: 320, format: logo_format }}{% else %}{{ logo | image_url: width: 320 }}{% endif %}"
+            src="{{ logo_src }}"
             srcset="{% render 'showcase-srcset', image: logo, widths: '112,160,224,320,336,480', format: logo_format %}"
             sizes="(min-width: 990px) 160px, 112px"
             alt="{{ section.settings.logo_text | escape }}"
-            {% if logo.width %}
-              width="{{ logo.width }}"
-              height="{{ logo.height }}"
-            {% endif %}
+            width="{{ logo.width }}"
+            height="{{ logo.height }}"
           >
         {% else %}
           <span class="showcase-header__logo-text">{{ section.settings.logo_text }}</span>
