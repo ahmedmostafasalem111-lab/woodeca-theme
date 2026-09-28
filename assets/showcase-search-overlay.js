@@ -10,12 +10,10 @@
  * a slow early response overwriting a newer one.
  */
 
-import { formatMajorMoney } from '@theme/showcase-money';
+import { DEBOUNCE_MS, MIN_QUERY, escapeHtml, fetchSuggestions, renderResult } from '@theme/showcase-search-suggest';
 
 const OPEN_CLASS = 'search-overlay--open';
 const BODY_LOCK = 'search-overlay-locked';
-const DEBOUNCE_MS = 220;
-const MIN_QUERY = 2;
 
 /** @type {AbortController | null} */
 let inFlight = null;
@@ -77,20 +75,11 @@ async function suggest(overlay, query) {
   inFlight = new AbortController();
   results.setAttribute('aria-busy', 'true');
 
-  const base = overlay.dataset.searchSuggestUrl || '/search/suggest';
-  const url = `${base}?q=${encodeURIComponent(
-    query
-  )}&resources[type]=product&resources[limit]=8&resources[options][unavailable_products]=last`;
-
   try {
-    const response = await fetch(url, {
-      headers: { Accept: 'application/json' },
+    const products = await fetchSuggestions(query, {
+      base: overlay.dataset.searchSuggestUrl || '/search/suggest',
       signal: inFlight.signal,
     });
-    if (!response.ok) throw new Error(`suggest responded ${response.status}`);
-
-    const payload = await response.json();
-    const products = payload?.resources?.results?.products ?? [];
 
     results.innerHTML = products.length
       ? products.map(renderResult).join('')
@@ -104,37 +93,6 @@ async function suggest(overlay, query) {
   } finally {
     results.setAttribute('aria-busy', 'false');
   }
-}
-
-/** @param {string} value */
-function escapeHtml(value) {
-  return String(value).replace(
-    /[&<>"']/g,
-    (char) =>
-      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char] ?? char
-  );
-}
-
-/** @param {Record<string, any>} product */
-function renderResult(product) {
-  const image = product.featured_image?.url ?? product.image ?? '';
-  // /search/suggest returns a bare decimal ("10226.00"); format it like every other price.
-  const price = product.price != null && product.price !== '' ? formatMajorMoney(product.price) : '';
-
-  return `
-    <a class="search-overlay__result" href="${escapeHtml(product.url ?? '#')}">
-      ${
-        image
-          ? `<img class="search-overlay__result-image" src="${escapeHtml(
-              image
-            )}" alt="" loading="lazy" width="48" height="48">`
-          : '<span class="search-overlay__result-image"></span>'
-      }
-      <span class="search-overlay__result-text">
-        <span class="search-overlay__result-title">${escapeHtml(product.title ?? '')}</span>
-        ${price ? `<span class="search-overlay__result-price">${escapeHtml(price)}</span>` : ''}
-      </span>
-    </a>`;
 }
 
 document.addEventListener('click', (event) => {

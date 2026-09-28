@@ -16,6 +16,10 @@
     method="get"
     role="search"
     class="showcase-search__form"
+    {% if id_suffix == 'desktop' %}
+      data-search-desktop
+      data-search-suggest-url="{{ routes.predictive_search_url }}"
+    {% endif %}
   >
     <label
       for="showcase-search-{{ id_suffix }}"
@@ -30,6 +34,11 @@
       class="showcase-search__input"
       placeholder="{{ section.settings.search_placeholder | escape }}"
       autocomplete="off"
+      {% if id_suffix == 'desktop' %}
+        aria-controls="showcase-search-panel-{{ id_suffix }}"
+        aria-expanded="false"
+        aria-autocomplete="list"
+      {% endif %}
     >
     <input
       type="hidden"
@@ -45,6 +54,21 @@
         {{- 'icon-search.svg' | inline_asset_content -}}
       </span>
     </button>
+
+    {%- comment -%} Desktop live suggestions, filled by showcase-search-desktop.js. {%- endcomment -%}
+    {% if id_suffix == 'desktop' %}
+      <div
+        class="showcase-search__panel"
+        id="showcase-search-panel-{{ id_suffix }}"
+        data-search-panel
+        hidden
+      >
+        <div class="showcase-search__results" data-search-results aria-live="polite"></div>
+        <button type="submit" class="showcase-search__all" data-search-all hidden>
+          {{- 'actions.view_all' | t -}}
+        </button>
+      </div>
+    {% endif %}
   </form>
 
   {% if section.settings.show_photo_search %}
@@ -72,6 +96,45 @@
     position: relative;
     flex-grow: 1;
     min-width: 0;
+  }
+
+  /* Desktop suggestions; rows reuse the mobile overlay's result styles. */
+  .showcase-search__panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    inset-inline: 0;
+    z-index: 40;
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
+    padding: var(--padding-xs);
+    border-radius: 12px;
+    background-color: var(--color-background, #ffffff);
+    box-shadow: 0 16px 40px rgb(0 0 0 / 0.14);
+  }
+
+  .showcase-search__panel[hidden] {
+    display: none;
+  }
+
+  .showcase-search__all {
+    display: block;
+    width: 100%;
+    margin-block-start: var(--margin-2xs);
+    padding: var(--padding-sm);
+    border: 0;
+    border-radius: 8px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5));
+    color: var(--color-foreground);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .showcase-search__all[hidden] {
+    display: none;
+  }
+
+  .showcase-search__all:hover {
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-10));
   }
 
   .showcase-search__input {
