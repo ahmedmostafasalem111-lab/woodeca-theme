@@ -20,6 +20,7 @@ import { Component } from '@theme/component';
  * @property {string | null} compareHtml
  * @property {number | null} savePercent
  * @property {string | null} image
+ * @property {string | null} [imageSrcset]
  * @property {number | null} [mediaId]
  * @property {string} [instalmentHtml]
  * @property {Record<string, string>} [instalments]
@@ -132,7 +133,7 @@ class ShowcaseProductComponent extends Component {
     const { mainImage, thumbs } = this.refs;
     const full = thumb.dataset.full;
     if (mainImage && full) {
-      mainImage.src = full;
+      swapImage(mainImage, full, thumb.dataset.srcset);
       if (thumb.dataset.alt) mainImage.alt = thumb.dataset.alt;
     }
 
@@ -209,9 +210,8 @@ class ShowcaseProductComponent extends Component {
     }
 
     if (variant.image) {
-      if (mainImage) mainImage.src = variant.image;
-      const thumbImg = stickyThumb?.querySelector('img');
-      if (thumbImg instanceof HTMLImageElement) thumbImg.src = variant.image;
+      swapImage(mainImage, variant.image, variant.imageSrcset);
+      swapImage(stickyThumb?.querySelector('img'), variant.image, variant.imageSrcset);
     }
 
     this.#showMedia(variant.mediaId);
@@ -295,7 +295,7 @@ class ShowcaseProductComponent extends Component {
     const variant = this.#variants.find((candidate) => String(candidate.id) === id);
     if (!variant) return;
 
-    if (variant.image && this.refs.mainImage) this.refs.mainImage.src = variant.image;
+    if (variant.image) swapImage(this.refs.mainImage, variant.image, variant.imageSrcset);
     requestAnimationFrame(() => this.#showMedia(variant.mediaId, true));
   }
 
@@ -462,6 +462,22 @@ class ShowcaseProductComponent extends Component {
       dot.setAttribute('aria-current', String(isActive));
     }
   }
+}
+
+/**
+ * Points an <img> at a new picture. `src` alone is not enough: when the image
+ * has a `srcset`, the browser keeps choosing from it and the change never
+ * shows, so the two are always set together.
+ *
+ * @param {Element | null | undefined} img
+ * @param {string} src
+ * @param {string | null | undefined} srcset
+ */
+function swapImage(img, src, srcset) {
+  if (!(img instanceof HTMLImageElement) || !src) return;
+  if (srcset) img.srcset = srcset;
+  else img.removeAttribute('srcset');
+  img.src = src;
 }
 
 if (!customElements.get('showcase-product-component')) {

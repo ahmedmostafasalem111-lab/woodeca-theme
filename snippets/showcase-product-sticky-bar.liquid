@@ -32,10 +32,10 @@
           {{
             selected_variant.featured_image
             | image_url: width: 160
-            | image_tag: loading: 'lazy', alt: product.title
+            | image_tag: loading: 'lazy', alt: product.title, sizes: '64px', widths: '80, 160'
           }}
         {% elsif product.featured_image != blank %}
-          {{ product.featured_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: product.title }}
+          {{ product.featured_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: product.title, sizes: '64px', widths: '80, 160' }}
         {% endif %}
       </span>
 

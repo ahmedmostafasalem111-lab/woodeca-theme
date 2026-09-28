@@ -155,7 +155,13 @@
                 null
               {%- endif -%},
             "image": {%- if variant.featured_image != blank -%}
-                {{ variant.featured_image | image_url: width: 1400 | json }}
+                {{ variant.featured_image | image_url: width: 1200 | json }}
+              {%- else -%}
+                null
+              {%- endif -%},
+            "imageSrcset": {%- if variant.featured_image != blank -%}
+                {%- capture variant_srcset -%}{% render 'showcase-srcset', image: variant.featured_image, widths: '160,600,900,1200,1600,2000' %}{%- endcapture -%}
+                {{ variant_srcset | json }}
               {%- else -%}
                 null
               {%- endif -%}

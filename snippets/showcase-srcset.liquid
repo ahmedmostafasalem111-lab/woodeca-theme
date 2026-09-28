@@ -1,0 +1,34 @@
+{%- doc -%}
+  A `srcset` value for an image at the given widths, never wider than the
+  original. Pair it with a `sizes` attribute that says how wide the image is
+  shown, so each device downloads the smallest file that stays sharp.
+
+  @param {object} image - An image or media image.
+  @param {string} widths - Comma-separated pixel widths, e.g. '400,800,1200'.
+  @param {string} [format] - Optional image_url format, e.g. 'png' to rasterise an SVG.
+
+  @example
+  <img srcset="{% render 'showcase-srcset', image: image, widths: '400,800,1200' %}" sizes="50vw" …>
+{%- enddoc -%}
+{%- liquid
+  assign candidates = widths | split: ','
+  assign srcset = ''
+  for candidate in candidates
+    assign width = candidate | strip | times: 1
+    if image.width == blank or width <= image.width
+      if format != blank
+        assign url = image | image_url: width: width, format: format
+      else
+        assign url = image | image_url: width: width
+      endif
+      assign srcset = srcset | append: url | append: ' ' | append: width | append: 'w, '
+    endif
+  endfor
+
+  if srcset == ''
+    assign url = image | image_url
+    assign srcset = url | append: ' ' | append: image.width | append: 'w, '
+  endif
+
+  echo srcset | remove_last: ', '
+-%}
