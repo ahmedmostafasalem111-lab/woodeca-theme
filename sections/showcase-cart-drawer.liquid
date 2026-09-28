@@ -22,6 +22,7 @@
   id="CartDrawer"
   data-cart-drawer
   data-cart-count="{{ cart.item_count }}"
+  data-limit-text="{{ section.settings.stock_limit_text | default: 'Only [count] available' | escape }}"
   data-countdown-minutes="{{ section.settings.countdown_minutes | default: 10 }}"
   style="
     --cart-accent: {{ section.settings.accent_color | default: '#e8342a' }};
@@ -77,7 +78,7 @@
         {%- comment -%} 3 — Line items {%- endcomment -%}
         <ul class="cart-lines" role="list">
           {% for line in cart.items %}
-            <li class="cart-line" data-cart-line="{{ forloop.index }}">
+            <li class="cart-line" data-cart-line="{{ forloop.index }}" data-variant-id="{{ line.variant_id }}">
               <a href="{{ line.url }}" class="cart-line__media">
                 {% if line.image != blank %}
                   {{
@@ -152,6 +153,9 @@
                     {%- render 'showcase-money', amount: line.final_line_price -%}
                   </span>
                 </div>
+
+                {%- comment -%} Filled by the cart script when an add or step-up hits the stock limit. {%- endcomment -%}
+                <p class="cart-line__notice" data-cart-line-notice role="status" hidden></p>
               </div>
             </li>
           {% endfor %}
@@ -448,6 +452,13 @@
     white-space: nowrap;
   }
 
+  .cart-line__notice {
+    margin: var(--margin-2xs) 0 0;
+    color: var(--cart-accent);
+    font-size: var(--font-size--xs);
+    font-weight: 600;
+  }
+
   /* ---- Foot ---- */
   .cart-drawer__foot {
     flex: 0 0 auto;
@@ -607,6 +618,13 @@
       "id": "increase_label",
       "label": "Increase accessible label",
       "default": "Increase quantity"
+    },
+    {
+      "type": "text",
+      "id": "stock_limit_text",
+      "label": "Stock limit message",
+      "info": "Shown under a line when a shopper tries to add more than is in stock. [count] becomes the quantity available.",
+      "default": "Only [count] available"
     },
     {
       "type": "header",

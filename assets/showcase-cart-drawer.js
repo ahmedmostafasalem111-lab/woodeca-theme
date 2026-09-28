@@ -111,6 +111,14 @@ async function changeLine(line, quantity) {
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ line, quantity, sections: SECTION_ID }),
     });
+
+    if (response.status === 422) {
+      // Past the stock limit. Shopify keeps the line at the most it can hold;
+      // re-render so the quantity and total are the real ones, then say why.
+      await refreshDrawer();
+      showLimitNotice(drawer()?.querySelector(`[data-cart-line="${line}"]`));
+      return;
+    }
     if (!response.ok) throw new Error(`cart/change.js responded ${response.status}`);
 
     const payload = await response.json();
@@ -154,6 +162,28 @@ function replaceDrawer(html) {
   // the header badge right without a second request.
   const count = Number(next.dataset.cartCount);
   if (Number.isFinite(count)) syncCartCount(count);
+}
+
+/**
+ * Tells the shopper why a line stopped at its quantity: "Only 2 available".
+ *
+ * @param {Element | null | undefined} lineElement
+ */
+function showLimitNotice(lineElement) {
+  if (!(lineElement instanceof HTMLElement)) return;
+
+  const notice = lineElement.querySelector('[data-cart-line-notice]');
+  const quantity = lineElement.querySelector('.cart-quantity__value')?.textContent?.trim();
+  const template = drawer()?.dataset.limitText || 'Only [count] available';
+  if (!(notice instanceof HTMLElement) || !quantity) return;
+
+  notice.textContent = template.replace('[count]', quantity);
+  notice.hidden = false;
+}
+
+/** @param {string | number} variantId */
+function showLimitForVariant(variantId) {
+  showLimitNotice(drawer()?.querySelector(`[data-variant-id="${variantId}"]`));
 }
 
 /** @param {number} count */
@@ -219,12 +249,39 @@ document.addEventListener('submit', async (event) => {
 
   event.preventDefault();
 
+  // Sent as a JSON `items` add rather than the raw form data: the form-data
+  // endpoint accepted more units than are in stock (6 of a 1-in-stock item),
+  // leaving the shopper to find out at checkout. The items endpoint enforces
+  // stock and reports it.
+  const data = new FormData(form);
+  const variantId = Number(data.get('id'));
+  /** @type {Record<string, unknown>} */
+  const item = { id: variantId, quantity: Number(data.get('quantity')) || 1 };
+  const sellingPlan = data.get('selling_plan');
+  if (sellingPlan) item.selling_plan = Number(sellingPlan);
+  /** @type {Record<string, FormDataEntryValue>} */
+  const properties = {};
+  for (const [key, value] of data.entries()) {
+    const match = key.match(/^properties\[(.+)\]$/);
+    if (match) properties[match[1]] = value;
+  }
+  if (Object.keys(properties).length) item.properties = properties;
+
   try {
     const response = await fetch(`${root()}cart/add.js`, {
       method: 'POST',
-      headers: { Accept: 'application/json' },
-      body: new FormData(form),
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ items: [item] }),
     });
+
+    if (response.status === 422) {
+      // Stock limit: Shopify added what it could (or nothing, if the cart
+      // already holds the maximum). Show the cart as it really is, and why.
+      await refreshDrawer();
+      openDrawer();
+      showLimitForVariant(variantId);
+      return;
+    }
     if (!response.ok) throw new Error(`cart/add.js responded ${response.status}`);
 
     await refreshDrawer();
@@ -242,6 +299,14 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
     closeDrawer();
   }
+});
+
+// A card quick-add that hit the stock limit: show the line and the limit.
+document.addEventListener('showcase:cart:limit', async (event) => {
+  await refreshDrawer();
+  openDrawer();
+  const detail = /** @type {CustomEvent<{ variantId?: string | number }>} */ (event).detail;
+  if (detail?.variantId) showLimitForVariant(detail.variantId);
 });
 
 // Opened by the card and product-page add-to-cart handlers once the add succeeds.

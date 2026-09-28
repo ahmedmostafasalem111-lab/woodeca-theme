@@ -75,6 +75,18 @@ async function addToCart(button) {
     if (!response.ok) {
       // Shopify returns the reason (e.g. sold out) in the JSON body.
       const problem = await response.json().catch(() => ({}));
+
+      // Stock limit — the cart already holds all there is. Not a failure of
+      // this button: hand over to the drawer, which shows the line and
+      // "Only N available". A sold-out variant has no line to point at, so it
+      // stays an error on the button.
+      if (response.status === 422 && !/sold out/i.test(problem.description || problem.message || '')) {
+        document.dispatchEvent(
+          new CustomEvent('showcase:cart:limit', { detail: { variantId }, bubbles: true })
+        );
+        return;
+      }
+
       throw new Error(problem.description || problem.message || 'Add to cart failed');
     }
 
