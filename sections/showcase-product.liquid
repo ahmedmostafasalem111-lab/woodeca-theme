@@ -83,7 +83,15 @@
       {%- comment -%} ---------- Gallery ---------- {%- endcomment -%}
       <div class="product-gallery">
         <div class="product-gallery__rail">
-          {% for image in media_list limit: section.settings.thumb_limit %}
+          {% liquid
+            # 0 (the default) shows every image; the rail scrolls when they
+            # don't fit beside the main image.
+            assign thumb_count = section.settings.thumb_limit | default: 0
+            if thumb_count == 0
+              assign thumb_count = media_list.size
+            endif
+          %}
+          {% for image in media_list limit: thumb_count %}
             <button
               type="button"
               class="product-thumb{% if forloop.first %} product-thumb--active{% endif %}"
@@ -465,17 +473,21 @@
     gap: var(--gap-sm);
   }
 
+  /*
+    Exactly as tall as the main image (`height: 0` keeps it out of the row's
+    sizing, `min-height: 100%` then fills the row), scrolling when a product
+    has more thumbnails than fit. A thin scrollbar shows that it scrolls.
+  */
   .product-gallery__rail {
     display: flex;
     flex-direction: column;
     gap: var(--gap-2xs);
-    max-height: 620px;
+    height: 0;
+    min-height: 100%;
     overflow-y: auto;
-    scrollbar-width: none;
-  }
-
-  .product-gallery__rail::-webkit-scrollbar {
-    display: none;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--color-foreground-rgb) / var(--opacity-20)) transparent;
   }
 
   .product-thumb {
@@ -921,10 +933,11 @@
       "type": "range",
       "id": "thumb_limit",
       "label": "Maximum thumbnails",
-      "min": 3,
-      "max": 12,
+      "info": "0 shows every image. The thumbnail strip scrolls when they don't fit beside the main image.",
+      "min": 0,
+      "max": 30,
       "step": 1,
-      "default": 8
+      "default": 0
     },
     {
       "type": "text",

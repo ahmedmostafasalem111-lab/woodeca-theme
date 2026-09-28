@@ -250,6 +250,7 @@ class ShowcaseProductComponent extends Component {
       const isActive = thumb.dataset.mediaId === key;
       thumb.classList.toggle('product-thumb--active', isActive);
       thumb.setAttribute('aria-current', String(isActive));
+      if (isActive) this.#revealThumb(thumb);
     }
 
     const { scroller, slides } = this.refs;
@@ -262,6 +263,23 @@ class ShowcaseProductComponent extends Component {
       left: index * scroller.clientWidth,
       behavior: instant || reduceMotion ? 'auto' : 'smooth',
     });
+  }
+
+  /**
+   * Scrolls the thumbnail rail (only the rail, never the page) so the active
+   * thumbnail is in view when it sits below the visible part of a long strip.
+   *
+   * @param {HTMLElement} thumb
+   */
+  #revealThumb(thumb) {
+    const rail = thumb.parentElement;
+    if (!rail || rail.clientHeight === 0 || rail.scrollHeight <= rail.clientHeight) return;
+
+    const railBox = rail.getBoundingClientRect();
+    const thumbBox = thumb.getBoundingClientRect();
+    if (thumbBox.top >= railBox.top && thumbBox.bottom <= railBox.bottom) return;
+
+    rail.scrollTop += thumbBox.top - railBox.top - (railBox.height - thumbBox.height) / 2;
   }
 
   /**
