@@ -36,8 +36,14 @@
 
   <div class="showcase-collections__grid">
     {% for block in card_blocks %}
-      <a
-        href="{{ block.settings.link | default: '#' }}"
+      {%- liquid
+        assign card_tag = 'div'
+        if block.settings.link != blank
+          assign card_tag = 'a'
+        endif
+      -%}
+      <{{ card_tag }}
+        {% if card_tag == 'a' %}href="{{ block.settings.link }}"{% endif %}
         class="collection-card"
         {{ block.shopify_attributes }}
       >
@@ -70,7 +76,7 @@
             </span>
           </span>
         </span>
-      </a>
+      </{{ card_tag }}>
     {% endfor %}
   </div>
 </div>

@@ -64,9 +64,9 @@
       {% endif %}
     </div>
 
-    {% if section.settings.button_label != blank %}
+    {% if section.settings.button_label != blank and section.settings.button_link != blank %}
       <a
-        href="{{ section.settings.button_link | default: '#' }}"
+        href="{{ section.settings.button_link }}"
         class="showcase-promo__button"
       >
         {{- section.settings.button_label -}}
@@ -76,8 +76,14 @@
 
   <div class="showcase-promo__grid">
     {% for block in section.blocks %}
-      <a
-        href="{{ block.settings.link | default: '#' }}"
+      {%- liquid
+        assign tile_tag = 'div'
+        if block.settings.link != blank
+          assign tile_tag = 'a'
+        endif
+      -%}
+      <{{ tile_tag }}
+        {% if tile_tag == 'a' %}href="{{ block.settings.link }}"{% endif %}
         class="promo-tile"
         {{ block.shopify_attributes }}
       >
@@ -102,7 +108,7 @@
             {{ 'product-apparel-2' | placeholder_svg_tag: 'promo-tile__image promo-tile__image--placeholder' }}
           {% endif %}
         </span>
-      </a>
+      </{{ tile_tag }}>
     {% endfor %}
   </div>
 </div>

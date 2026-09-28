@@ -11,10 +11,14 @@
 
 {% liquid
   assign row_label = label | default: fallback_label
-  assign row_href = link | default: '#'
+  # No destination: show the row as text rather than a link to "#".
+  assign row_tag = 'div'
+  if link != blank
+    assign row_tag = 'a'
+  endif
 %}
 
-<a href="{{ row_href }}" class="mobile-drawer__row mobile-drawer__row--flat">
+<{{ row_tag }} {% if row_tag == 'a' %}href="{{ link }}" {% endif %}class="mobile-drawer__row mobile-drawer__row--flat">
   <span class="mobile-drawer__row-icon">
     {% if image != blank %}
       {{ image | image_url: width: 96 | image_tag: loading: 'lazy', class: 'mobile-drawer__row-img', alt: '', sizes: '32px', widths: '32, 64, 96' }}
@@ -25,4 +29,4 @@
     {% endif %}
   </span>
   <span class="mobile-drawer__row-label">{{ row_label }}</span>
-</a>
+</{{ row_tag }}>

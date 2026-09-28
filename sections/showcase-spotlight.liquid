@@ -114,7 +114,6 @@
               assign item_image = block.settings.image
               assign item_url = block.settings.url
             endif
-            assign item_url = item_url | default: '#'
 
             # Only a single-variant, in-stock product can be added straight from the
             # card. Anything with options keeps its link so we never silently add the
@@ -134,8 +133,14 @@
             {{ block.shopify_attributes }}
           >
             <div class="spotlight-item__media">
-              <a
-                href="{{ item_url }}"
+              {%- liquid
+                assign item_link_tag = 'div'
+                if item_url != blank
+                  assign item_link_tag = 'a'
+                endif
+              -%}
+              <{{ item_link_tag }}
+                {% if item_link_tag == 'a' %}href="{{ item_url }}"{% endif %}
                 tabindex="-1"
                 aria-hidden="true"
                 class="spotlight-item__media-link"
@@ -149,7 +154,7 @@
                 {% else %}
                   {{ 'product-apparel-1' | placeholder_svg_tag: 'spotlight-item__image spotlight-item__image--placeholder' }}
                 {% endif %}
-              </a>
+              </{{ item_link_tag }}>
 
             </div>
 
@@ -159,12 +164,18 @@
             {%- endcomment -%}
             <div class="spotlight-item__info">
               <p class="spotlight-item__price">{{ item_price }}</p>
-              <a
-                href="{{ item_url }}"
+              {%- liquid
+                assign item_link_tag = 'div'
+                if item_url != blank
+                  assign item_link_tag = 'a'
+                endif
+              -%}
+              <{{ item_link_tag }}
+                {% if item_link_tag == 'a' %}href="{{ item_url }}"{% endif %}
                 class="spotlight-item__title"
               >
                 {{- item_title -}}
-              </a>
+              </{{ item_link_tag }}>
 
               {% if section.settings.add_to_cart_label != blank %}
                 {% if item_variant_id != null %}
@@ -185,13 +196,19 @@
                     Options required, or out of stock — send the shopper to the product
                     page rather than guessing a variant.
                   {%- endcomment -%}
-                  <a
-                    href="{{ item_url }}"
+                  {%- liquid
+                    assign item_link_tag = 'div'
+                    if item_url != blank
+                      assign item_link_tag = 'a'
+                    endif
+                  -%}
+                  <{{ item_link_tag }}
+                    {% if item_link_tag == 'a' %}href="{{ item_url }}"{% endif %}
                     class="spotlight-item__add"
                     aria-label="Choose options for {{ item_title | escape }}"
                   >
                     {{ section.settings.options_label | default: 'Choose options' }}
-                  </a>
+                  </{{ item_link_tag }}>
                 {% endif %}
               {% endif %}
             </div>
@@ -209,9 +226,9 @@
     </div>
   </div>
 
-  {% if section.settings.cta_label != blank %}
+  {% if section.settings.cta_label != blank and section.settings.cta_link != blank %}
     <a
-      href="{{ section.settings.cta_link | default: '#' }}"
+      href="{{ section.settings.cta_link }}"
       class="showcase-spotlight__cta"
     >
       <span>{{ section.settings.cta_label }}</span>

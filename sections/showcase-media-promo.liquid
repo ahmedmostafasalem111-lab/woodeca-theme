@@ -65,8 +65,8 @@
           <div class="media-promo__body">{{ section.settings.body }}</div>
         {% endif %}
 
-        {% if section.settings.button_label != blank %}
-          <a href="{{ section.settings.button_link | default: '#' }}" class="media-promo__button">
+        {% if section.settings.button_label != blank and section.settings.button_link != blank %}
+          <a href="{{ section.settings.button_link }}" class="media-promo__button">
             {{- section.settings.button_label -}}
           </a>
         {% endif %}

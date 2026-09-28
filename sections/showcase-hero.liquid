@@ -84,9 +84,9 @@
               <p class="showcase-hero__subheading">{{ block.settings.subheading }}</p>
             {% endif %}
 
-            {% if block.settings.link_text != blank %}
+            {% if block.settings.link_text != blank and block.settings.link != blank %}
               <a
-                href="{{ block.settings.link | default: '#' }}"
+                href="{{ block.settings.link }}"
                 class="showcase-hero__link"
               >
                 {{- block.settings.link_text -}}

@@ -48,8 +48,14 @@
 
   {%- capture info_cards -%}
     {%- for block in section.blocks -%}
-      <a
-        href="{{ block.settings.link | default: '#' }}"
+      {%- liquid
+        assign card_tag = 'div'
+        if block.settings.link != blank
+          assign card_tag = 'a'
+        endif
+      -%}
+      <{{ card_tag }}
+        {% if card_tag == 'a' %}href="{{ block.settings.link }}"{% endif %}
         class="info-card"
         {{ block.shopify_attributes }}
       >
@@ -73,7 +79,7 @@
             <span class="info-card__subtext">{{ block.settings.subtext }}</span>
           {% endif %}
         </span>
-      </a>
+      </{{ card_tag }}>
     {%- endfor -%}
   {%- endcapture -%}
 
@@ -116,7 +122,8 @@
     transition: scale var(--animation-speed-slow) var(--animation-easing);
   }
 
-  .info-card:hover .info-card__image {
+  /* Only a card that links somewhere reacts to hover. */
+  a.info-card:hover .info-card__image {
     scale: 1.04;
   }
 

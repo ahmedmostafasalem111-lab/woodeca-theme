@@ -406,8 +406,8 @@
         {% endif %}
 
         {%- comment -%} ---------- Series / collection links (metafield only) ---------- {%- endcomment -%}
-        {% if series_name != blank %}
-          <a href="{{ series_link | default: '#' }}" class="product-link-row">
+        {% if series_name != blank and series_link != blank %}
+          <a href="{{ series_link }}" class="product-link-row">
             <span class="svg-wrapper product-link-row__icon" aria-hidden="true">
               {{- 'icon-grid-default.svg' | inline_asset_content -}}
             </span>
@@ -423,8 +423,8 @@
           </a>
         {% endif %}
 
-        {% if collection_name != blank %}
-          <a href="{{ collection_link | default: '#' }}" class="product-link-row">
+        {% if collection_name != blank and collection_link != blank %}
+          <a href="{{ collection_link }}" class="product-link-row">
             <span class="svg-wrapper product-link-row__icon" aria-hidden="true">
               {{- 'icon-store.svg' | inline_asset_content -}}
             </span>

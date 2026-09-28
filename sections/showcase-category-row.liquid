@@ -45,8 +45,14 @@
 
   {%- capture tiles -%}
     {%- for block in section.blocks -%}
-      <a
-        href="{{ block.settings.link | default: '#' }}"
+      {%- liquid
+        assign tile_tag = 'div'
+        if block.settings.link != blank
+          assign tile_tag = 'a'
+        endif
+      -%}
+      <{{ tile_tag }}
+        {% if tile_tag == 'a' %}href="{{ block.settings.link }}"{% endif %}
         class="category-tile"
         {{ block.shopify_attributes }}
       >
@@ -65,7 +71,7 @@
         {% if block.settings.label != blank %}
           <span class="category-tile__label">{{ block.settings.label }}</span>
         {% endif %}
-      </a>
+      </{{ tile_tag }}>
     {%- endfor -%}
   {%- endcapture -%}
 
@@ -141,7 +147,8 @@
     text-wrap: balance;
   }
 
-  .category-tile:hover .category-tile__label {
+  /* Only a tile that links somewhere reacts to hover. */
+  a.category-tile:hover .category-tile__label {
     text-decoration: underline;
   }
 

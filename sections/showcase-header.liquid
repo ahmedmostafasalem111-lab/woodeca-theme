@@ -84,13 +84,19 @@
                 </div>
               </details>
             {% else %}
-              <a
-                href="{{ block.settings.link | default: '#' }}"
+              {%- liquid
+                assign link_tag = 'span'
+                if block.settings.link != blank
+                  assign link_tag = 'a'
+                endif
+              -%}
+              <{{ link_tag }}
+                {% if link_tag == 'a' %}href="{{ block.settings.link }}"{% endif %}
                 class="showcase-header__utility-link"
                 {{ block.shopify_attributes }}
               >
                 {{- block.settings.label -}}
-              </a>
+              </{{ link_tag }}>
             {% endif %}
           {% endfor %}
         </div>
@@ -117,13 +123,19 @@
                 </div>
               </details>
             {% else %}
-              <a
-                href="{{ block.settings.link | default: '#' }}"
+              {%- liquid
+                assign link_tag = 'span'
+                if block.settings.link != blank
+                  assign link_tag = 'a'
+                endif
+              -%}
+              <{{ link_tag }}
+                {% if link_tag == 'a' %}href="{{ block.settings.link }}"{% endif %}
                 class="showcase-header__utility-link"
                 {{ block.shopify_attributes }}
               >
                 {{- block.settings.label -}}
-              </a>
+              </{{ link_tag }}>
             {% endif %}
           {% endfor %}
         </div>
@@ -227,13 +239,19 @@
           aria-label="{{ section.settings.nav_label | default: 'Main navigation' | escape }}"
         >
           {% for block in nav_links %}
-            <a
-              href="{{ block.settings.link | default: '#' }}"
+            {%- liquid
+              assign link_tag = 'span'
+              if block.settings.link != blank
+                assign link_tag = 'a'
+              endif
+            -%}
+            <{{ link_tag }}
+              {% if link_tag == 'a' %}href="{{ block.settings.link }}"{% endif %}
               class="showcase-header__nav-link"
               {{ block.shopify_attributes }}
             >
               {{- block.settings.label -}}
-            </a>
+            </{{ link_tag }}>
           {% endfor %}
         </nav>
       {% endif %}
@@ -272,9 +290,9 @@
         {% endif %}
 
         {%- comment -%} Mobile-only chat + location icons, per the condensed layout {%- endcomment -%}
-        {% if section.settings.show_mobile_chat %}
+        {% if section.settings.show_mobile_chat and section.settings.mobile_chat_link != blank %}
           <a
-            href="{{ section.settings.mobile_chat_link | default: '#' }}"
+            href="{{ section.settings.mobile_chat_link }}"
             class="showcase-header__icon-button showcase-header__icon-button--mobile"
             aria-label="{{ section.settings.mobile_chat_label | default: 'Chat' | escape }}"
           >
@@ -345,8 +363,14 @@
     <div class="showcase-header__promo">
       <div class="showcase-header__inner showcase-header__promo-inner">
         {% for block in promo_links %}
-          <a
-            href="{{ block.settings.link | default: '#' }}"
+          {%- liquid
+            assign link_tag = 'span'
+            if block.settings.link != blank
+              assign link_tag = 'a'
+            endif
+          -%}
+          <{{ link_tag }}
+            {% if link_tag == 'a' %}href="{{ block.settings.link }}"{% endif %}
             class="showcase-header__promo-link"
             {% if block.settings.highlight %}
               data-highlight="true"
@@ -357,7 +381,7 @@
             {{ block.shopify_attributes }}
           >
             {{- block.settings.label -}}
-          </a>
+          </{{ link_tag }}>
         {% endfor %}
       </div>
     </div>
@@ -439,7 +463,8 @@
     white-space: nowrap;
   }
 
-  .showcase-header__utility-link:hover {
+  /* An unlinked item renders as a span and shouldn't look clickable. */
+  a.showcase-header__utility-link:hover {
     text-decoration: underline;
   }
 
@@ -709,7 +734,7 @@
     white-space: nowrap;
   }
 
-  .showcase-header__nav-link:hover {
+  a.showcase-header__nav-link:hover {
     text-decoration: underline;
   }
 
@@ -794,7 +819,7 @@
     white-space: nowrap;
   }
 
-  .showcase-header__promo-link:hover {
+  a.showcase-header__promo-link:hover {
     text-decoration: underline;
   }
 

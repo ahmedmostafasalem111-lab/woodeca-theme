@@ -50,8 +50,8 @@
         {% endif %}
       </div>
 
-      {% if section.settings.button_label != blank %}
-        <a href="{{ section.settings.button_link | default: '#' }}" class="cta-band__button">
+      {% if section.settings.button_label != blank and section.settings.button_link != blank %}
+        <a href="{{ section.settings.button_link }}" class="cta-band__button">
           {{- section.settings.button_label -}}
         </a>
       {% endif %}

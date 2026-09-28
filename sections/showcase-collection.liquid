@@ -91,9 +91,9 @@
       <div class="collection-editorial">
         <span class="collection-editorial__text">{{ editorial | strip_html | truncate: 200 }}</span>
 
-        {% if section.settings.editorial_link_text != blank %}
+        {% if section.settings.editorial_link_text != blank and section.settings.editorial_link != blank %}
           <a
-            href="{{ section.settings.editorial_link | default: '#' }}"
+            href="{{ section.settings.editorial_link }}"
             class="collection-editorial__link"
           >
             <span>{{ section.settings.editorial_link_text }}</span>
@@ -219,8 +219,14 @@
             appears on the first page so it stays a single mid-grid placement.
           {%- endcomment -%}
           {% if show_promo and paginate.current_page == 1 and forloop.index == promo_after %}
-            <a
-              href="{{ section.settings.promo_link | default: '#' }}"
+            {%- liquid
+              assign promo_tag = 'div'
+              if section.settings.promo_link != blank
+                assign promo_tag = 'a'
+              endif
+            -%}
+            <{{ promo_tag }}
+              {% if promo_tag == 'a' %}href="{{ section.settings.promo_link }}"{% endif %}
               class="collection-promo"
               style="--collection-promo-span: {{ section.settings.promo_span }};"
             >
@@ -243,7 +249,7 @@
                   <span class="collection-promo__link">{{ section.settings.promo_link_text }}</span>
                 {% endif %}
               </span>
-            </a>
+            </{{ promo_tag }}>
           {% endif %}
         {% endfor %}
       </div>

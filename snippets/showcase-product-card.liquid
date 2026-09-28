@@ -68,7 +68,6 @@
     assign card_compare_price = compare_price
   endif
 
-  assign card_url = card_url | default: '#'
   assign resolved_stock_level = resolved_stock_level | default: stock_level | default: 'in'
 
   # Discount percentage is derived rather than authored so it can never disagree
@@ -177,8 +176,14 @@
     {% if card_slider_images != null and card_slider_images.size > 1 %}
       <div class="showcase-card__slides" data-card-slides>
         {% for slide_image in card_slider_images %}
-          <a
-            href="{{ card_url }}"
+          {%- liquid
+            assign card_link_tag = 'div'
+            if card_url != blank
+              assign card_link_tag = 'a'
+            endif
+          -%}
+          <{{ card_link_tag }}
+            {% if card_link_tag == 'a' %}href="{{ card_url }}"{% endif %}
             class="showcase-card__slide"
             tabindex="-1"
             aria-hidden="true"
@@ -195,7 +200,7 @@
               | image_url: width: 600
               | image_tag: loading: slide_loading, class: 'showcase-card__image', alt: card_title, sizes: '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw', widths: '200, 300, 400, 500, 600'
             }}
-          </a>
+          </{{ card_link_tag }}>
         {% endfor %}
       </div>
 
@@ -210,8 +215,14 @@
         {% endfor %}
       </div>
     {% else %}
-      <a
-        href="{{ card_url }}"
+      {%- liquid
+        assign card_link_tag = 'div'
+        if card_url != blank
+          assign card_link_tag = 'a'
+        endif
+      -%}
+      <{{ card_link_tag }}
+        {% if card_link_tag == 'a' %}href="{{ card_url }}"{% endif %}
         class="showcase-card__media-link"
         tabindex="-1"
         aria-hidden="true"
@@ -225,7 +236,7 @@
         {% else %}
           {{ 'product-apparel-1' | placeholder_svg_tag: 'showcase-card__image showcase-card__image--placeholder' }}
         {% endif %}
-      </a>
+      </{{ card_link_tag }}>
     {% endif %}
 
   </div>
@@ -267,12 +278,18 @@
       {% endif %}
     </div>
 
-    <a
-      href="{{ card_url }}"
+    {%- liquid
+      assign card_link_tag = 'div'
+      if card_url != blank
+        assign card_link_tag = 'a'
+      endif
+    -%}
+    <{{ card_link_tag }}
+      {% if card_link_tag == 'a' %}href="{{ card_url }}"{% endif %}
       class="showcase-card__title"
     >
       {{- card_title -}}
-    </a>
+    </{{ card_link_tag }}>
 
     {% if stock_text != blank %}
       <p class="showcase-card__stock showcase-card__stock--{{ resolved_stock_level }}">
@@ -375,8 +392,14 @@
         {%- endcomment -%}
         {% if show_variant_button and has_variants %}
           {% assign variant_label = variant_button_label | default: 'Change color and options' %}
-          <a
-            href="{{ card_url }}"
+          {%- liquid
+            assign card_link_tag = 'div'
+            if card_url != blank
+              assign card_link_tag = 'a'
+            endif
+          -%}
+          <{{ card_link_tag }}
+            {% if card_link_tag == 'a' %}href="{{ card_url }}"{% endif %}
             class="showcase-card__variant-button"
             aria-label="{{ variant_label | escape }}"
             title="{{ variant_label | escape }}"
@@ -384,7 +407,7 @@
             <span class="svg-wrapper" aria-hidden="true">
               {{- 'icon-pencil.svg' | inline_asset_content -}}
             </span>
-          </a>
+          </{{ card_link_tag }}>
         {% endif %}
       </div>
     {% endif %}

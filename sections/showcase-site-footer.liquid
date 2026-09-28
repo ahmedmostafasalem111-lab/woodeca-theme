@@ -88,7 +88,13 @@
             {% endif %}
 
             {% if section.settings.email_link_text != blank %}
-              <a href="{{ section.settings.email_link | default: '#' }}" class="footer-contact__row">
+              {%- liquid
+                assign email_tag = 'div'
+                if section.settings.email_link != blank
+                  assign email_tag = 'a'
+                endif
+              -%}
+              <{{ email_tag }} {% if email_tag == 'a' %}href="{{ section.settings.email_link }}" {% endif %}class="footer-contact__row">
                 {% if section.settings.email_icon != blank %}
                   {{
                     section.settings.email_icon
@@ -100,7 +106,7 @@
                   <span class="footer-contact__label">{{ section.settings.email_label | default: 'Email us' }}</span>
                   <span class="footer-contact__value">{{ section.settings.email_link_text }}</span>
                 </span>
-              </a>
+              </{{ email_tag }}>
             {% endif %}
           </div>
           {% endif %}
@@ -229,8 +235,9 @@
     <div class="site-footer__band site-footer__band--bottom">
       <div class="footer-bottom__social">
         {% for block in socials %}
+          {% if block.settings.link == blank %}{% continue %}{% endif %}
           <a
-            href="{{ block.settings.link | default: '#' }}"
+            href="{{ block.settings.link }}"
             class="footer-social"
             aria-label="{{ block.settings.label | default: 'Social' | escape }}"
             {{ block.shopify_attributes }}

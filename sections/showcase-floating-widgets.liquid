@@ -31,9 +31,9 @@
   <script src="{{ 'showcase-floating-chat.js' | asset_url }}" type="module" fetchpriority="low"></script>
 {% endif %}
 
-{% if section.settings.show_feedback_tab and section.settings.feedback_label != blank %}
+{% if section.settings.show_feedback_tab and section.settings.feedback_label != blank and section.settings.feedback_link != blank %}
   <a
-    href="{{ section.settings.feedback_link | default: '#' }}"
+    href="{{ section.settings.feedback_link }}"
     class="floating-feedback"
     style="
       --feedback-background: {{ section.settings.feedback_background | default: '#333333' }};
