@@ -34,9 +34,10 @@
         <p class="product-reviews__empty-text">{{ section.settings.empty_text }}</p>
       {% endif %}
 
-      {% if section.settings.cta_label != blank %}
+      {%- comment -%} Off until a reviews app provides somewhere for the button to go. {%- endcomment -%}
+      {% if section.settings.show_review_buttons and section.settings.cta_label != blank and section.settings.cta_link != blank %}
         <a
-          href="{{ section.settings.cta_link | default: '#' }}"
+          href="{{ section.settings.cta_link }}"
           class="product-reviews__cta"
         >
           {{- section.settings.cta_label -}}
@@ -69,9 +70,9 @@
         {% endif %}
       </div>
 
-      {% if section.settings.ugc_cta_label != blank %}
+      {% if section.settings.show_review_buttons and section.settings.ugc_cta_label != blank and section.settings.ugc_cta_link != blank %}
         <a
-          href="{{ section.settings.ugc_cta_link | default: '#' }}"
+          href="{{ section.settings.ugc_cta_link }}"
           class="product-reviews__ugc-cta"
         >
           {{- section.settings.ugc_cta_label -}}
@@ -228,6 +229,13 @@
       "id": "empty_text",
       "label": "Empty state text",
       "default": "Share your experience and help other customers choose with confidence."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_review_buttons",
+      "label": "Show review buttons",
+      "info": "\"Add a review\" and \"Submit a photo\". Turn on once a reviews app is connected and their links are set.",
+      "default": false
     },
     {
       "type": "text",
