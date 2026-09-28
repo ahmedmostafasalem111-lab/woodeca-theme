@@ -21,6 +21,9 @@
       {{- 'icon-chat.svg' | inline_asset_content -}}
     </span>
   </a>
+
+  {%- comment -%} Lifts the bubble clear of submit buttons and the sticky buy bar. {%- endcomment -%}
+  <script src="{{ 'showcase-floating-chat.js' | asset_url }}" type="module" fetchpriority="low"></script>
 {% endif %}
 
 {% if section.settings.show_feedback_tab and section.settings.feedback_label != blank %}
@@ -51,7 +54,11 @@
     background-color: var(--chat-background);
     color: var(--chat-icon-color);
     box-shadow: 0 4px 16px rgb(0 0 0 / var(--opacity-15));
-    transition: scale var(--animation-speed) var(--animation-timing-bounce);
+    /* Raised by showcase-floating-chat.js while a button would sit underneath. */
+    translate: 0 calc(-1 * var(--chat-lift, 0px));
+    transition:
+      scale var(--animation-speed) var(--animation-timing-bounce),
+      translate 160ms ease-out;
   }
 
   .floating-chat:hover {
