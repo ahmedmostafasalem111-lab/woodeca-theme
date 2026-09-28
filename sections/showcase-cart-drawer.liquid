@@ -21,6 +21,7 @@
   class="cart-drawer"
   id="CartDrawer"
   data-cart-drawer
+  data-cart-count="{{ cart.item_count }}"
   data-countdown-minutes="{{ section.settings.countdown_minutes | default: 10 }}"
   style="
     --cart-accent: {{ section.settings.accent_color | default: '#e8342a' }};

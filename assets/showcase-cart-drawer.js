@@ -148,6 +148,12 @@ function replaceDrawer(html) {
 
   current.replaceWith(next);
   startCountdown();
+
+  // The freshly rendered section carries the authoritative item count, so every
+  // path that refreshes the drawer — any add, any quantity change — also keeps
+  // the header badge right without a second request.
+  const count = Number(next.dataset.cartCount);
+  if (Number.isFinite(count)) syncCartCount(count);
 }
 
 /** @param {number} count */
@@ -260,9 +266,12 @@ import('@shopify/events')
 
 /** @param {Event & { action?: string, promise?: Promise<{ detail?: { didError?: boolean } }> }} event */
 function onHorizonCartUpdate(event) {
-  if (event.action !== 'add') return;
-  // The cart page re-renders itself; a drawer over it would only duplicate it.
-  if (window.location.pathname.replace(/\/$/, '').endsWith('/cart')) return;
+  // Quantity changes and removals (e.g. on the cart page) only need the drawer
+  // markup and header badge brought up to date, not the drawer opened.
+  if (event.action !== 'add' || window.location.pathname.replace(/\/$/, '').endsWith('/cart')) {
+    event.promise?.then(() => refreshDrawer()).catch(() => {});
+    return;
+  }
 
   // Let a quick-add modal finish closing (and restore focus) before the
   // drawer takes over.

@@ -306,8 +306,19 @@
             {{- 'icon-cart.svg' | inline_asset_content -}}
           </span>
 
-          {% if section.settings.show_cart_count and cart.item_count > 0 %}
-            <span class="showcase-header__cart-count">{{ cart.item_count }}</span>
+          {%- comment -%}
+            Always rendered (hidden at zero) so the cart script can show and
+            update it after any add, remove or quantity change without a reload.
+          {%- endcomment -%}
+          {% if section.settings.show_cart_count %}
+            <span
+              class="showcase-header__cart-count"
+              {% if cart.item_count == 0 %}
+                hidden
+              {% endif %}
+            >
+              {{- cart.item_count -}}
+            </span>
           {% endif %}
         </a>
       </div>
@@ -731,6 +742,11 @@
     font-size: 10px;
     font-weight: 600;
     line-height: 1;
+  }
+
+  /* `display: flex` above would otherwise win over the hidden attribute. */
+  .showcase-header__cart-count[hidden] {
+    display: none;
   }
 
   /* ---------- Row 3: promo bar ---------- */
