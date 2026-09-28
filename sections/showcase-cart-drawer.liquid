@@ -22,6 +22,7 @@
   id="CartDrawer"
   data-cart-drawer
   data-cart-count="{{ cart.item_count }}"
+  data-cart-token="{{ cart.token }}"
   data-limit-text="{{ section.settings.stock_limit_text | default: 'Only [count] available' | escape }}"
   data-countdown-minutes="{{ section.settings.countdown_minutes | default: 10 }}"
   style="
@@ -62,7 +63,7 @@
       time from a cached render.
     {%- endcomment -%}
     {% if section.settings.show_countdown and has_items %}
-      <p class="cart-urgency">
+      <p class="cart-urgency" data-cart-urgency>
         <span class="svg-wrapper cart-urgency__icon" aria-hidden="true">
           {{- 'icon-fire.svg' | inline_asset_content -}}
         </span>

@@ -16,8 +16,63 @@ const BODY_LOCK = 'cart-drawer-locked';
 
 /** @type {number | undefined} */
 let countdownTimer;
-/** @type {number | null} */
-let deadline = null;
+
+/*
+  The countdown belongs to the cart session, not the page: it starts the first
+  time the drawer renders with items, is stored per cart token so it keeps
+  counting across page loads, and is forgotten when the cart empties. Storage
+  can be unavailable (private mode, blocked site data), so every access is
+  guarded and falls back to memory for the current page.
+*/
+const DEADLINE_KEY = 'woodeca:cart-countdown';
+/** @type {{ token: string, deadline: number } | null} */
+let memoryDeadline = null;
+
+/** @returns {{ token: string, deadline: number } | null} */
+function readDeadline() {
+  try {
+    const raw = window.localStorage.getItem(DEADLINE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    // fall through to the in-memory copy
+  }
+  return memoryDeadline;
+}
+
+/** @param {{ token: string, deadline: number } | null} value */
+function writeDeadline(value) {
+  memoryDeadline = value;
+  try {
+    if (value) window.localStorage.setItem(DEADLINE_KEY, JSON.stringify(value));
+    else window.localStorage.removeItem(DEADLINE_KEY);
+  } catch {
+    // memory copy already updated
+  }
+}
+
+/**
+ * The deadline for this cart, created on first sight of a non-empty cart.
+ *
+ * @param {HTMLElement} el - The drawer root.
+ * @returns {number | null}
+ */
+function cartDeadline(el) {
+  const token = el.dataset.cartToken || '';
+  const count = Number(el.dataset.cartCount) || 0;
+
+  if (count === 0) {
+    writeDeadline(null);
+    return null;
+  }
+
+  const stored = readDeadline();
+  if (stored && stored.token === token && Number.isFinite(stored.deadline)) return stored.deadline;
+
+  const minutes = Number(el.dataset.countdownMinutes) || 10;
+  const deadline = Date.now() + minutes * 60_000;
+  writeDeadline({ token, deadline });
+  return deadline;
+}
 /** Guards against a second change landing while the first is still in flight. */
 let busy = false;
 
@@ -61,15 +116,11 @@ function startCountdown() {
   const el = drawer();
   if (!(el instanceof HTMLElement)) return;
 
-  const target = el.querySelector('[data-cart-countdown]');
-  if (!(target instanceof HTMLElement)) return;
-
-  const minutes = Number(el.dataset.countdownMinutes) || 10;
-  // Keep the existing deadline across re-renders, so changing a quantity does
-  // not hand the shopper a fresh ten minutes every time.
-  if (deadline == null || deadline < Date.now()) deadline = Date.now() + minutes * 60_000;
-
   clearInterval(countdownTimer);
+
+  const deadline = cartDeadline(el);
+  const target = el.querySelector('[data-cart-countdown]');
+  if (!(target instanceof HTMLElement) || deadline == null) return;
 
   const tick = () => {
     const live = document.querySelector('[data-cart-countdown]');
@@ -78,12 +129,18 @@ function startCountdown() {
       return;
     }
 
-    const remaining = Math.max(0, (deadline ?? 0) - Date.now());
+    const remaining = Math.max(0, deadline - Date.now());
+    if (remaining === 0) {
+      // Time's up: the banner goes; the cart itself is left exactly as it is.
+      const banner = live.closest('[data-cart-urgency]');
+      if (banner instanceof HTMLElement) banner.hidden = true;
+      clearInterval(countdownTimer);
+      return;
+    }
+
     const mins = Math.floor(remaining / 60_000);
     const secs = Math.floor((remaining % 60_000) / 1000);
     live.textContent = `${mins}m ${String(secs).padStart(2, '0')}s`;
-
-    if (remaining === 0) clearInterval(countdownTimer);
   };
 
   tick();
