@@ -153,7 +153,7 @@
       "settings": {
         "show_chat_bubble": true,
         "chat_label": "Open support chat",
-        "chat_link": "",
+        "chat_link": "https://wa.me/201041920335",
         "chat_size": 56,
         "chat_background": "#f2f2f0",
         "chat_icon_color": "#1c1c1c",

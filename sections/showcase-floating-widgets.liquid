@@ -6,10 +6,15 @@
   The chat bubble lifts above the mobile tab bar when that section is enabled.
 {% endcomment %}
 
-{% if section.settings.show_chat_bubble %}
+{%- comment -%} A bubble with nowhere to go is hidden rather than linked to "#". {%- endcomment -%}
+{% if section.settings.show_chat_bubble and section.settings.chat_link != blank %}
   <a
-    href="{{ section.settings.chat_link | default: '#' }}"
+    href="{{ section.settings.chat_link | escape }}"
     class="floating-chat"
+    {% if section.settings.chat_link contains '://' %}
+      target="_blank"
+      rel="noopener"
+    {% endif %}
     aria-label="{{ section.settings.chat_label | default: 'Open support chat' | escape }}"
     style="
       --chat-background: {{ section.settings.chat_background | default: '#f2f2f0' }};
@@ -128,9 +133,11 @@
       "default": "Open support chat"
     },
     {
-      "type": "url",
+      "type": "text",
       "id": "chat_link",
-      "label": "Link"
+      "label": "Link",
+      "info": "Where the bubble goes, e.g. a WhatsApp chat (https://wa.me/<number>). Web links open in a new tab. Leave empty to hide the bubble.",
+      "default": "https://wa.me/201041920335"
     },
     {
       "type": "range",
