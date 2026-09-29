@@ -296,7 +296,11 @@
             hidden
           {% endunless %}
         >
-          {{ product.description }}
+          {%- comment -%}
+            Bold words inside a sentence are marked so they can read at normal
+            weight, like Care Instructions; a line bold end to end stays bold.
+          {%- endcomment -%}
+          {% render 'showcase-prose-mixed-bold', html: product.description %}
         </div>
       {% endif %}
 
@@ -386,6 +390,28 @@
 
   .product-specs__prose > :last-child {
     margin-block-end: 0;
+  }
+
+  /*
+    Description and Care Instructions share this one style. Headings typed into
+    a description (h1–h6) read like Care Instructions' bold lines: body size and
+    line height, bold, paragraph spacing — not the theme's 32px headings. The
+    tags stay; only their look changes. Colour is left to the theme.
+  */
+  .product-specs__prose :is(h1, h2, h3, h4, h5, h6) {
+    margin-block: 1em;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 700;
+    line-height: inherit;
+    letter-spacing: inherit;
+    text-transform: none;
+  }
+
+  /* Bold words inside a sentence read at normal weight (the description marks
+     those lines, see showcase-prose-mixed-bold). */
+  .product-specs__prose [data-prose-mixed] :is(strong, b) {
+    font-weight: inherit;
   }
 
   .product-specs__diagram {

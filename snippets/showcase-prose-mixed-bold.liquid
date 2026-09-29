@@ -1,0 +1,81 @@
+{% doc %}
+  Marks the paragraphs and list items of a rich-text body whose bold words sit
+  inside normal text, by adding `data-prose-mixed` to their opening tag. The
+  product description styles those bold words at normal weight, so only a line
+  that is bold from end to end (a heading in practice) still reads as bold.
+
+  CSS can't tell the two apart (selectors don't see text nodes), so it is done
+  here, on the HTML string: each </p> or </li> closes a block; the block's own
+  opening tag is its last "<p" / "<li" before that; the block is mixed when text
+  (more than punctuation) remains after its <strong> elements are taken out.
+
+  @param {string} html - Rich-text HTML, e.g. product.description.
+
+  @example
+  {% render 'showcase-prose-mixed-bold', html: product.description %}
+{% enddoc %}
+
+{%- liquid
+  assign result = html
+  assign block_tags = 'p,li' | split: ','
+  for tag in block_tags
+    assign open_tag = '<' | append: tag
+    assign close_tag = '</' | append: tag | append: '>'
+
+    # split drops a trailing empty piece, so remember whether the text ends
+    # with a closing tag (the last piece then still needs its own).
+    assign close_length = close_tag.size
+    assign close_start = close_length | times: -1
+    assign ending = result | slice: close_start, close_length
+    assign ends_closed = false
+    if ending == close_tag
+      assign ends_closed = true
+    endif
+
+    assign blocks = result | split: close_tag
+    assign result = ''
+    for part in blocks
+      assign closes = true
+      if forloop.last and ends_closed == false
+        assign closes = false
+      endif
+
+      assign block_html = part
+      if part contains open_tag
+        assign body = part | split: open_tag | last
+        assign head_length = part.size | minus: body.size | minus: open_tag.size
+        assign head = part | slice: 0, head_length
+        assign attributes = body | split: '>' | first
+        assign content = body | remove_first: attributes | remove_first: '>'
+
+        # Text left once every <strong>…</strong> is taken out.
+        assign outside = ''
+        assign pieces = content | split: '</strong>'
+        for piece in pieces
+          assign before_strong = piece | split: '<strong' | first
+          assign outside = outside | append: before_strong
+        endfor
+        # Punctuation alone (a trailing " :" after a bold label) doesn't make a
+        # line mixed: "<strong>Dimensions</strong> :" is still a bold heading.
+        assign outside = outside | strip_html | remove: '&nbsp;' | remove: '&amp;'
+        assign punctuation = ':,.,;,-,–,—,•,·,|,/,(,),*,!,?,،,؛' | split: ','
+        for mark in punctuation
+          assign outside = outside | remove: mark
+        endfor
+        assign outside = outside | remove: ',' | strip
+
+        assign block_html = head | append: open_tag
+        if content contains '<strong' and outside != blank
+          assign block_html = block_html | append: ' data-prose-mixed'
+        endif
+        assign block_html = block_html | append: attributes | append: '>' | append: content
+      endif
+
+      assign result = result | append: block_html
+      if closes
+        assign result = result | append: close_tag
+      endif
+    endfor
+  endfor
+  echo result
+-%}
