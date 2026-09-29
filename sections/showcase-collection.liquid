@@ -15,9 +15,20 @@
 {% liquid
   assign per_page = section.settings.products_per_page | default: 24
   assign promo_after = section.settings.promo_after_products | default: 8
+
+  # Mid-grid promo: each collection's own banner, from its custom.promo_*
+  # metafields (Products → Collections → the collection → Metafields). No
+  # heading and no image = no banner, and the grid closes up with no gap.
+  assign promo_image = collection.metafields.custom.promo_image.value
+  assign promo_heading = collection.metafields.custom.promo_heading.value
+  assign promo_subtext = collection.metafields.custom.promo_subtext.value
+  assign promo_button = collection.metafields.custom.promo_button_label.value
+  assign promo_link = collection.metafields.custom.promo_link.value
   assign show_promo = false
-  if section.settings.show_promo and section.settings.promo_heading != blank
-    assign show_promo = true
+  if section.settings.show_promo
+    if promo_heading != blank or promo_image != blank
+      assign show_promo = true
+    endif
   endif
 
   # Sub-category tiles are read from the current collection, not from section blocks.
@@ -218,33 +229,36 @@
           {%- endcomment -%}
           {% if show_promo and paginate.current_page == 1 and forloop.index == promo_after %}
             {%- liquid
+              # The whole banner is the link when the collection has one.
               assign promo_tag = 'div'
-              if section.settings.promo_link != blank
+              if promo_link != blank
                 assign promo_tag = 'a'
               endif
             -%}
             <{{ promo_tag }}
-              {% if promo_tag == 'a' %}href="{{ section.settings.promo_link }}"{% endif %}
+              {% if promo_tag == 'a' %}href="{{ promo_link }}"{% endif %}
               class="collection-promo"
               style="--collection-promo-span: {{ section.settings.promo_span }};"
             >
-              {% if section.settings.promo_image != blank %}
+              {% if promo_image != blank %}
                 {{
-                  section.settings.promo_image
+                  promo_image
                   | image_url: width: 1600
-                  | image_tag: loading: 'lazy', class: 'collection-promo__image', alt: section.settings.promo_heading, sizes: '(min-width: 990px) 50vw, 100vw', widths: '400, 600, 800, 1000, 1300, 1600'
+                  | image_tag: loading: 'lazy', class: 'collection-promo__image', alt: promo_heading, sizes: '(min-width: 990px) 50vw, 100vw', widths: '400, 600, 800, 1000, 1300, 1600'
                 }}
               {% endif %}
 
               <span class="collection-promo__scrim" aria-hidden="true"></span>
 
               <span class="collection-promo__content">
-                <span class="collection-promo__heading">{{ section.settings.promo_heading }}</span>
-                {% if section.settings.promo_subtext != blank %}
-                  <span class="collection-promo__subtext">{{ section.settings.promo_subtext }}</span>
+                {% if promo_heading != blank %}
+                  <span class="collection-promo__heading">{{ promo_heading }}</span>
                 {% endif %}
-                {% if section.settings.promo_link_text != blank %}
-                  <span class="collection-promo__link">{{ section.settings.promo_link_text }}</span>
+                {% if promo_subtext != blank %}
+                  <span class="collection-promo__subtext">{{ promo_subtext }}</span>
+                {% endif %}
+                {% if promo_button != blank %}
+                  <span class="collection-promo__link">{{ promo_button }}</span>
                 {% endif %}
               </span>
             </{{ promo_tag }}>
@@ -1052,32 +1066,35 @@
       "default": 2
     },
     {
+      "type": "paragraph",
+      "content": "Each collection's banner content comes from its own metafields: Products → Collections → the collection → Metafields → Promo image / heading / subtext / button label / link. No heading and no image = no banner."
+    },
+    {
       "type": "image_picker",
       "id": "promo_image",
-      "label": "Promo image"
+      "label": "Promo image (no longer used)",
+      "info": "Replaced by each collection's Promo image metafield."
     },
     {
       "type": "text",
       "id": "promo_heading",
-      "label": "Promo heading",
-      "default": "The first step to productivity"
+      "label": "Promo heading (no longer used)",
+      "info": "Replaced by each collection's Promo heading metafield."
     },
     {
       "type": "text",
       "id": "promo_subtext",
-      "label": "Promo subtext",
-      "default": "Comfortable furniture for work and study with a discount of up to 20%"
+      "label": "Promo subtext (no longer used)"
     },
     {
       "type": "text",
       "id": "promo_link_text",
-      "label": "Promo link text",
-      "default": "Buy"
+      "label": "Promo link text (no longer used)"
     },
     {
       "type": "url",
       "id": "promo_link",
-      "label": "Promo link"
+      "label": "Promo link (no longer used)"
     },
     {
       "type": "header",
