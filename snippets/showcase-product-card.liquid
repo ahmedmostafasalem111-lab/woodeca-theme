@@ -317,14 +317,17 @@
       <div class="showcase-card__swatches">
         {% for option_value in colour_option.values limit: swatch_limit %}
           {%- comment -%}
-            Three sources, in descending order of fidelity:
-              1. the swatch Shopify holds against the option value,
-              2. the matching variant's own photo, cropped into the circle,
+            Three sources, in order:
+              1. the colour's own photo (the variant photo), cropped into the
+                 circle — what the shopper will actually get;
+              2. the swatch Shopify holds against the option value (colour or
+                 texture), only when that colour has no photo;
               3. a neutral disc, only when a value has neither.
 
-            Source 2 is what makes these render at all in this store — no option
-            value here has swatch data, but every variant has an image. It also
-            supplies the image the card swaps to when the swatch is pressed.
+            Photos come first even where the colour is linked to a Shopify
+            swatch (dining buffets, kids ranges, bedroom sets), whose generic
+            textures didn't show the actual finish. The same photo is the one
+            the card swaps to when the swatch is pressed.
           {%- endcomment -%}
           {% liquid
             assign swatch_variant = null
@@ -374,14 +377,14 @@
             title="{{ option_value.name | escape }}"
             aria-label="{{ option_value.name | escape }}"
           >
-            {% if option_value.swatch != blank %}
-              {% render 'swatch', swatch: option_value.swatch, mode: 'unscaled', label: option_value.name %}
-            {% elsif swatch_image != blank %}
+            {% if swatch_image != blank %}
               {{
                 swatch_image
                 | image_url: width: 80
                 | image_tag: loading: 'lazy', class: 'showcase-card__swatch-img', alt: '', sizes: '20px', widths: '40, 60, 80'
               }}
+            {% elsif option_value.swatch != blank %}
+              {% render 'swatch', swatch: option_value.swatch, mode: 'unscaled', label: option_value.name %}
             {% else %}
               <span class="showcase-card__swatch-fallback"></span>
             {% endif %}
