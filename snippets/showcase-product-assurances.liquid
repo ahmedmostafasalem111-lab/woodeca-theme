@@ -6,6 +6,7 @@
   hardcoded. Each block picks its own icon from the theme's existing icon set.
 
   @param {object} section - The section holding the `assurance` blocks.
+  @param {string} [delivery] - Rendered delivery estimate, listed right after the first entry.
 
   @example
   {% render 'showcase-product-assurances', section: section %}
@@ -13,8 +14,11 @@
 
 {% assign assurances = section.blocks | where: 'type', 'assurance' %}
 
-{% if assurances.size > 0 %}
+{% if assurances.size > 0 or delivery != blank %}
   <ul class="product-assurances" role="list">
+    {% if assurances.size == 0 %}
+      <li class="product-assurances__delivery">{{ delivery }}</li>
+    {% endif %}
     {% for block in assurances %}
       {% assign icon_file = block.settings.icon | default: 'checkmark' | prepend: 'icon-' | append: '.svg' %}
       <li class="product-assurance" {{ block.shopify_attributes }}>
@@ -23,20 +27,23 @@
         </span>
         <span class="product-assurance__text">{{ block.settings.text }}</span>
       </li>
+      {% if forloop.first and delivery != blank %}
+        <li class="product-assurances__delivery">{{ delivery }}</li>
+      {% endif %}
     {% endfor %}
   </ul>
 {% endif %}
 
 {% stylesheet %}
   /*
-    Two per row at every width, which is what keeps short claims paired instead of
-    running as a ragged single column on a narrow phone.
+    One evenly spaced list: rows 8px apart, 20px below the instalment box (the
+    buy box's 12px gap + 8). The first entry (the warranty) is the emphasised one.
   */
   .product-assurances {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: var(--gap-2xs) var(--gap-md);
-    margin: var(--margin-md) 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 8px 0 0;
     padding: 0;
     list-style: none;
   }
@@ -44,9 +51,14 @@
   .product-assurance {
     display: flex;
     align-items: center;
-    gap: var(--gap-2xs);
+    gap: 8px;
     min-width: 0;
-    font-size: var(--font-size--sm);
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .product-assurance:first-child {
+    font-weight: 600;
   }
 
   .product-assurance__icon {
@@ -54,8 +66,36 @@
     color: var(--color-foreground);
   }
 
-  .product-assurance__icon svg {
-    width: 17px;
-    height: 17px;
+  .product-assurance .product-assurance__icon,
+  .product-assurance .product-assurance__icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .product-assurances__delivery .product-delivery-estimate {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  @media screen and (min-width: 990px) {
+    .product-assurances {
+      gap: 9px;
+      margin-block-start: 11px;
+    }
+
+    .product-assurance,
+    .product-assurances__delivery .product-delivery-estimate {
+      gap: 9px;
+      font-size: 17px;
+    }
+
+    .product-assurance .product-assurance__icon,
+    .product-assurance .product-assurance__icon svg,
+    .product-assurances__delivery .product-delivery-estimate__icon,
+    .product-assurances__delivery .product-delivery-estimate__icon svg {
+      width: 22px;
+      height: 22px;
+    }
   }
 {% endstylesheet %}

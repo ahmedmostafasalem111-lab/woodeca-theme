@@ -265,11 +265,15 @@
           section: section
         %}
 
-        {%- comment -%} 7 — Assurance row. {%- endcomment -%}
-        {% render 'showcase-product-assurances', section: section %}
-
-        {%- comment -%} 8 — Delivery estimate, computed from today plus lead time. {%- endcomment -%}
-        {% render 'showcase-product-delivery-estimate', product: product, section: section %}
+        {%- comment -%}
+          7 — Info rows: the assurances with the delivery estimate (working days,
+          Fridays skipped) slotted in after the first one, so they read
+          Warranty → Delivery → Exchange & Return as one evenly spaced list.
+        {%- endcomment -%}
+        {%- capture delivery_row -%}
+          {% render 'showcase-product-delivery-estimate', product: product, section: section %}
+        {%- endcapture -%}
+        {% render 'showcase-product-assurances', section: section, delivery: delivery_row %}
 
         {%- comment -%} 9 — Option pickers. {%- endcomment -%}
         {% render 'showcase-product-options',
@@ -599,11 +603,24 @@
     gap: var(--gap-sm);
   }
 
+  /*
+    Info block sizing (badge → title → price → instalments → info rows → Color),
+    after ricracshop.com's product page at 375px, scaled up from 990px. The buy
+    box's 12px gap stays; the spacing inside this block is set with margins on
+    top of it: badge→title 8, title→price 12, price→instalments 12,
+    instalments→info rows 20, rows 8 apart, last row→Color 20.
+  */
   .product-buybox__display-name {
     margin: 0;
-    font-size: var(--product-title-size, var(--font-size--4xl));
+    font-size: 19.6px;
     font-weight: 700;
-    line-height: var(--line-height--heading-tight);
+    line-height: 1.35;
+  }
+
+  @media screen and (min-width: 990px) {
+    .product-buybox__display-name {
+      font-size: 22px;
+    }
   }
 
   .product-buybox__full-title {
@@ -640,6 +657,8 @@
     align-items: center;
     gap: 6px;
     min-width: 0;
+    /* 12px buy-box gap − 4 = 8px to the title (nothing when the row is hidden). */
+    margin-block-end: -4px;
   }
 
   /* Neither a discount nor a label: no row, no gap. */
@@ -652,10 +671,23 @@
   .product-label--pill {
     flex: 0 0 auto;
     margin: 0;
-    padding: 3px 10px;
+    padding: 2px 8px;
     border-radius: 999px;
-    font-size: var(--font-size--xs);
+    font-size: 12.5px;
     font-weight: 700;
+    line-height: 1.4;
+  }
+
+  @media screen and (min-width: 990px) {
+    .product-badge-row {
+      margin-block-end: -3px;
+    }
+
+    .product-save-badge,
+    .product-label--pill {
+      padding: 3px 9px;
+      font-size: 14px;
+    }
   }
 
   .product-label--pill {
@@ -681,14 +713,16 @@
 
   .product-price-row__current {
     color: var(--product-accent, #e8342a);
-    font-size: var(--font-size--2xl);
+    font-size: 16px;
     font-weight: 700;
     line-height: 1.1;
   }
 
   .product-price-row__compare {
     color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
-    font-size: var(--font-size--lg);
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
   }
 
   .product-price-row__compare[hidden] {
@@ -697,7 +731,23 @@
 
   .product-price-row__tax {
     color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
-    font-size: var(--font-size--xs);
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  @media screen and (min-width: 990px) {
+    .product-price-row__current {
+      font-size: 18px;
+    }
+
+    .product-price-row__compare {
+      font-size: 17px;
+    }
+
+    .product-price-row__tax {
+      font-size: 15px;
+    }
   }
 
   /* ---- Quantity ---- */
@@ -925,11 +975,11 @@
     }
 
     .product-buybox__display-name {
-      font-size: var(--font-size--2xl);
+      font-size: 19.6px;
     }
 
     .product-price-row__current {
-      font-size: var(--font-size--xl);
+      font-size: 16px;
     }
 
     /*
@@ -1020,6 +1070,7 @@
       "type": "select",
       "id": "title_size",
       "label": "Title size",
+      "info": "No longer applied: the product info block uses fixed sizes (19.6px on phones, 22px on desktop).",
       "options": [
         { "value": "var(--font-size--2xl)", "label": "Medium" },
         { "value": "var(--font-size--3xl)", "label": "Large" },

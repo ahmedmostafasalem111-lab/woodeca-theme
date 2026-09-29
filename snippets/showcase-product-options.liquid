@@ -225,8 +225,15 @@
 {% endif %}
 
 {% stylesheet %}
+  /* 20px below the last info row (the buy box's 12px gap + 8). */
   .product-options {
-    margin-block-start: var(--margin-lg);
+    margin-block-start: 8px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .product-options {
+      margin-block-start: 11px;
+    }
   }
 
   .product-option {
@@ -241,7 +248,17 @@
     gap: var(--gap-3xs);
     margin-block-end: var(--margin-2xs);
     padding: 0;
-    font-size: var(--font-size--sm);
+    font-size: 15px;
+  }
+
+  .product-option__name {
+    font-weight: 600;
+  }
+
+  @media screen and (min-width: 990px) {
+    .product-option__legend {
+      font-size: 17px;
+    }
   }
 
   .product-option__name {
