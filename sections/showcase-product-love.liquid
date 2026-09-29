@@ -10,9 +10,10 @@
   swiped — no arrows, no dots, and no slider library: native overflow scrolling
   already does all of it, including momentum and keyboard paging.
 
-  Images are capped by height rather than aspect ratio so a portrait and a
-  landscape detail shot sit on the same baseline, and the type is a step down
-  from the page's body size — this block is a supporting detail, not a hero.
+  Below 990px images are capped by height so a portrait and a landscape detail
+  shot sit on the same baseline; from 990px they are square, so the square
+  detail shots aren't cropped to a strip. The type is a step down from the
+  page's body size — this block is a supporting detail, not a hero.
 
   The whole section removes itself when the metafield is empty.
 {% endcomment %}
@@ -54,13 +55,9 @@
               {{
                 slide.image
                 | image_url: width: 800
-                | image_tag: loading: 'lazy', class: 'love-card__image', alt: slide.heading, sizes: '(min-width: 750px) 38vw, 70vw', widths: '300, 450, 600, 800'
+                | image_tag: loading: 'lazy', class: 'love-card__image', alt: slide.heading, sizes: '(min-width: 990px) 460px, (min-width: 750px) 38vw, 70vw', widths: '300, 450, 600, 800, 1000'
               }}
             </div>
-          {% endif %}
-
-          {% if section.settings.show_numbers %}
-            <span class="love-card__index" aria-hidden="true">{{ forloop.index }}.</span>
           {% endif %}
 
           {% if slide.heading != blank %}
@@ -136,16 +133,8 @@
     object-fit: cover;
   }
 
-  .love-card__index {
-    display: block;
-    margin-block-start: var(--margin-sm);
-    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
-    font-size: var(--font-size--sm);
-    font-weight: 600;
-  }
-
   .love-card__heading {
-    margin: var(--margin-2xs) 0 var(--margin-3xs);
+    margin: var(--margin-sm) 0 var(--margin-3xs);
     font-size: var(--font-size--md);
     font-weight: 600;
   }
@@ -179,6 +168,24 @@
 
     .love-card__text {
       font-size: var(--font-size--xs);
+    }
+  }
+
+  /*
+    Desktop: square images, uncropped. Two square cards across the full page
+    would be ~550px tall at 1440, so the track is capped and centred under the
+    centred heading: cards come out at 460px with the same two-and-a-peek view
+    (2 full cards + the 18% peek) as before.
+  */
+  @media screen and (min-width: 990px) {
+    .product-love__grid {
+      max-width: 1140px;
+      margin-inline: auto;
+    }
+
+    .love-card__image {
+      height: auto;
+      aspect-ratio: 1 / 1;
     }
   }
 {% endstylesheet %}
@@ -233,7 +240,8 @@
       "type": "checkbox",
       "id": "show_numbers",
       "label": "Number the entries",
-      "default": true
+      "default": true,
+      "info": "No longer used: entries are not numbered. Kept so saved settings stay valid."
     },
     {
       "type": "header",
