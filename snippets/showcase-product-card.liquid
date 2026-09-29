@@ -237,17 +237,21 @@
   </div>
 
   {%- comment -%}
-    Tabs hanging from the bottom-left of the image: the product's own label
+    Tabs hanging from the bottom-left of the image (divan.ru style): the
+    discount ("-15%") and, right beside it, the product's own label
     (custom.product_label). The media box clips its overflow, so the row sits
-    just under it rather than inside it. Nothing is rendered without a label.
+    just under it rather than inside it. Nothing is rendered when neither exists.
   {%- endcomment -%}
-  {%- if product != blank and product != nil -%}
-    {%- capture card_tabs -%}
-      {%- render 'showcase-product-label', product: product, style: 'tab' -%}
-    {%- endcapture -%}
-    {%- if card_tabs != blank -%}
-      <div class="showcase-card__tabs">{{ card_tabs }}</div>
+  {%- capture card_tabs -%}
+    {%- if discount_percent > 0 -%}
+      <span class="showcase-card__discount">-{{ discount_percent }}%</span>
     {%- endif -%}
+    {%- if product != blank and product != nil -%}
+      {%- render 'showcase-product-label', product: product, style: 'tab' -%}
+    {%- endif -%}
+  {%- endcapture -%}
+  {%- if card_tabs != blank -%}
+    <div class="showcase-card__tabs">{{ card_tabs }}</div>
   {%- endif -%}
 
   {%- comment -%}
@@ -262,15 +266,8 @@
       the sale price alone.
     {%- endcomment -%}
     <div class="showcase-card__price-row">
-      {% if card_compare_price != blank or discount_percent > 0 %}
-        <span class="showcase-card__was">
-          {% if card_compare_price != blank %}
-            <s class="showcase-card__compare-price">{{ card_compare_price }}</s>
-          {% endif %}
-          {% if discount_percent > 0 %}
-            <span class="showcase-card__discount">-{{ discount_percent }}%</span>
-          {% endif %}
-        </span>
+      {% if card_compare_price != blank %}
+        <s class="showcase-card__compare-price">{{ card_compare_price }}</s>
       {% endif %}
 
       <span class="showcase-card__price">{{ card_price }}</span>
@@ -612,7 +609,8 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--gap-xs);
-    padding-block-start: var(--padding-sm);
+    /* 25px under the image: see the hanging tabs below (20px tab + 5px). */
+    padding-block-start: 25px;
   }
 
   /* 5px between the price block and the name (and the rows after it). */
@@ -645,21 +643,27 @@
     padding-inline-start: 5px;
   }
 
-  .showcase-card__tabs .product-label--tab {
+  .showcase-card__tabs > * {
     flex: 0 1 auto;
     padding: 5px;
     border-radius: 0 0 2px 2px;
     font-size: 10px;
     font-weight: 500;
     line-height: 10px;
+    white-space: nowrap;
   }
 
-  /* Never splits: the chip always sits beside the price it discounts. */
-  .showcase-card__was {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--gap-2xs);
-    white-space: nowrap;
+  .showcase-card__tabs .showcase-card__discount {
+    flex-shrink: 0;
+  }
+
+  /*
+    The text block starts 25px under the image on every card: 20px tab + 5px
+    when there are tabs, 25px of padding when there are none, so prices in a
+    row stay aligned whether or not a card has a discount.
+  */
+  .showcase-card__tabs + .showcase-card__info {
+    padding-block-start: 5px;
   }
 
   .showcase-card__compare-price {
@@ -669,14 +673,10 @@
     line-height: 18px;
   }
 
+  /* Colours unchanged; size and shape come from .showcase-card__tabs > *. */
   .showcase-card__discount {
-    padding: 1px var(--padding-3xs);
-    border-radius: 4px;
     background-color: var(--showcase-card-discount-background, #e8705a);
     color: var(--showcase-card-discount-text, #fff);
-    font-size: var(--font-size--2xs);
-    font-weight: 500;
-    white-space: nowrap;
   }
 
   /* Titles clamp to two lines so cards in a row stay the same height. */
