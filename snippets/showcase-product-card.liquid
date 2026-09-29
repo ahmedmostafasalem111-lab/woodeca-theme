@@ -412,8 +412,9 @@
           {%- endif -%}
         "
       >
+        {%- comment -%} divan.ru's outline bag: 22px, 1px stroke. {%- endcomment -%}
         <span class="svg-wrapper showcase-card__quick-add-icon showcase-card__quick-add-icon--bag" aria-hidden="true">
-          {{- 'icon-cart.svg' | inline_asset_content -}}
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true" focusable="false"><path d="M7.33203 8.43314L7.33203 5.82796C7.33203 4.24847 8.50536 3.2998 9.8987 3.2998H12.0987C13.5654 3.2998 14.6654 4.24847 14.6654 5.82796V8.43314" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.3328 6.96631H3.66602V16.2797C3.66602 17.7662 4.62899 19.0297 5.88826 19.0297H16.1106C17.3699 19.0297 18.3328 17.8405 18.3328 16.2797V6.96631Z" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
         <span class="svg-wrapper showcase-card__quick-add-icon showcase-card__quick-add-icon--done" aria-hidden="true">
           {{- 'icon-checkmark.svg' | inline_asset_content -}}
@@ -535,13 +536,16 @@
     fill: rgb(var(--color-foreground-rgb) / var(--opacity-20));
   }
 
+  /* 35px circle, 10px in from the card's right edge, top level with the
+     compare-at price (the first line of the text block). */
   .showcase-card__quick-add {
     flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 35px;
+    height: 35px;
+    margin-inline-end: 10px;
     padding: 0;
     border: none;
     border-radius: 50%;
@@ -559,8 +563,12 @@
 
   .showcase-card__quick-add .svg-wrapper,
   .showcase-card__quick-add svg {
-    width: 15px;
-    height: 15px;
+    width: 22px;
+    height: 22px;
+  }
+
+  .showcase-card__quick-add-icon--bag svg {
+    stroke-width: 1;
   }
 
   /* Both icons are rendered; the state class decides which one shows. */
@@ -606,7 +614,7 @@
   .showcase-card__info {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: var(--gap-xs);
     /* 25px under the image: see the hanging tabs below (20px tab + 5px). */
