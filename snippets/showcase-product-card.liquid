@@ -185,6 +185,7 @@
           <{{ card_link_tag }}
             {% if card_link_tag == 'a' %}href="{{ card_url }}"{% endif %}
             class="showcase-card__slide"
+            draggable="false"
             tabindex="-1"
             aria-hidden="true"
           >
@@ -198,7 +199,7 @@
             {{
               slide_image
               | image_url: width: 600
-              | image_tag: loading: slide_loading, class: 'showcase-card__image', alt: card_title, sizes: '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw', widths: '200, 300, 400, 500, 600'
+              | image_tag: loading: slide_loading, class: 'showcase-card__image', alt: card_title, draggable: 'false', sizes: '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw', widths: '200, 300, 400, 500, 600'
             }}
           </{{ card_link_tag }}>
         {% endfor %}
@@ -224,6 +225,7 @@
       <{{ card_link_tag }}
         {% if card_link_tag == 'a' %}href="{{ card_url }}"{% endif %}
         class="showcase-card__media-link"
+        draggable="false"
         tabindex="-1"
         aria-hidden="true"
       >
@@ -231,7 +233,7 @@
           {{
             card_image
             | image_url: width: 600
-            | image_tag: loading: 'lazy', class: 'showcase-card__image', alt: card_title, sizes: '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw', widths: '200, 300, 400, 500, 600'
+            | image_tag: loading: 'lazy', class: 'showcase-card__image', alt: card_title, draggable: 'false', sizes: '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw', widths: '200, 300, 400, 500, 600'
           }}
         {% else %}
           {{ 'product-apparel-1' | placeholder_svg_tag: 'showcase-card__image showcase-card__image--placeholder' }}
@@ -301,6 +303,7 @@
     <{{ card_link_tag }}
       {% if card_link_tag == 'a' %}href="{{ card_url }}"{% endif %}
       class="showcase-card__title"
+      draggable="false"
     >
       {{- card_title -}}
     </{{ card_link_tag }}>
@@ -462,6 +465,17 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+  }
+
+  /*
+    A press on the card that moves a few pixels (a normal hand) used to start
+    the browser's native drag of the image/link: its shrunken ghost image read
+    as a "shrink/minimize" animation and the click never happened. Cards aren't
+    draggable, so the press stays a plain click and navigates instantly.
+  */
+  .showcase-card a,
+  .showcase-card img {
+    -webkit-user-drag: none;
   }
 
   .showcase-card__media {
