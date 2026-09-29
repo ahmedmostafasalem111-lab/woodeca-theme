@@ -203,8 +203,6 @@
               show_swatches: section.settings.show_swatches,
               swatch_option_name: section.settings.swatch_option_name,
               swatch_limit: section.settings.swatch_limit,
-              show_variant_button: section.settings.show_variant_button,
-              variant_button_label: section.settings.variant_button_label,
               show_image_slider: section.settings.show_image_slider,
               slider_limit: section.settings.slider_limit,
               show_dimensions: section.settings.show_dimensions,
@@ -957,13 +955,15 @@
       "type": "checkbox",
       "id": "show_variant_button",
       "label": "Show \"Change options\" button on products with variants",
-      "default": true
+      "default": true,
+      "info": "No longer used: product cards no longer have this button. Kept so saved settings stay valid."
     },
     {
       "type": "text",
       "id": "variant_button_label",
       "label": "Variant button label",
-      "default": "Change color and options"
+      "default": "Change color and options",
+      "info": "No longer used."
     },
     {
       "type": "checkbox",

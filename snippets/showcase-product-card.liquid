@@ -24,8 +24,6 @@
   @param {boolean} [show_swatches] - Render a colour swatch row under the title.
   @param {string} [swatch_option_name] - Which product option holds the colours. Default 'Color'.
   @param {number} [swatch_limit] - Swatches shown before the "+N" overflow label. Default 5.
-  @param {boolean} [show_variant_button] - Render the "Change color and options" button for products with variants.
-  @param {string} [variant_button_label] - Label for that button.
   @param {boolean} [show_reviews] - Render the review-count line when review data exists.
   @param {boolean} [show_image_slider] - Page through the product's images in the media box. Default false.
   @param {number} [slider_limit] - Maximum images the slider renders. Default 5.
@@ -122,11 +120,6 @@
   assign dimensions_value = null
   if show_dimensions and product != blank and product != nil
     assign dimensions_value = product.metafields[dimensions_namespace][dimensions_key].value
-  endif
-
-  assign has_variants = false
-  if product != blank and product != nil and product.variants.size > 1
-    assign has_variants = true
   endif
 
   # ---- Card image slider ----
@@ -401,30 +394,6 @@
 
         {% if swatch_overflow > 0 %}
           <span class="showcase-card__swatch-overflow">+{{ swatch_overflow }}</span>
-        {% endif %}
-
-        {%- comment -%}
-          Compact square button closing the swatch row, replacing the old full-width
-          bar so the row reads as one control group.
-        {%- endcomment -%}
-        {% if show_variant_button and has_variants %}
-          {% assign variant_label = variant_button_label | default: 'Change color and options' %}
-          {%- liquid
-            assign card_link_tag = 'div'
-            if card_url != blank
-              assign card_link_tag = 'a'
-            endif
-          -%}
-          <{{ card_link_tag }}
-            {% if card_link_tag == 'a' %}href="{{ card_url }}"{% endif %}
-            class="showcase-card__variant-button"
-            aria-label="{{ variant_label | escape }}"
-            title="{{ variant_label | escape }}"
-          >
-            <span class="svg-wrapper" aria-hidden="true">
-              {{- 'icon-pencil.svg' | inline_asset_content -}}
-            </span>
-          </{{ card_link_tag }}>
         {% endif %}
       </div>
     {% endif %}
@@ -856,31 +825,5 @@
   .showcase-card__swatch-overflow {
     color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
     font-size: var(--font-size--2xs);
-  }
-
-  /* Compact square control closing the swatch row, not a full-width bar. */
-  .showcase-card__variant-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    width: 24px;
-    height: 24px;
-    margin-inline-start: var(--margin-3xs);
-    border: var(--style-border-width-inputs) solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
-    border-radius: 4px;
-    color: var(--color-foreground);
-    text-decoration: none;
-    transition: background-color var(--animation-speed) var(--animation-easing);
-  }
-
-  .showcase-card__variant-button:hover {
-    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
-  }
-
-  .showcase-card__variant-button .svg-wrapper,
-  .showcase-card__variant-button svg {
-    width: 12px;
-    height: 12px;
   }
 {% endstylesheet %}
