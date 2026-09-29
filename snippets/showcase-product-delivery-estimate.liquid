@@ -6,10 +6,19 @@
   renders a broken range. When the section defaults are zero as well, nothing
   renders at all.
 
-  Liquid has no date arithmetic, so the dates are built by converting today to a
-  Unix timestamp, adding the lead time in seconds, and formatting the result.
-  `'now'` resolves in the store's timezone, so the range matches what the merchant
-  and the customer both see.
+  Lead times are WORKING days: Woodeca's weekly day off (Friday) is skipped, so
+  "7 days" ordered on a Wednesday lands on the following Thursday, not Wednesday.
+  "Today" is the store's timezone, which is set to Cairo in admin.
+
+  Liquid has no date arithmetic, so the count steps a Unix timestamp forward a
+  day at a time and checks each day's weekday. It steps from today's noon, so a
+  daylight-saving change (a 23- or 25-hour day) can never land a step on the
+  wrong date.
+
+  Shopify can serve a cached page rendered on an earlier day. The markup also
+  carries the lead times and the next weeks' dates already formatted, and
+  showcase-delivery-estimate.js recounts from today in Cairo time when the page
+  is older than today, so the range is right without JavaScript formatting dates.
 
   @param {object} product - The product carrying the lead-time metafields.
   @param {object} section - The section, for the namespace, defaults and labels.
@@ -39,24 +48,66 @@
     assign lead_max = lead_min
   endif
 
+  # Weekly day off, as `%u` numbers it (1 = Monday … 7 = Sunday): Friday.
+  assign day_off = '5'
   assign day_seconds = 86400
-  assign today_ts = 'now' | date: '%s' | times: 1
-  assign from_ts = lead_min | times: day_seconds | plus: today_ts
-  assign to_ts = lead_max | times: day_seconds | plus: today_ts
+
+  # Today's noon in the store's timezone.
+  assign now_ts = 'now' | date: '%s' | times: 1
+  assign since_midnight = 'now' | date: '%H' | times: 3600
+  assign since_hour = 'now' | date: '%M' | times: 60
+  assign since_minute = 'now' | date: '%S' | times: 1
+  assign noon_ts = now_ts | minus: since_midnight | minus: since_hour | minus: since_minute | plus: 43200
+
+  # Walk forward, counting only working days. Twice the lead plus a week always
+  # covers it with one day off a week.
+  assign horizon = lead_max | times: 2 | plus: 7
+  assign counted = 0
+  assign cursor = noon_ts
+  assign from_ts = noon_ts
+  assign to_ts = noon_ts
+  for step in (1..horizon)
+    if counted >= lead_max
+      break
+    endif
+    assign cursor = cursor | plus: day_seconds
+    assign weekday = cursor | date: '%u'
+    if weekday != day_off
+      assign counted = counted | plus: 1
+      if counted == lead_min
+        assign from_ts = cursor
+      endif
+      if counted == lead_max
+        assign to_ts = cursor
+      endif
+    endif
+  endfor
 
   assign date_format = section.settings.delivery_date_format | default: '%-d %b'
   assign date_from = from_ts | date: date_format
   assign date_to = to_ts | date: date_format
+  assign render_date = noon_ts | date: '%Y-%m-%d'
+
+  # The next weeks' dates, formatted here so the script can recount a cached page
+  # in the theme's own date format. A week beyond the horizon covers a page that
+  # is a few days old.
+  assign label_span = horizon | plus: 7
 %}
 
 {% if section.settings.show_delivery_estimate and lead_max > 0 %}
-  <p class="product-delivery-estimate">
+  <p
+    class="product-delivery-estimate"
+    data-delivery-estimate
+    data-lead-min="{{ lead_min }}"
+    data-lead-max="{{ lead_max }}"
+    data-render-date="{{ render_date }}"
+  >
     <span class="svg-wrapper product-delivery-estimate__icon" aria-hidden="true">
       {{- 'icon-truck.svg' | inline_asset_content -}}
     </span>
     <span>
       {{ section.settings.delivery_estimate_prefix | default: 'Delivery By' }}
-      <strong>
+      <strong data-delivery-range>
         {{- date_from }}
         {%- if lead_max > lead_min %} – {{ date_to }}{% endif -%}
       </strong>
@@ -66,7 +117,17 @@
         </span>
       {% endif %}
     </span>
+    <script type="application/json" data-delivery-labels>
+      {
+        {%- for step in (0..label_span) -%}
+          {%- assign day_ts = step | times: day_seconds | plus: noon_ts -%}
+          {{- day_ts | date: '%Y-%m-%d' | json }}:{{ day_ts | date: date_format | json -}}
+          {%- unless forloop.last %},{% endunless -%}
+        {%- endfor -%}
+      }
+    </script>
   </p>
+  <script src="{{ 'showcase-delivery-estimate.js' | asset_url }}" type="module"></script>
 {% endif %}
 
 {% stylesheet %}
