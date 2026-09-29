@@ -1,6 +1,9 @@
 /**
  * Add-to-cart for the showcase product card.
  *
+ * The cart drawer opens on the tap (`showcase:cart:pending`) and is filled or
+ * given an error by the events this script sends when Shopify answers.
+ *
  * Uses one delegated listener on the document rather than a component per card,
  * so cards injected later — the collection grid's "Show more" pagination — work
  * without re-binding anything.
@@ -27,6 +30,13 @@ async function addToCart(button) {
   button.classList.add(BUSY_CLASS);
   button.classList.remove(ERROR_CLASS);
 
+  // The drawer opens on the tap, in its loading state; one of the events below
+  // (open, limit or error) always follows, so it never keeps spinning.
+  document.dispatchEvent(new CustomEvent('showcase:cart:pending', { bubbles: true }));
+
+  /** Shopify's reason for a failed add, shown in the drawer. */
+  let reason;
+
   try {
     const response = await fetch(`${window.Shopify?.routes?.root ?? '/'}cart/add.js`, {
       method: 'POST',
@@ -51,7 +61,8 @@ async function addToCart(button) {
         return;
       }
 
-      throw new Error(problem.description || problem.message || 'Add to cart failed');
+      reason = problem.description || problem.message;
+      throw new Error(reason || 'Add to cart failed');
     }
 
     // Confirmation is a flash, not a mode: the button shows a green tick and
@@ -88,6 +99,7 @@ async function addToCart(button) {
     button.classList.add(ERROR_CLASS);
     button.setAttribute('aria-label', error instanceof Error ? error.message : 'Add to cart failed');
     console.error('[showcase-card-cart]', error);
+    document.dispatchEvent(new CustomEvent('showcase:cart:error', { detail: { message: reason }, bubbles: true }));
   } finally {
     button.classList.remove(BUSY_CLASS);
   }

@@ -13,6 +13,7 @@
 const SECTION_ID = 'showcase-cart-drawer';
 const OPEN_CLASS = 'cart-drawer--open';
 const BODY_LOCK = 'cart-drawer-locked';
+const LOADING_CLASS = 'cart-drawer--loading';
 
 /** @type {number | undefined} */
 let countdownTimer;
@@ -79,6 +80,66 @@ let busy = false;
 const root = () => window.Shopify?.routes?.root ?? '/';
 
 const drawer = () => document.querySelector('[data-cart-drawer]');
+
+/* ---------------------------------------------------------------- pending adds */
+
+/*
+  An add opens the drawer on the click, before Shopify has answered: the drawer
+  shows "Adding to cart…" over the current cart, and the confirmed cart replaces
+  it when the add returns. Counted, so two quick adds keep the loading state
+  until both have landed.
+*/
+let pendingAdds = 0;
+
+/**
+ * @param {Element | null | undefined} el - The drawer root.
+ * @param {boolean} on
+ */
+function setLoading(el, on) {
+  if (!(el instanceof HTMLElement)) return;
+
+  el.classList.toggle(LOADING_CLASS, on);
+  const status = el.querySelector('[data-cart-loading]');
+  if (status instanceof HTMLElement) status.hidden = !on;
+
+  const panel = el.querySelector('.cart-drawer__panel');
+  if (on) panel?.setAttribute('aria-busy', 'true');
+  else panel?.removeAttribute('aria-busy');
+}
+
+function beginAdd() {
+  pendingAdds += 1;
+  const el = drawer();
+  clearAddError();
+  setLoading(el, true);
+  if (el instanceof HTMLElement && !el.classList.contains(OPEN_CLASS)) openDrawer();
+}
+
+function endAdd() {
+  pendingAdds = Math.max(0, pendingAdds - 1);
+  if (pendingAdds === 0) setLoading(drawer(), false);
+}
+
+/**
+ * Says, inside the open drawer, why an add didn't happen.
+ *
+ * @param {string} [message] - Shopify's own reason, when it gave one.
+ */
+function showAddError(message) {
+  const el = drawer();
+  const box = el?.querySelector('[data-cart-error]');
+  if (!(el instanceof HTMLElement) || !(box instanceof HTMLElement)) return;
+
+  box.textContent = message || el.dataset.addErrorText || 'This item could not be added. Please try again.';
+  box.hidden = false;
+}
+
+function clearAddError() {
+  const box = drawer()?.querySelector('[data-cart-error]');
+  if (!(box instanceof HTMLElement)) return;
+  box.hidden = true;
+  box.textContent = '';
+}
 
 /* ------------------------------------------------------------------ open/close */
 
@@ -212,6 +273,8 @@ function replaceDrawer(html) {
   }
 
   current.replaceWith(next);
+  // Another add still on its way: the fresh markup keeps saying so.
+  if (pendingAdds > 0) setLoading(next, true);
   startCountdown();
 
   // The freshly rendered section carries the authoritative item count, so every
@@ -324,35 +387,47 @@ document.addEventListener('submit', async (event) => {
   }
   if (Object.keys(properties).length) item.properties = properties;
 
+  // The drawer opens now; the confirmed cart fills it when Shopify answers.
+  beginAdd();
+
+  /** Shopper-facing reason the add failed ('' = the default message); null = it worked. */
+  let failure = null;
+  let limited = false;
+
   try {
     const response = await fetch(`${root()}cart/add.js`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      // Ask for the drawer section in the same request: the drawer can then
-      // open on the add's own response instead of a second round trip.
+      // The drawer section comes back with the add, so no second round trip.
       body: JSON.stringify({ items: [item], sections: SECTION_ID }),
     });
+    const payload = await response.json().catch(() => null);
 
     if (response.status === 422) {
-      // Stock limit: Shopify added what it could (or nothing, if the cart
-      // already holds the maximum). Show the cart as it really is, and why.
+      // Stock limit or sold out: Shopify added what it could, or nothing.
+      // Show the cart as it really is, then say why.
       await refreshDrawer();
-      openDrawer();
-      showLimitForVariant(variantId);
-      return;
+      limited = true;
+      failure = payload?.description || payload?.message || '';
+    } else if (!response.ok) {
+      console.error('[showcase-cart-drawer] add', response.status, payload);
+      failure = '';
+    } else {
+      const html = payload?.sections?.[SECTION_ID];
+      if (html) replaceDrawer(html);
+      else await refreshDrawer();
     }
-    if (!response.ok) throw new Error(`cart/add.js responded ${response.status}`);
-
-    const payload = await response.json().catch(() => null);
-    const html = payload?.sections?.[SECTION_ID];
-    if (html) replaceDrawer(html);
-    else await refreshDrawer();
-    openDrawer();
   } catch (error) {
     console.error('[showcase-cart-drawer] add', error);
-    // Fall back to the ordinary form post rather than silently doing nothing.
-    form.submit();
+    failure = '';
+  } finally {
+    endAdd();
   }
+
+  // A line for this variant means the cart holds the most there is: say so
+  // under it. No line (sold out, network failure) gets the drawer-level message.
+  if (limited && drawer()?.querySelector(`[data-variant-id="${variantId}"]`)) showLimitForVariant(variantId);
+  else if (failure !== null) showAddError(failure);
 });
 
 document.addEventListener('keydown', (event) => {
@@ -363,22 +438,38 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
+/*
+  Card quick-add. `pending` opens the drawer in its loading state on the click;
+  one of `open` (added), `limit` (stock limit) or `error` follows. A drawer
+  the shopper closed while waiting stays closed.
+*/
+document.addEventListener('showcase:cart:pending', () => beginAdd());
+
 // A card quick-add that hit the stock limit: show the line and the limit.
 document.addEventListener('showcase:cart:limit', async (event) => {
+  const wasPending = pendingAdds > 0;
   await refreshDrawer();
-  openDrawer();
+  endAdd();
+  if (!wasPending) openDrawer();
   const detail = /** @type {CustomEvent<{ variantId?: string | number }>} */ (event).detail;
   if (detail?.variantId) showLimitForVariant(detail.variantId);
 });
 
-// Opened by the card and product-page add-to-cart handlers once the add succeeds.
-// Callers that already have the rendered drawer (they asked for it with their
-// add request) pass it as `detail.html`, saving a round trip.
+// The add succeeded. Callers that already have the rendered drawer (they asked
+// for it with their add request) pass it as `detail.html`, saving a round trip.
 document.addEventListener('showcase:cart:open', async (event) => {
+  const wasPending = pendingAdds > 0;
   const html = /** @type {CustomEvent<{ html?: string }>} */ (event).detail?.html;
   if (html) replaceDrawer(html);
   else await refreshDrawer();
-  openDrawer();
+  endAdd();
+  if (!wasPending) openDrawer();
+});
+
+// The add failed outright (sold out, network): say so in the open drawer.
+document.addEventListener('showcase:cart:error', (event) => {
+  endAdd();
+  showAddError(/** @type {CustomEvent<{ message?: string }>} */ (event).detail?.message);
 });
 
 /*
