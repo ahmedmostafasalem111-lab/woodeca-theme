@@ -1,0 +1,22 @@
+{% doc %}
+  One monthly instalment, in cents, rounded UP to whole pounds so the advertised
+  payment is never below the real one: price × (1 + rate) ÷ months.
+
+  Integer maths only. Floating point turned 12,000 × 1.05 ÷ 6 into
+  2,100.0000000000005, which rounds up to a pound too many.
+
+  @param {number} price - Price in cents.
+  @param {number} months - Number of monthly payments.
+  @param {number} [rate_bp] - Rate in hundredths of a percent (500 = 5%). Default 0.
+
+  @example
+  {% capture amount %}{% render 'showcase-instalment-amount', price: variant.price, months: 6, rate_bp: 500 %}{% endcapture %}
+{% enddoc %}
+
+{%- liquid
+  assign rate_bp = rate_bp | default: 0
+  # 10,000 basis points × 100 cents per pound × months.
+  assign divisor = months | times: 1000000
+  assign pounds = rate_bp | plus: 10000 | times: price | plus: divisor | minus: 1 | divided_by: divisor
+  echo pounds | times: 100
+-%}

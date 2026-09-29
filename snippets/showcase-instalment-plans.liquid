@@ -1,0 +1,34 @@
+{% doc %}
+  Flattens the enabled "Instalment provider" blocks' plans into one string for
+  the instalment snippets to split: entries "block_id|months|rate_bp", joined by
+  ";". rate_bp is the rate in hundredths of a percent (5% → 500, 7.5% → 750), so
+  every instalment sum stays in integers.
+
+  A provider's plans are typed as "3:0, 6:0, 9:5, 12:10" (months:rate%). Spaces
+  and "%" are ignored; an entry without a positive month count is skipped, and a
+  provider left with no valid plan is left out entirely.
+
+  @param {object} section - The product section carrying the provider blocks.
+
+  @example
+  {% capture provider_plans %}{% render 'showcase-instalment-plans', section: section %}{% endcapture %}
+{% enddoc %}
+
+{%- liquid
+  for block in section.blocks
+    if block.type != 'instalment_logo' or block.settings.enabled == false
+      continue
+    endif
+
+    assign entries = block.settings.plans | remove: ' ' | remove: '%' | split: ','
+    for entry in entries
+      assign pair = entry | split: ':'
+      assign months = pair[0] | times: 1
+      if months < 1
+        continue
+      endif
+      assign rate_bp = pair[1] | default: 0 | times: 100 | round
+      echo block.id | append: '|' | append: months | append: '|' | append: rate_bp | append: ';'
+    endfor
+  endfor
+-%}

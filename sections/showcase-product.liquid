@@ -1573,7 +1573,21 @@
         {
           "type": "image_picker",
           "id": "logo",
-          "label": "Logo"
+          "label": "Logo",
+          "info": "Shown as a tab in the payment methods popup. A wide logo on a transparent or white background works best."
+        },
+        {
+          "type": "checkbox",
+          "id": "enabled",
+          "label": "Enabled",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "plans",
+          "label": "Plans",
+          "default": "3:0, 6:0, 9:0, 12:0",
+          "info": "Months:rate% pairs separated by commas, e.g. 3:0, 6:0, 9:5, 12:10. Monthly payment = price × (1 + rate) ÷ months, rounded up to whole pounds."
         }
       ]
     }

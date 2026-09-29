@@ -1,15 +1,20 @@
 {% doc %}
-  Collapsed instalment bar plus the modal it opens.
+  Collapsed instalment bar plus the "Payment methods" modal it opens.
 
-  The headline figure is the selected variant's price divided by the section's
-  "headline duration" (6 months by default), so it moves with the variant instead
-  of being authored per product. Each duration inside the modal is a section block
-  carrying its own months count and rate label, and its monthly figure is computed
-  the same way — price ÷ months. No interest is applied: the rate is display copy,
-  which is what a 0% instalment plan actually is.
+  Providers mode: each enabled "Instalment provider" block (logo, name, plans
+  typed as "3:0, 6:0, 9:5, 12:10" = months:rate%) becomes a tab in the modal;
+  its panel lists that provider's plans. Monthly = price × (1 + rate) ÷ months,
+  rounded UP to whole pounds. Up to five providers sit in a static row; more
+  become a horizontal slider.
 
-  Money is formatted server-side per row, so nothing here has to format currency
-  in JavaScript.
+  No providers: the generic "Instalment plan" blocks, price ÷ months with the
+  rate as display copy.
+
+  The bar's "Starting from" figure is the LOWEST monthly payment among the rows
+  the modal shows, so it always matches one of them. With no rows at all it
+  falls back to price ÷ the headline duration. Money is formatted server-side;
+  the variant JSON (showcase-product-options) carries the same figures per
+  variant so a variant change is a lookup.
 
   @param {object} product - The product, for the price floor when no variant is chosen.
   @param {object} selected_variant - Variant whose price drives every figure.
@@ -20,136 +25,319 @@
 {% enddoc %}
 
 {% liquid
-  assign plans = section.blocks | where: 'type', 'instalment_plan'
-  assign providers = section.blocks | where: 'type', 'instalment_logo'
-
-  assign headline_months = section.settings.instalment_headline_months | default: 6
+  assign generic_plans = section.blocks | where: 'type', 'instalment_plan'
   assign base_price = selected_variant.price | default: product.price
 
-  # Integer division rounds down, which would understate the payment; adding
-  # months-1 first rounds up so the sum of instalments always covers the price.
-  # Round UP to whole pounds: the advertised instalment is never below the real one.
-  assign headline_amount = base_price | times: 1.0 | divided_by: headline_months | divided_by: 100 | ceil | times: 100
+  capture provider_plans
+    render 'showcase-instalment-plans', section: section
+  endcapture
+  assign provider_entries = provider_plans | strip | split: ';'
+
+  # Providers that have at least one valid plan, in block order.
+  assign provider_ids = ''
+  for entry in provider_entries
+    assign entry_id = entry | split: '|' | first
+    assign entry_key = '|' | append: entry_id | append: '|'
+    unless provider_ids contains entry_key
+      assign provider_ids = provider_ids | append: entry_key
+    endunless
+  endfor
+  assign provider_count = provider_ids | split: '||' | size
+
+  # "Starting from": the lowest row the modal will show.
+  assign headline_amount = nil
+  if provider_entries.size > 0
+    for entry in provider_entries
+      assign parts = entry | split: '|'
+      assign months = parts[1] | times: 1
+      assign rate_bp = parts[2] | times: 1
+      capture amount
+        render 'showcase-instalment-amount', price: base_price, months: months, rate_bp: rate_bp
+      endcapture
+      assign amount = amount | times: 1
+      if headline_amount == nil or amount < headline_amount
+        assign headline_amount = amount
+      endif
+    endfor
+  else
+    for block in generic_plans
+      assign months = block.settings.months | default: 3
+      capture amount
+        render 'showcase-instalment-amount', price: base_price, months: months
+      endcapture
+      assign amount = amount | times: 1
+      if headline_amount == nil or amount < headline_amount
+        assign headline_amount = amount
+      endif
+    endfor
+  endif
+  if headline_amount == nil
+    assign headline_months = section.settings.instalment_headline_months | default: 6
+    capture headline_amount
+      render 'showcase-instalment-amount', price: base_price, months: headline_months
+    endcapture
+    assign headline_amount = headline_amount | times: 1
+  endif
+
+  assign short_period = section.settings.instalment_short_period | default: 'mo'
+  assign months_label = section.settings.instalment_months_label | default: 'months'
 %}
 
-{% if section.settings.show_instalments and base_price > 0 and plans.size > 0 %}
-  <div class="product-instalments">
-    <button
-      type="button"
-      class="instalment-bar"
-      aria-haspopup="dialog"
-      on:click="/openInstalments"
-    >
-      <span class="svg-wrapper instalment-bar__icon" aria-hidden="true">
-        {{- 'icon-card.svg' | inline_asset_content -}}
-      </span>
-
-      <span class="instalment-bar__text">
-        <span class="instalment-bar__headline">
-          {{ section.settings.instalment_prefix | default: 'Starting From' }}
-          <span class="instalment-bar__amount" ref="instalmentHeadline">
-            {%- render 'showcase-money', amount: headline_amount -%}
-          </span>
-          <span class="instalment-bar__period">
-            /{{ section.settings.instalment_period_label | default: 'Month' }}
-          </span>
+{% if section.settings.show_instalments and base_price > 0 %}
+  {% if provider_entries.size > 0 or generic_plans.size > 0 %}
+    <div class="product-instalments">
+      <button
+        type="button"
+        class="instalment-bar"
+        aria-haspopup="dialog"
+        on:click="/openInstalments"
+      >
+        <span class="svg-wrapper instalment-bar__icon" aria-hidden="true">
+          {{- 'icon-card.svg' | inline_asset_content -}}
         </span>
 
-        {% if section.settings.instalment_subtext != blank %}
-          <span class="instalment-bar__subtext">{{ section.settings.instalment_subtext }}</span>
-        {% endif %}
-      </span>
-
-      <span class="svg-wrapper instalment-bar__chevron" aria-hidden="true">
-        {{- 'icon-chevron-right.svg' | inline_asset_content -}}
-      </span>
-    </button>
-
-    <dialog
-      class="instalment-modal"
-      ref="instalmentDialog"
-      aria-label="{{ section.settings.instalment_modal_heading | default: 'Payment methods' | escape }}"
-    >
-      <div class="instalment-modal__head">
-        <h2 class="instalment-modal__heading">
-          {{- section.settings.instalment_modal_heading | default: 'Payment methods' -}}
-        </h2>
-        <button
-          type="button"
-          class="instalment-modal__close"
-          aria-label="{{ section.settings.instalment_close_label | default: 'Close' | escape }}"
-          on:click="/closeInstalments"
-        >
-          <span class="svg-wrapper" aria-hidden="true">
-            {{- 'icon-close.svg' | inline_asset_content -}}
+        <span class="instalment-bar__text">
+          <span class="instalment-bar__headline">
+            {{ section.settings.instalment_prefix | default: 'Starting From' }}
+            <span class="instalment-bar__amount" ref="instalmentHeadline">
+              {%- render 'showcase-money', amount: headline_amount -%}
+            </span>
+            <span class="instalment-bar__period">
+              /{{ section.settings.instalment_period_label | default: 'Month' }}
+            </span>
           </span>
-        </button>
-      </div>
 
-      {%- comment -%}
-        Provider logo strip. Reserved even when no logo has been uploaded yet, so
-        the modal's proportions do not jump once they are added.
-      {%- endcomment -%}
-      <div class="instalment-modal__providers">
-        {% for block in providers %}
-          <span class="instalment-provider" {{ block.shopify_attributes }}>
-            {% if block.settings.logo != blank %}
-              {{
-                block.settings.logo
-                | image_url: width: 200
-                | image_tag: loading: 'lazy', class: 'instalment-provider__logo', alt: block.settings.name, sizes: '96px', widths: '100, 200'
-              }}
-            {% else %}
-              <span class="instalment-provider__placeholder">{{ block.settings.name }}</span>
-            {% endif %}
-          </span>
-        {% else %}
-          <span class="instalment-provider__empty">
-            {{- section.settings.instalment_providers_empty
-              | default: 'Provider logos appear here once added in the theme editor.'
-            -}}
-          </span>
-        {% endfor %}
-      </div>
+          {% if section.settings.instalment_subtext != blank %}
+            <span class="instalment-bar__subtext">{{ section.settings.instalment_subtext }}</span>
+          {% endif %}
+        </span>
 
-      <table class="instalment-table">
-        <thead>
-          <tr>
-            <th scope="col">{{ section.settings.instalment_col_duration | default: 'Duration' }}</th>
-            <th scope="col">{{ section.settings.instalment_col_rate | default: 'Rate' }}</th>
-            <th scope="col">{{ section.settings.instalment_col_payment | default: 'Monthly payment' }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for block in plans %}
-            {% liquid
-              assign months = block.settings.months | default: 3
-              assign monthly = base_price | times: 1.0 | divided_by: months | divided_by: 100 | ceil | times: 100
-            %}
-            <tr {{ block.shopify_attributes }}>
-              <th scope="row">
-                {{ months }} {{ section.settings.instalment_months_label | default: 'months' }}
-              </th>
-              <td>
-                <span class="instalment-table__rate">{{ block.settings.rate_label | default: '0%' }}</span>
-              </td>
-              <td
-                class="instalment-table__amount"
-                ref="instalmentRows[]"
-                data-instalment-months="{{ months }}"
+        <span class="svg-wrapper instalment-bar__chevron" aria-hidden="true">
+          {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+        </span>
+      </button>
+
+      <dialog
+        class="instalment-modal"
+        ref="instalmentDialog"
+        aria-label="{{ section.settings.instalment_modal_heading | default: 'Payment methods' | escape }}"
+      >
+        <div class="instalment-modal__head">
+          <h2 class="instalment-modal__heading">
+            {{- section.settings.instalment_modal_heading | default: 'Payment methods' -}}
+          </h2>
+          <button
+            type="button"
+            class="instalment-modal__close"
+            aria-label="{{ section.settings.instalment_close_label | default: 'Close' | escape }}"
+            on:click="/closeInstalments"
+          >
+            <span class="svg-wrapper" aria-hidden="true">
+              {{- 'icon-close.svg' | inline_asset_content -}}
+            </span>
+          </button>
+        </div>
+
+        {% if provider_entries.size > 0 %}
+          {%- comment -%}
+            Provider tabs. Five or fewer: one static, evenly spaced row. More: a
+            horizontal slider (swipe; arrows on desktop) with the next logo
+            peeking. Every tab is the same size in both modes.
+          {%- endcomment -%}
+          <div
+            class="instalment-providers{% if provider_count > 5 %} instalment-providers--slider{% endif %}"
+            data-provider-count="{{ provider_count }}"
+          >
+            {% if provider_count > 5 %}
+              <button
+                type="button"
+                class="instalment-providers__arrow instalment-providers__arrow--prev"
+                aria-label="{{ 'accessibility.slideshow_previous' | t | escape }}"
+                data-direction="-1"
+                on:click="/scrollInstalmentProviders"
               >
-                {%- render 'showcase-money', amount: monthly %} / {{ section.settings.instalment_short_period | default: 'mo' -}}
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+                <span class="svg-wrapper" aria-hidden="true">
+                  {{- 'icon-chevron-left.svg' | inline_asset_content -}}
+                </span>
+              </button>
+            {% endif %}
 
-      {% if section.settings.instalment_footnote != blank %}
-        <p class="instalment-modal__footnote">{{ section.settings.instalment_footnote }}</p>
-      {% endif %}
-    </dialog>
-  </div>
+            <div
+              class="instalment-providers__track"
+              role="tablist"
+              aria-label="{{ section.settings.instalment_modal_heading | default: 'Payment methods' | escape }}"
+              ref="instalmentTrack"
+            >
+              {% assign first_tab = true %}
+              {% for block in section.blocks %}
+                {% assign block_key = '|' | append: block.id | append: '|' %}
+                {% unless block.type == 'instalment_logo' and provider_ids contains block_key %}
+                  {% continue %}
+                {% endunless %}
+                <button
+                  type="button"
+                  role="tab"
+                  class="instalment-provider-tab"
+                  id="InstalmentTab-{{ section.id }}-{{ block.id }}"
+                  aria-controls="InstalmentPanel-{{ section.id }}-{{ block.id }}"
+                  aria-selected="{{ first_tab }}"
+                  tabindex="{% if first_tab %}0{% else %}-1{% endif %}"
+                  ref="instalmentTabs[]"
+                  on:click="/selectInstalmentProvider"
+                  on:keydown="/stepInstalmentProvider"
+                  {{ block.shopify_attributes }}
+                >
+                  {% if block.settings.logo != blank %}
+                    {{
+                      block.settings.logo
+                      | image_url: width: 240
+                      | image_tag:
+                        loading: 'lazy',
+                        class: 'instalment-provider-tab__logo',
+                        alt: block.settings.name,
+                        sizes: '120px',
+                        widths: '120, 240'
+                    }}
+                  {% else %}
+                    <span class="instalment-provider-tab__name">{{ block.settings.name | default: 'Provider' }}</span>
+                  {% endif %}
+                </button>
+                {% assign first_tab = false %}
+              {% endfor %}
+            </div>
+
+            {% if provider_count > 5 %}
+              <button
+                type="button"
+                class="instalment-providers__arrow instalment-providers__arrow--next"
+                aria-label="{{ 'accessibility.slideshow_next' | t | escape }}"
+                data-direction="1"
+                on:click="/scrollInstalmentProviders"
+              >
+                <span class="svg-wrapper" aria-hidden="true">
+                  {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+                </span>
+              </button>
+            {% endif %}
+          </div>
+
+          {% assign first_panel = true %}
+          {% for block in section.blocks %}
+            {% assign block_key = '|' | append: block.id | append: '|' %}
+            {% unless block.type == 'instalment_logo' and provider_ids contains block_key %}
+              {% continue %}
+            {% endunless %}
+            <div
+              class="instalment-panel"
+              role="tabpanel"
+              id="InstalmentPanel-{{ section.id }}-{{ block.id }}"
+              aria-labelledby="InstalmentTab-{{ section.id }}-{{ block.id }}"
+              ref="instalmentPanels[]"
+              {% unless first_panel %}
+                hidden
+              {% endunless %}
+            >
+              <table class="instalment-table">
+                <thead>
+                  <tr>
+                    <th scope="col">{{ section.settings.instalment_col_duration | default: 'Duration' }}</th>
+                    <th scope="col">{{ section.settings.instalment_col_rate | default: 'Rate' }}</th>
+                    <th scope="col">{{ section.settings.instalment_col_payment | default: 'Monthly payment' }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for entry in provider_entries %}
+                    {% assign parts = entry | split: '|' %}
+                    {% unless parts[0] == block.id %}
+                      {% continue %}
+                    {% endunless %}
+                    {% liquid
+                      assign months = parts[1] | times: 1
+                      assign rate_bp = parts[2] | times: 1
+                      capture monthly
+                        render 'showcase-instalment-amount', price: base_price, months: months, rate_bp: rate_bp
+                      endcapture
+                      assign monthly = monthly | times: 1
+                      assign rate_rest = rate_bp | modulo: 100
+                      if rate_rest == 0
+                        assign rate_text = rate_bp | divided_by: 100 | append: '%'
+                      else
+                        assign rate_text = rate_bp | divided_by: 100.0 | append: '%'
+                      endif
+                    %}
+                    <tr>
+                      <th scope="row">{{ months }} {{ months_label }}</th>
+                      <td>
+                        <span class="instalment-table__rate">{{ rate_text }}</span>
+                      </td>
+                      <td
+                        class="instalment-table__amount"
+                        ref="instalmentRows[]"
+                        data-instalment-key="{{ block.id }}-{{ months }}"
+                      >
+                        {%- render 'showcase-money', amount: monthly %} / {{ short_period -}}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% assign first_panel = false %}
+          {% endfor %}
+        {% else %}
+          {%- comment -%}
+            No providers yet: the generic plan table. The strip keeps its height
+            so the modal's proportions don't jump once providers are added.
+          {%- endcomment -%}
+          <div class="instalment-modal__providers">
+            <span class="instalment-provider__empty">
+              {{- section.settings.instalment_providers_empty
+                | default: 'Provider logos appear here once added in the theme editor.'
+              -}}
+            </span>
+          </div>
+
+          <table class="instalment-table">
+            <thead>
+              <tr>
+                <th scope="col">{{ section.settings.instalment_col_duration | default: 'Duration' }}</th>
+                <th scope="col">{{ section.settings.instalment_col_rate | default: 'Rate' }}</th>
+                <th scope="col">{{ section.settings.instalment_col_payment | default: 'Monthly payment' }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for block in generic_plans %}
+                {% liquid
+                  assign months = block.settings.months | default: 3
+                  capture monthly
+                    render 'showcase-instalment-amount', price: base_price, months: months
+                  endcapture
+                  assign monthly = monthly | times: 1
+                %}
+                <tr {{ block.shopify_attributes }}>
+                  <th scope="row">{{ months }} {{ months_label }}</th>
+                  <td>
+                    <span class="instalment-table__rate">{{ block.settings.rate_label | default: '0%' }}</span>
+                  </td>
+                  <td
+                    class="instalment-table__amount"
+                    ref="instalmentRows[]"
+                    data-instalment-key="{{ months }}"
+                  >
+                    {%- render 'showcase-money', amount: monthly %} / {{ short_period -}}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+
+        {% if section.settings.instalment_footnote != blank %}
+          <p class="instalment-modal__footnote">{{ section.settings.instalment_footnote }}</p>
+        {% endif %}
+      </dialog>
+    </div>
+  {% endif %}
 {% endif %}
 
 {% stylesheet %}
@@ -270,24 +458,133 @@
     height: 14px;
   }
 
+  /* ---- Provider tabs ---- */
+  .instalment-providers {
+    /* Tabs are sized for five-and-a-half per row in both modes, measured on this
+       container (cqi), so a logo is the same size in the static row and in the
+       slider (where the half is the next logo peeking in), arrows or not. */
+    --provider-gap: 8px;
+    --provider-tab-width: calc((100cqi - 4 * var(--provider-gap)) / 5.5);
+
+    container-type: inline-size;
+    position: relative;
+    margin-block-end: var(--margin-md);
+  }
+
+  .instalment-providers__track {
+    display: flex;
+    justify-content: space-evenly;
+    gap: var(--provider-gap);
+    padding-block: 2px;
+  }
+
+  .instalment-providers--slider .instalment-providers__track {
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  .instalment-providers--slider .instalment-providers__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .instalment-provider-tab {
+    flex: 0 0 var(--provider-tab-width);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: 48px;
+    padding: 6px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-15));
+    border-radius: 10px;
+    background-color: var(--color-background, #ffffff);
+    color: var(--color-foreground);
+    cursor: pointer;
+    scroll-snap-align: start;
+  }
+
+  .instalment-provider-tab[aria-selected='true'] {
+    border-color: var(--product-accent, #e8342a);
+    box-shadow: inset 0 0 0 1px var(--product-accent, #e8342a);
+  }
+
+  .instalment-provider-tab__logo {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 30px;
+    object-fit: contain;
+  }
+
+  .instalment-provider-tab__name {
+    overflow: hidden;
+    font-size: var(--font-size--xs);
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .instalment-providers__arrow {
+    display: none;
+  }
+
+  @media screen and (min-width: 990px) {
+    .instalment-providers--slider .instalment-providers__track {
+      margin-inline: 34px;
+    }
+
+    .instalment-providers__arrow {
+      position: absolute;
+      top: 50%;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-15));
+      border-radius: 50%;
+      background-color: var(--color-background, #ffffff);
+      color: var(--color-foreground);
+      translate: 0 -50%;
+      cursor: pointer;
+    }
+
+    .instalment-providers__arrow--prev {
+      inset-inline-start: 0;
+    }
+
+    .instalment-providers__arrow--next {
+      inset-inline-end: 0;
+    }
+
+    .instalment-providers__arrow svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  .instalment-panel[hidden] {
+    display: none;
+  }
+
+  /* ---- Generic mode strip (no providers) ---- */
   .instalment-modal__providers {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: var(--gap-md);
-    /* Holds the strip's height before any logo is uploaded. */
+    /* Holds the strip's height before any provider is added. */
     min-height: 34px;
     margin-block-end: var(--margin-md);
   }
 
-  .instalment-provider__logo {
-    width: auto;
-    height: 22px;
-    max-width: 80px;
-    object-fit: contain;
-  }
-
-  .instalment-provider__placeholder,
   .instalment-provider__empty {
     color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
     font-size: var(--font-size--xs);
