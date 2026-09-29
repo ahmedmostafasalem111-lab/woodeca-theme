@@ -256,15 +256,12 @@
   {%- endcomment -%}
   <div class="showcase-card__info">
     <div class="showcase-card__info-text">
+    {%- comment -%}
+      Stacked, divan.ru style: the struck-through compare-at price on top, the
+      sale price directly under it, the name just below. No compare-at price =
+      the sale price alone.
+    {%- endcomment -%}
     <div class="showcase-card__price-row">
-      <span class="showcase-card__price">{{ card_price }}</span>
-
-      {%- comment -%}
-        The was-price and its discount chip travel as one unit. Loose in the
-        wrapping row they broke apart on narrower cards, so the chip sat beside
-        the old price on some cards and under it on others — which made the text
-        block a different height on every card in the row.
-      {%- endcomment -%}
       {% if card_compare_price != blank or discount_percent > 0 %}
         <span class="showcase-card__was">
           {% if card_compare_price != blank %}
@@ -275,6 +272,8 @@
           {% endif %}
         </span>
       {% endif %}
+
+      <span class="showcase-card__price">{{ card_price }}</span>
 
       {% if review_count > 0 %}
         <span class="showcase-card__reviews">
@@ -616,23 +615,26 @@
     padding-block-start: var(--padding-sm);
   }
 
+  /* 5px between the price block and the name (and the rows after it). */
   .showcase-card__info-text {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-3xs);
+    gap: 5px;
     min-width: 0;
   }
 
+  /* Compare-at on top, sale price directly under it — no gap between them. */
   .showcase-card__price-row {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--gap-2xs);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
   }
 
   .showcase-card__price {
-    font-size: var(--font-size--md);
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
   }
 
   /* Hanging tabs: flat top against the image, 2px bottom corners, 5px in. */
@@ -662,7 +664,9 @@
 
   .showcase-card__compare-price {
     color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
-    font-size: var(--font-size--sm);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
   }
 
   .showcase-card__discount {
@@ -683,8 +687,27 @@
     line-clamp: 2;
     overflow: hidden;
     color: var(--color-foreground);
-    font-size: var(--font-size--sm);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 21px;
     text-decoration: none;
+  }
+
+  @media screen and (min-width: 990px) {
+    .showcase-card__compare-price {
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .showcase-card__price {
+      font-size: 18px;
+      line-height: 27px;
+    }
+
+    .showcase-card__title {
+      font-size: 16px;
+      line-height: 24px;
+    }
   }
 
   .showcase-card__stock {
