@@ -447,14 +447,20 @@
   }
 
   /* ---- Product grid ---- */
+  /*
+    Desktop: four across with 30px gaps (divan.ru's grid: ~295px cards at 1366).
+    Below 990px: two across, edge to edge — only this grid leaves the page
+    margin; the heading, tiles, filters and pagination keep theirs.
+  */
   .collection-grid {
     /* Container so the promo can derive one column's width for its height. */
     container-type: inline-size;
     --collection-grid-cols: var(--collection-columns, 4);
+    --collection-grid-col-gap: 30px;
 
     display: grid;
     grid-template-columns: repeat(var(--collection-columns, 4), minmax(0, 1fr));
-    gap: var(--gap-xl) var(--gap-lg);
+    gap: 30px var(--collection-grid-col-gap);
   }
 
   .collection-grid__item {
@@ -499,7 +505,8 @@
     align-self: start;
     display: block;
     height: calc(
-      (100cqi - (var(--collection-grid-cols, 4) - 1) * var(--gap-lg)) / var(--collection-grid-cols, 4)
+      (100cqi - (var(--collection-grid-cols, 4) - 1) * var(--collection-grid-col-gap, 30px)) /
+        var(--collection-grid-cols, 4)
     );
     border-radius: var(--style-border-radius-inputs, 8px);
     color: var(--collection-promo-text, #fff);
@@ -602,10 +609,19 @@
 
   @media screen and (max-width: 989px) {
     .collection-grid {
-      /* Keep the promo height calc in step with the tablet column count. */
-      --collection-grid-cols: 3;
+      /* Keep the promo height calc in step with the column count. */
+      --collection-grid-cols: var(--collection-columns-mobile, 2);
+      --collection-grid-col-gap: 5px;
 
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      /* Full row of the page grid = edge to edge, no side margin. */
+      grid-column: 1 / -1;
+      grid-template-columns: repeat(var(--collection-columns-mobile, 2), minmax(0, 1fr));
+      gap: var(--gap-lg) var(--collection-grid-col-gap);
+    }
+
+    /* Text sits 10px in from the card edge now the card meets the screen edge. */
+    .collection-grid .showcase-card__info {
+      padding-inline: 10px;
     }
   }
 
@@ -624,11 +640,6 @@
 
     .collection-banner__image {
       height: 200px;
-    }
-
-    .collection-grid {
-      grid-template-columns: repeat(var(--collection-columns-mobile, 2), minmax(0, 1fr));
-      gap: var(--gap-lg) var(--gap-sm);
     }
 
     /* Promo spans the full mobile grid width and sizes to its own content. */
