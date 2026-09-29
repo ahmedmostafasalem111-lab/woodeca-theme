@@ -242,6 +242,20 @@
   </div>
 
   {%- comment -%}
+    Tabs hanging from the bottom-left of the image: the product's own label
+    (custom.product_label). The media box clips its overflow, so the row sits
+    just under it rather than inside it. Nothing is rendered without a label.
+  {%- endcomment -%}
+  {%- if product != blank and product != nil -%}
+    {%- capture card_tabs -%}
+      {%- render 'showcase-product-label', product: product, style: 'tab' -%}
+    {%- endcapture -%}
+    {%- if card_tabs != blank -%}
+      <div class="showcase-card__tabs">{{ card_tabs }}</div>
+    {%- endif -%}
+  {%- endif -%}
+
+  {%- comment -%}
     The cart button lives in the text row, not the image box, so the media panel
     holds only the photo.
   {%- endcomment -%}
@@ -636,6 +650,23 @@
   .showcase-card__price {
     font-size: var(--font-size--md);
     font-weight: 600;
+  }
+
+  /* Hanging tabs: flat top against the image, 2px bottom corners, 5px in. */
+  .showcase-card__tabs {
+    display: flex;
+    gap: 4px;
+    min-width: 0;
+    padding-inline-start: 5px;
+  }
+
+  .showcase-card__tabs .product-label--tab {
+    flex: 0 1 auto;
+    padding: 5px;
+    border-radius: 0 0 2px 2px;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 10px;
   }
 
   /* Never splits: the chip always sits beside the price it discounts. */

@@ -1,0 +1,56 @@
+{% doc %}
+  A product's own label ("New", "Hot deal", "Fast delivery"…) from the
+  custom.product_label metafield. Nothing at all is output when it is empty.
+
+  Colours: by default the announcement bar's background (read from the bar's own
+  setting through --announcement-bar-background, so the two stay in sync) with
+  black text, like the bar. A custom.product_label_color overrides the
+  background, and the text switches to white or black for contrast.
+
+  @param {object} product - The product carrying the metafields.
+  @param {string} [style] - 'pill' (product page, beside "Save X%") or 'tab'
+    (product cards, beside the hanging discount tab). Default 'pill'.
+
+  @example
+  {% render 'showcase-product-label', product: product, style: 'tab' %}
+{% enddoc %}
+
+{%- liquid
+  assign label_text = product.metafields.custom.product_label.value | strip
+  assign label_style = style | default: 'pill'
+  assign label_color = product.metafields.custom.product_label_color.value
+  assign label_css = ''
+  if label_color != blank
+    # Perceived brightness 0–255: dark backgrounds get white text.
+    assign label_brightness = label_color | color_brightness
+    assign label_text_color = '#000000'
+    if label_brightness < 150
+      assign label_text_color = '#ffffff'
+    endif
+    assign label_css = '--product-label-background: ' | append: label_color | append: '; --product-label-color: ' | append: label_text_color | append: ';'
+  endif
+-%}
+{%- if label_text != blank -%}
+<span
+  class="product-label product-label--{{ label_style }}"
+  title="{{ label_text | escape }}"
+  {% if label_css != blank %}
+    style="{{ label_css }}"
+  {% endif %}
+>
+  {{- label_text | escape -}}
+</span>
+{%- endif -%}
+
+{% stylesheet %}
+  .product-label {
+    display: inline-block;
+    /* Long labels end in an ellipsis rather than wrapping or pushing prices. */
+    max-width: 20ch;
+    overflow: hidden;
+    background-color: var(--product-label-background, var(--announcement-bar-background, #cbdde3));
+    color: var(--product-label-color, #000000);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+{% endstylesheet %}

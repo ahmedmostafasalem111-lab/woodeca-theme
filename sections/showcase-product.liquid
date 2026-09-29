@@ -211,17 +211,24 @@
           3 — Discount badge, computed from the variant's own prices. There is no
           static label anywhere: no compare-at price means no badge.
         {%- endcomment -%}
-        {% if save_percent > 0 %}
-          <p class="product-save-badge" ref="saveBadge">
-            {{ section.settings.save_badge_prefix | default: 'Save' }}
-            <span ref="savePercent">{{ save_percent }}</span>%
-          </p>
-        {% else %}
-          <p class="product-save-badge" ref="saveBadge" hidden>
-            {{ section.settings.save_badge_prefix | default: 'Save' }}
-            <span ref="savePercent"></span>%
-          </p>
-        {% endif %}
+        {%- comment -%}
+          The product's own label (custom.product_label) sits right beside it,
+          or alone in its place when there is no discount.
+        {%- endcomment -%}
+        <div class="product-badge-row">
+          {% if save_percent > 0 %}
+            <p class="product-save-badge" ref="saveBadge">
+              {{ section.settings.save_badge_prefix | default: 'Save' }}
+              <span ref="savePercent">{{ save_percent }}</span>%
+            </p>
+          {% else %}
+            <p class="product-save-badge" ref="saveBadge" hidden>
+              {{ section.settings.save_badge_prefix | default: 'Save' }}
+              <span ref="savePercent"></span>%
+            </p>
+          {% endif %}
+          {% render 'showcase-product-label', product: product, style: 'pill' %}
+        </div>
 
         {%- comment -%} 4 — Title. {%- endcomment -%}
         {% if display_name != blank %}
@@ -627,16 +634,37 @@
     height: var(--icon-size-sm);
   }
 
-  /* ---- Discount badge ---- */
-  .product-save-badge {
-    align-self: start;
+  /* ---- Discount badge + product label ---- */
+  .product-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  /* Neither a discount nor a label: no row, no gap. */
+  .product-badge-row:not(:has(> :not([hidden]))) {
+    display: none;
+  }
+
+  /* The label pill is the badge's twin: same height, shape, size and weight. */
+  .product-save-badge,
+  .product-label--pill {
+    flex: 0 0 auto;
     margin: 0;
     padding: 3px 10px;
     border-radius: 999px;
-    background-color: var(--product-accent, #e8342a);
-    color: #ffffff;
     font-size: var(--font-size--xs);
     font-weight: 700;
+  }
+
+  .product-label--pill {
+    flex-shrink: 1;
+  }
+
+  .product-save-badge {
+    background-color: var(--product-accent, #e8342a);
+    color: #ffffff;
   }
 
   .product-save-badge[hidden] {

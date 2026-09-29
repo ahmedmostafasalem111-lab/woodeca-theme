@@ -53,11 +53,20 @@
             data-product-id="{{ product.id }}"
             ref="cards[]"
           >
-            {% content_for 'block',
-              type: '_product-card',
-              id: 'product-card',
-              closest.product: product,
-              product_view_context: 'search'
+            {%- comment -%}
+              The storefront's own product card, as on collection pages,
+              carousels and related products, so search results carry the same
+              label, discount tab, prices, swatches and quick add. Options match
+              the collection grid's.
+            {%- endcomment -%}
+            {% render 'showcase-product-card',
+              product: product,
+              show_quick_add: true,
+              show_swatches: true,
+              swatch_limit: 5,
+              show_image_slider: true,
+              slider_limit: 5,
+              show_dimensions: true
             %}
           </li>
         {% endfor %}
@@ -74,6 +83,15 @@
     {% endpaginate %}
   </div>
 </results-list>
+
+<script
+  src="{{ 'showcase-card-cart.js' | asset_url }}"
+  type="module"
+></script>
+<script
+  src="{{ 'showcase-card-slider.js' | asset_url }}"
+  type="module"
+></script>
 
 {% schema %}
 {

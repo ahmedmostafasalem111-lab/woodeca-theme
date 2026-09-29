@@ -8,6 +8,18 @@
 
 {% render 'contrast-override', background_color: section.settings.background_color, section_id: section.id %}
 
+{%- comment -%}
+  Product labels (showcase-product-label) use the bar's background, so the two
+  stay the same colour when this setting changes.
+{%- endcomment -%}
+{%- if section.settings.background_color != blank -%}
+  <style>
+    :root {
+      --announcement-bar-background: {{ section.settings.background_color }};
+    }
+  </style>
+{%- endif -%}
+
 <div class="section-background color-custom-{{ section.id }}"></div>
 <aside
   class="announcement-bar spacing-style section section--{{ section.settings.section_width }} color-custom-{{ section.id }}"
