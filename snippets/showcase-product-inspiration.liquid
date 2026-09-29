@@ -7,6 +7,11 @@
   product. Both native Shopify video and external (YouTube/Vimeo) media are
   picked up. The whole row renders nothing when the product has no video.
 
+  Each native video's circle plays a silent, looping preview of its first
+  seconds from the lowest-resolution MP4 (showcase-inspiration-previews.js finds
+  it in the product JSON and loads it only while the circle is on screen);
+  external videos keep a still poster.
+
   @param {object} product - The product whose media is read.
   @param {object} section - The section, for labels.
 
@@ -36,6 +41,14 @@
           if media_label == blank
             assign media_label = product.title
           endif
+
+          # Native videos get a moving preview. Its source is picked in the
+          # browser: Liquid only exposes the 1080p MP4 (and HLS), while the
+          # product JSON also lists the 480p / 720p renditions.
+          assign has_preview = false
+          if media.media_type == 'video'
+            assign has_preview = true
+          endif
         %}
         <li class="product-inspiration__item">
           <button
@@ -46,7 +59,25 @@
             aria-label="{{ section.settings.inspiration_play_label | default: 'Play video' | escape }} — {{ media_label | escape }}"
             on:click="/openInspiration"
           >
-            {% if poster != blank %}
+            {% if has_preview %}
+              <video
+                class="product-inspiration__preview"
+                muted
+                playsinline
+                autoplay
+                loop
+                preload="none"
+                disablepictureinpicture
+                disableremoteplayback
+                aria-hidden="true"
+                tabindex="-1"
+                {% if poster != blank %}
+                  poster="{{ poster | image_url: width: 160 }}"
+                {% endif %}
+                data-preview-media-id="{{ media.id }}"
+                data-preview-product="{{ product.url | append: '.js' }}"
+              ></video>
+            {% elsif poster != blank %}
               {{
                 poster
                 | image_url: width: 220
@@ -98,6 +129,12 @@
       {% endfor %}
     </dialog>
   </div>
+
+  <script
+    src="{{ 'showcase-inspiration-previews.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
 {% endif %}
 
 {% stylesheet %}
@@ -148,11 +185,17 @@
     overflow: hidden;
   }
 
-  .product-inspiration__poster {
+  .product-inspiration__poster,
+  .product-inspiration__preview {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  /* The preview is decoration: taps go to the button, which opens the full video. */
+  .product-inspiration__preview {
+    pointer-events: none;
   }
 
   .product-inspiration__play {
