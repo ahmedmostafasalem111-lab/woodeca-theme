@@ -27,6 +27,9 @@
   @param {boolean} [show_reviews] - Render the review-count line when review data exists.
   @param {boolean} [show_image_slider] - Page through the product's images in the media box. Default false.
   @param {number} [slider_limit] - Maximum images the slider renders. Default 5.
+  @param {number} [card_index] - 1-based position in the grid (across pages). Slide 1 loads
+    eagerly for the first row (cards 1–4) and the first card gets fetchpriority high;
+    without it every card's first slide is lazy.
   @param {boolean} [show_dimensions] - Render the dimensions line when the metafield exists.
   @param {string} [dimensions_namespace] - Metafield namespace for dimensions. Default 'custom'.
   @param {string} [dimensions_key] - Metafield key for dimensions. Default 'dimensions'.
@@ -182,18 +185,45 @@
             tabindex="-1"
             aria-hidden="true"
           >
-            {% liquid
-              if forloop.first
-                assign slide_loading = 'eager'
-              else
+            {%- comment -%}
+              Only slide 1 is a real image. Slides 2–5 carry their sources in
+              data- attributes and are attached by showcase-card-slider.js the
+              first time this card is hovered, touched or scrolled — inside a
+              horizontal scroller "lazy" doesn't hold them back (they sit within
+              the browser's lazy-load distance), so every card used to download
+              all five. Slide 1 is eager for the first row only (cards 1–4: the
+              desktop row, the first two rows on phones) and the very first card
+              gets fetchpriority high as the likely LCP image.
+            {%- endcomment -%}
+            {% if forloop.first %}
+              {% liquid
                 assign slide_loading = 'lazy'
-              endif
-            %}
-            {{
-              slide_image
-              | image_url: width: 600
-              | image_tag: loading: slide_loading, class: 'showcase-card__image', alt: card_title, draggable: 'false', sizes: '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw', widths: '200, 300, 400, 500, 600'
-            }}
+                assign slide_priority = 'auto'
+                if card_index != blank and card_index <= 4
+                  assign slide_loading = 'eager'
+                  if card_index == 1
+                    assign slide_priority = 'high'
+                  endif
+                endif
+              %}
+              {{
+                slide_image
+                | image_url: width: 600
+                | image_tag: loading: slide_loading, fetchpriority: slide_priority, class: 'showcase-card__image', alt: card_title, draggable: 'false', sizes: '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw', widths: '200, 300, 400, 500, 600'
+              }}
+            {% else %}
+              <img
+                class="showcase-card__image"
+                data-src="{{ slide_image | image_url: width: 600 }}"
+                data-srcset="{% render 'showcase-srcset', image: slide_image, widths: '200,300,400,500,600' %}"
+                sizes="(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw"
+                data-alt="{{ card_title | escape }}"
+                alt=""
+                width="{{ slide_image.width }}"
+                height="{{ slide_image.height }}"
+                draggable="false"
+              >
+            {% endif %}
           </{{ card_link_tag }}>
         {% endfor %}
       </div>

@@ -46,6 +46,7 @@
 
       {% capture children %}
         {% for product in products %}
+          {%- assign card_position = paginate.current_offset | plus: forloop.index -%}
           <li
             id="{{ section.id }}-{{ product.id }}"
             class="product-grid__item product-grid__item--{{ forloop.index0 }}"
@@ -61,6 +62,7 @@
             {%- endcomment -%}
             {% render 'showcase-product-card',
               product: product,
+              card_index: card_position,
               show_quick_add: true,
               show_swatches: true,
               swatch_limit: 5,

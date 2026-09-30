@@ -11,6 +11,32 @@
 
 const ACTIVE_DOT = 'showcase-card__slide-dot--active';
 
+/**
+ * Attaches the card's deferred slides (2–5): their sources wait in data-
+ * attributes until this card is hovered, touched or scrolled, so a grid only
+ * downloads each card's first photo up front.
+ *
+ * @param {EventTarget | null} target - Anything inside the card.
+ */
+function hydrateSlides(target) {
+  const track = /** @type {HTMLElement | null} */ (target instanceof Element ? target.closest('.showcase-card')?.querySelector('[data-card-slides]') : null);
+  if (!track || track.dataset.slidesHydrated) return;
+  track.dataset.slidesHydrated = 'true';
+
+  for (const img of track.querySelectorAll('img[data-src]')) {
+    if (!(img instanceof HTMLImageElement)) continue;
+    if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+    img.src = img.dataset.src ?? '';
+    img.alt = img.dataset.alt ?? '';
+    img.removeAttribute('data-src');
+    img.removeAttribute('data-srcset');
+  }
+}
+
+// Desktop hover and phone touch warm the card up before its slider moves.
+document.addEventListener('pointerover', (event) => hydrateSlides(/** @type {Element} */ (event.target)?.closest?.('.showcase-card__media') ?? null), { passive: true });
+document.addEventListener('touchstart', (event) => hydrateSlides(/** @type {Element} */ (event.target)?.closest?.('.showcase-card__media') ?? null), { passive: true });
+
 /** @param {Element} media */
 function syncDots(media) {
   const track = media.querySelector('[data-card-slides]');
@@ -90,6 +116,9 @@ document.addEventListener(
   (event) => {
     const target = /** @type {HTMLElement | null} */ (event.target);
     if (!(target instanceof HTMLElement) || !target.hasAttribute?.('data-card-slides')) return;
+
+    // Any scroll of the track (swipe, keyboard, the swatch rewind) needs the slides.
+    hydrateSlides(target);
 
     const media = target.closest('.showcase-card__media');
     if (media) syncDots(media);

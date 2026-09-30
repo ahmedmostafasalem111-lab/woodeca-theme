@@ -203,12 +203,14 @@
         ref="grid"
       >
         {% for product in collection.products %}
+          {%- assign card_position = paginate.current_offset | plus: forloop.index -%}
           <div
             class="collection-grid__item"
             data-grid-item
           >
             {% render 'showcase-product-card',
               product: product,
+              card_index: card_position,
               stock_text: section.settings.card_stock_text,
               show_quick_add: section.settings.show_quick_add,
               show_swatches: section.settings.show_swatches,
