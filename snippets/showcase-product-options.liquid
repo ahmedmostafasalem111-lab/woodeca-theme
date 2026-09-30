@@ -97,7 +97,8 @@
       table without formatting currency in JavaScript. Rows are keyed like the
       modal's cells: "<provider block id>-<months>" for provider plans, or just
       "<months>" for the generic plans used when no provider is set up. The
-      headline is the lowest row, as in showcase-product-installments.
+      headline is the lowest provider row, or price ÷ the headline duration
+      without providers, as in showcase-product-installments.
     {%- endcomment -%}
     {% liquid
       assign option_plans = section.blocks | where: 'type', 'instalment_plan'
@@ -147,9 +148,6 @@
                     render 'showcase-instalment-amount', price: variant.price, months: plan_months
                   endcapture
                   assign plan_amount = plan_amount | times: 1
-                  if headline_amount == nil or plan_amount < headline_amount
-                    assign headline_amount = plan_amount
-                  endif
                   capture plan_text
                     render 'showcase-money', amount: plan_amount
                     echo ' / '

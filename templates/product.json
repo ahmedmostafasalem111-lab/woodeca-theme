@@ -39,29 +39,13 @@
             "months": 6,
             "rate_label": "0%"
           }
-        },
-        "p3": {
-          "type": "instalment_plan",
-          "settings": {
-            "months": 9,
-            "rate_label": "0%"
-          }
-        },
-        "p4": {
-          "type": "instalment_plan",
-          "settings": {
-            "months": 12,
-            "rate_label": "0%"
-          }
         }
       },
       "block_order": [
         "a1",
         "a3",
         "p1",
-        "p2",
-        "p3",
-        "p4"
+        "p2"
       ],
       "settings": {
         "show_breadcrumbs": true,

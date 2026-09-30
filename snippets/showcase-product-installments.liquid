@@ -10,9 +10,10 @@
   No providers: the generic "Instalment plan" blocks, price ÷ months with the
   rate as display copy.
 
-  The bar's "Starting from" figure is the LOWEST monthly payment among the rows
-  the modal shows, so it always matches one of them. With no rows at all it
-  falls back to price ÷ the headline duration. Money is formatted server-side;
+  The bar's "Starting from" figure is the LOWEST monthly payment among the
+  providers' rows, so it always matches one of them. With no providers set up it
+  is price ÷ the headline duration (6 months by default), matching the generic
+  table's 6-month row rather than advertising a longer placeholder plan. Money is formatted server-side;
   the variant JSON (showcase-product-options) carries the same figures per
   variant so a variant change is a lookup.
 
@@ -44,7 +45,8 @@
   endfor
   assign provider_count = provider_ids | split: '||' | size
 
-  # "Starting from": the lowest row the modal will show.
+  # "Starting from": the lowest provider row; without providers, price ÷ the
+  # headline duration (6).
   assign headline_amount = nil
   if provider_entries.size > 0
     for entry in provider_entries
@@ -53,17 +55,6 @@
       assign rate_bp = parts[2] | times: 1
       capture amount
         render 'showcase-instalment-amount', price: base_price, months: months, rate_bp: rate_bp
-      endcapture
-      assign amount = amount | times: 1
-      if headline_amount == nil or amount < headline_amount
-        assign headline_amount = amount
-      endif
-    endfor
-  else
-    for block in generic_plans
-      assign months = block.settings.months | default: 3
-      capture amount
-        render 'showcase-instalment-amount', price: base_price, months: months
       endcapture
       assign amount = amount | times: 1
       if headline_amount == nil or amount < headline_amount
