@@ -8,6 +8,11 @@
  * and drops back once the control has scrolled away.
  *
  * Anything else can opt in with a `data-chat-avoid` attribute.
+ *
+ * Cheap by design: an IntersectionObserver watches only those controls and
+ * reports which are in the lower part of the screen (the only place the bubble
+ * can meet them). The lift is recomputed on scroll only while one of them is
+ * there — no document-wide observers, no work while nothing is nearby.
  */
 
 const BUBBLE = '.floating-chat';
@@ -18,6 +23,14 @@ const OBSTACLES = [
   '[data-chat-avoid]',
 ].join(', ');
 const GAP = 12;
+/** Share of the screen, from the top, where obstacles can't reach the bubble. */
+const SAFE_TOP_SHARE = 0.4;
+
+/** Obstacles currently in the lower part of the screen. */
+const nearBottom = new Set();
+
+/** @type {IntersectionObserver | null} */
+let observer = null;
 
 /** @type {number | null} */
 let frame = null;
@@ -34,8 +47,8 @@ function update() {
   const baseBottom = window.innerHeight - bottomOffset;
   const base = { top: baseBottom - bubble.offsetHeight, bottom: baseBottom, left: box.left, right: box.right };
 
-  const rects = [...document.querySelectorAll(OBSTACLES)]
-    .filter((el) => el instanceof HTMLElement && !el.closest(BUBBLE))
+  const rects = [...nearBottom]
+    .filter((el) => el.isConnected)
     .map((el) => el.getBoundingClientRect())
     .filter((r) => r.width > 0 && r.height > 0 && r.left < base.right + GAP && r.right > base.left - GAP);
 
@@ -60,9 +73,38 @@ function schedule() {
   if (frame == null) frame = requestAnimationFrame(update);
 }
 
-// Capture phase so scrolling inside any container (not just the window) counts.
-document.addEventListener('scroll', schedule, { capture: true, passive: true });
-window.addEventListener('resize', schedule, { passive: true });
-document.addEventListener('shopify:section:load', schedule);
-new MutationObserver(schedule).observe(document.documentElement, { subtree: true, childList: true });
-schedule();
+/** (Re)collects the obstacles and watches the lower part of the screen for them. */
+function watch() {
+  observer?.disconnect();
+  nearBottom.clear();
+
+  const safeTop = Math.round(window.innerHeight * SAFE_TOP_SHARE);
+  observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) nearBottom.add(entry.target);
+        else nearBottom.delete(entry.target);
+      }
+      schedule(); // also drops the lift once the last obstacle has left
+    },
+    { rootMargin: `-${safeTop}px 0px 0px 0px` }
+  );
+
+  for (const el of document.querySelectorAll(OBSTACLES)) {
+    if (el instanceof HTMLElement && !el.closest(BUBBLE)) observer.observe(el);
+  }
+  schedule();
+}
+
+// Scrolling moves obstacles through the zone; only then is work needed. Phones
+// scroll the window; from 990px the page scrolls inside .page-wrapper (the
+// document itself is overflow: hidden there), so both are listened to.
+const onScroll = () => {
+  if (nearBottom.size) schedule();
+};
+window.addEventListener('scroll', onScroll, { passive: true });
+document.querySelector('.page-wrapper')?.addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('resize', watch, { passive: true });
+// Theme editor: a re-rendered section brings new elements.
+document.addEventListener('shopify:section:load', watch);
+watch();
