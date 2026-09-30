@@ -146,7 +146,7 @@
                 loading="eager"
                 fetchpriority="high"
               >
-            {% else %}
+            {% elsif request.design_mode %}
               {{ 'product-apparel-1' | placeholder_svg_tag: 'product-gallery__image' }}
             {% endif %}
           </div>

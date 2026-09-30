@@ -47,7 +47,7 @@
             | image_url: width: 1200
             | image_tag: loading: 'lazy', class: 'media-promo__image', alt: section.settings.heading, sizes: '(min-width: 750px) 50vw, 100vw', widths: '400, 600, 800, 1000, 1200'
           }}
-        {% else %}
+        {% elsif request.design_mode %}
           {{ 'lifestyle-1' | placeholder_svg_tag: 'media-promo__image media-promo__image--placeholder' }}
         {% endif %}
       </div>
