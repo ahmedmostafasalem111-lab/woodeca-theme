@@ -358,14 +358,42 @@ document.addEventListener('click', (event) => {
  * Product-page add to cart. Intercepted here so it lands in the drawer instead
  * of navigating to /cart, while the form stays a real form for anyone without
  * JavaScript.
+ *
+ * Shopify's pixels count an add twice when it is both a submit of a form whose
+ * action is /cart/add AND a /cart/add.js request: one tap became two
+ * product_added_to_cart events, so two GA4 / Google Ads add_to_cart hits and
+ * two Meta AddToCart. With this script running, the form's action is parked in
+ * `data-cart-action`: the submit no longer looks like a cart add and only the
+ * request below is counted. Without JavaScript nothing changes and the form
+ * posts to /cart/add as before.
  */
+const PRODUCT_FORM = '.product-buybox__form';
+
+/** @param {ParentNode} root */
+function parkProductFormActions(root) {
+  for (const form of root.querySelectorAll(`${PRODUCT_FORM}[action]`)) {
+    if (!(form instanceof HTMLFormElement)) continue;
+    form.dataset.cartAction = form.getAttribute('action') ?? '';
+    form.removeAttribute('action');
+  }
+}
+
+parkProductFormActions(document);
+// Theme editor: a re-rendered product section brings a fresh form.
+document.addEventListener('shopify:section:load', (event) => {
+  if (event.target instanceof Element) parkProductFormActions(event.target);
+});
+
 document.addEventListener('submit', async (event) => {
   const form = /** @type {HTMLFormElement} */ (event.target);
   if (!(form instanceof HTMLFormElement) || !form.classList.contains('product-buybox__form')) return;
 
   // Buy It Now submits through its own handler and must still leave the page.
   const submitter = /** @type {HTMLElement | null} */ (event.submitter);
-  if (submitter?.getAttribute('name') === 'checkout') return;
+  if (submitter?.getAttribute('name') === 'checkout') {
+    if (form.dataset.cartAction) form.setAttribute('action', form.dataset.cartAction);
+    return;
+  }
 
   event.preventDefault();
 
