@@ -160,6 +160,10 @@
               <div class="product-gallery__slide" ref="slides[]" data-media-id="{{ image.id }}">
                 {%- comment -%}
                   The first slide is the mobile LCP image, so it is never lazy.
+                  The second is a normal lazy image (the one a swipe reveals).
+                  Slides 3+ keep their sources in data- attributes until the
+                  customer swipes or picks a colour (showcase-product.js):
+                  inside a horizontal track "lazy" alone doesn't hold them back.
                   On desktop the track is hidden and `sizes` drops to 1px.
                 {%- endcomment -%}
                 {%- liquid
@@ -171,16 +175,29 @@
                     assign slide_priority = 'auto'
                   endif
                 -%}
-                <img
-                  src="{{ image | image_url: width: 800 }}"
-                  srcset="{% render 'showcase-srcset', image: image, widths: '160,400,600,800,1000,1200,1500' %}"
-                  sizes="(max-width: 989px) calc(100vw - 32px), 1px"
-                  alt="{{ product.title | escape }}"
-                  width="{{ image.width }}"
-                  height="{{ image.height }}"
-                  loading="{{ slide_loading }}"
-                  fetchpriority="{{ slide_priority }}"
-                >
+                {% if forloop.index <= 2 %}
+                  <img
+                    src="{{ image | image_url: width: 800 }}"
+                    srcset="{% render 'showcase-srcset', image: image, widths: '160,400,600,800,1000,1200,1500' %}"
+                    sizes="(max-width: 989px) calc(100vw - 32px), 1px"
+                    alt="{{ product.title | escape }}"
+                    width="{{ image.width }}"
+                    height="{{ image.height }}"
+                    loading="{{ slide_loading }}"
+                    fetchpriority="{{ slide_priority }}"
+                  >
+                {% else %}
+                  <img
+                    data-src="{{ image | image_url: width: 800 }}"
+                    data-srcset="{% render 'showcase-srcset', image: image, widths: '160,400,600,800,1000,1200,1500' %}"
+                    sizes="(max-width: 989px) calc(100vw - 32px), 1px"
+                    data-alt="{{ product.title | escape }}"
+                    alt=""
+                    width="{{ image.width }}"
+                    height="{{ image.height }}"
+                    loading="lazy"
+                  >
+                {% endif %}
               </div>
             {% endfor %}
           </div>

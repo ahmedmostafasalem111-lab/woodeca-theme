@@ -58,6 +58,9 @@ import { Component } from '@theme/component';
  *
  * @extends {Component<Refs>}
  */
+/** Input on the mobile gallery track that starts a swipe. */
+const SWIPE_START = ['touchstart', 'pointerdown', 'wheel', 'keydown'];
+
 class ShowcaseProductComponent extends Component {
   /** @type {number | null} */
   #frame = null;
@@ -71,6 +74,11 @@ class ShowcaseProductComponent extends Component {
   connectedCallback() {
     super.connectedCallback();
     this.refs.scroller?.addEventListener('scroll', this.#onScroll, { passive: true });
+    // The customer's own swipe (touch, trackpad, keys) attaches the deferred
+    // slides; the scroll a colour pick causes does not — see #showMedia.
+    for (const type of SWIPE_START) {
+      this.refs.scroller?.addEventListener(type, this.#hydrateSlides, { passive: true });
+    }
     // Escape closes a <dialog> natively, without going through our close action,
     // which would leave the video playing with its audio audible.
     this.refs.inspirationDialog?.addEventListener('close', this.#onInspirationClose);
@@ -82,6 +90,7 @@ class ShowcaseProductComponent extends Component {
   disconnectedCallback() {
     super.disconnectedCallback();
     this.refs.scroller?.removeEventListener('scroll', this.#onScroll);
+    for (const type of SWIPE_START) this.refs.scroller?.removeEventListener(type, this.#hydrateSlides);
     this.refs.inspirationDialog?.removeEventListener('close', this.#onInspirationClose);
     if (this.#frame != null) cancelAnimationFrame(this.#frame);
     this.#barObserver?.disconnect();
@@ -260,6 +269,10 @@ class ShowcaseProductComponent extends Component {
     const index = (slides ?? []).findIndex((slide) => slide.dataset.mediaId === key);
     // A hidden track (desktop) has no width to scroll by.
     if (!scroller || index < 0 || scroller.clientWidth === 0) return;
+
+    // Only the chosen colour's photo is needed; the slides the jump passes over stay deferred.
+    const target = slides?.[index]?.querySelector('img[data-src]');
+    if (target instanceof HTMLImageElement) attachDeferredImage(target);
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     scroller.scrollTo({
@@ -509,6 +522,22 @@ class ShowcaseProductComponent extends Component {
     }
   }
 
+  /**
+   * Attaches the mobile track's deferred slides (3 onwards): their sources wait
+   * in data- attributes until the customer touches or swipes the track, so a
+   * visit that never swipes downloads only the first two photos. (Picking a
+   * colour attaches just that colour's slide — see #showMedia.)
+   */
+  #hydrateSlides = () => {
+    const { scroller } = this.refs;
+    if (!scroller || scroller.dataset.slidesHydrated) return;
+    scroller.dataset.slidesHydrated = 'true';
+
+    for (const img of scroller.querySelectorAll('img[data-src]')) {
+      if (img instanceof HTMLImageElement) attachDeferredImage(img);
+    }
+  };
+
   #onScroll = () => {
     if (this.#frame != null) return;
     this.#frame = requestAnimationFrame(() => {
@@ -529,6 +558,19 @@ class ShowcaseProductComponent extends Component {
       dot.setAttribute('aria-current', String(isActive));
     }
   }
+}
+
+/**
+ * Gives a deferred gallery slide its real sources (kept in data- attributes).
+ *
+ * @param {HTMLImageElement} img
+ */
+function attachDeferredImage(img) {
+  if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+  img.src = img.dataset.src ?? '';
+  img.alt = img.dataset.alt ?? '';
+  img.removeAttribute('data-src');
+  img.removeAttribute('data-srcset');
 }
 
 /**
