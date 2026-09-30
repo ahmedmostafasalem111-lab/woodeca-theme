@@ -9,8 +9,9 @@
 
   Each native video's circle plays a silent, looping preview of its first
   seconds from the lowest-resolution MP4 (showcase-inspiration-previews.js finds
-  it in the product JSON and loads it only while the circle is on screen);
-  external videos keep a still poster.
+  it in the product JSON). Nothing downloads until after the load event, ~2 s of
+  idle and the shopper's first scroll/interaction; never on Save-Data or 2G/3G;
+  on phones only the first circle plays. External videos keep a still poster.
 
   @param {object} product - The product whose media is read.
   @param {object} section - The section, for labels.
