@@ -13,6 +13,20 @@
   assign description = section.settings.description
   assign source_collection = section.settings.collection
   assign products_limit = section.settings.products_limit | default: 12
+
+  # On the cart page this carousel sits right under the cart — on screen on
+  # desktop, and the page's main content (its largest paint) when the cart is
+  # empty — so its cards load like a grid's first row: eager, with the first one
+  # at high priority only on an empty cart (card_index 1). Everywhere else it
+  # sits below other content and stays lazy.
+  assign eager_cards = false
+  assign card_offset = 0
+  if template.name == 'cart'
+    assign eager_cards = true
+    if cart.item_count > 0
+      assign card_offset = 1
+    endif
+  endif
 %}
 
 <div
@@ -69,9 +83,16 @@
   {%- capture carousel_items -%}
     {%- if source_collection != blank and source_collection.products.size > 0 -%}
       {%- for product in source_collection.products limit: products_limit -%}
+        {%- liquid
+          assign card_position = nil
+          if eager_cards
+            assign card_position = forloop.index | plus: card_offset
+          endif
+        -%}
         <div>
           {% render 'showcase-product-card',
             product: product,
+            card_index: card_position,
             stock_text: section.settings.default_stock_text,
             show_quick_add: section.settings.show_quick_add
           %}

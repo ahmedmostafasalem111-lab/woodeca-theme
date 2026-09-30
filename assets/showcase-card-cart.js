@@ -23,6 +23,20 @@ const CONFIRM_MS = 2000;
 /** Per-button revert timers, so a rapid second add restarts rather than stacks. */
 const revertTimers = new WeakMap();
 
+/**
+ * On the cart page (whose "You may also like" row uses these cards) the page's
+ * own cart list has to show the new line too, not just the drawer. Imported on
+ * demand so other pages never load the section renderer for it.
+ */
+function refreshCartPage() {
+  const pageCart = document.querySelector('cart-items-component:not([data-drawer])');
+  const sectionId = pageCart instanceof HTMLElement ? pageCart.dataset.sectionId : undefined;
+  if (!sectionId) return;
+  import('@theme/section-renderer')
+    .then(({ sectionRenderer }) => sectionRenderer.renderSection(sectionId, { cache: false, mode: 'full' }))
+    .catch((error) => console.warn('[showcase-card-cart] cart page refresh failed', error));
+}
+
 async function addToCart(button) {
   const variantId = button.dataset.variantId;
   if (!variantId || button.classList.contains(BUSY_CLASS)) return;
@@ -84,6 +98,7 @@ async function addToCart(button) {
     );
 
     const payload = await response.json().catch(() => null);
+    refreshCartPage();
 
     // Hand off to the drawer, which renders the updated cart and opens itself.
     document.dispatchEvent(
