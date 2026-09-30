@@ -29,7 +29,8 @@
   @param {number} [slider_limit] - Maximum images the slider renders. Default 5.
   @param {number} [card_index] - 1-based position in the grid (across pages). The card's
     (first) image loads eagerly for the first row (cards 1–4) and the first card gets
-    fetchpriority high; without it every card's image is lazy.
+    fetchpriority high; on phones card 2 does too (via a preload); without it every
+    card's image is lazy.
   @param {boolean} [show_dimensions] - Render the dimensions line when the metafield exists.
   @param {string} [dimensions_namespace] - Metafield namespace for dimensions. Default 'custom'.
   @param {string} [dimensions_key] - Metafield key for dimensions. Default 'dimensions'.
@@ -175,6 +176,36 @@
 
 <div class="showcase-card">
   <div class="showcase-card__media">
+    {%- comment -%}
+      Phones show two cards per row, so card 2 is as likely to be the LCP image as
+      card 1. An <img> can't set fetchpriority per screen width, so card 2 gets a
+      high-priority preload limited to phone widths (same srcset/sizes as its
+      image, so the browser reuses the download). Desktop's first row is four
+      cards and card 1 keeps the only hint there.
+      (image_tag's own preload is a Link header and can't be limited to phones,
+      hence the AssetPreload check is switched off for this one tag.)
+    {%- endcomment -%}
+    {%- if card_index == 2 -%}
+      {%- liquid
+        assign preload_image = card_image
+        if card_slider_images != null and card_slider_images.size > 1
+          assign preload_image = card_slider_images.first
+        endif
+      -%}
+      {%- if preload_image != blank -%}
+        {% # theme-check-disable AssetPreload %}
+        <link
+          rel="preload"
+          as="image"
+          href="{{ preload_image | image_url: width: 600 }}"
+          imagesrcset="{% render 'showcase-srcset', image: preload_image, widths: '200,300,400,500,600' %}"
+          imagesizes="(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw"
+          fetchpriority="high"
+          media="(max-width: 989px)"
+        >
+        {% # theme-check-enable AssetPreload %}
+      {%- endif -%}
+    {%- endif -%}
     {%- comment -%}
       With the slider on, the media box becomes a scroll-snap track of the product's
       own images. Native scrolling gives the mobile swipe for free; the arrows just
