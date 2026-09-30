@@ -156,17 +156,39 @@
           else
             assign sub_icon_value = null
           endif
+
+          # SVG icons are drawn at full artwork size (30–80 KB each), so like the
+          # logo they are requested as PNG at the size shown (76px box: 128px,
+          # 192px on 2x screens). Raster icons keep their own format.
+          assign sub_icon_format = ''
+          if sub_icon_value != null
+            assign sub_icon_url = sub_icon_value | image_url
+            if sub_icon_url contains '.svg'
+              assign sub_icon_format = 'png'
+            endif
+          endif
         %}
         <a
           href="{{ subcollection.url }}"
           class="collection-subcat"
         >
           <span class="collection-subcat__media">
-            {% if sub_icon_value != null %}
+            {% if sub_icon_value != null and sub_icon_format == 'png' %}
+              <img
+                class="collection-subcat__icon"
+                src="{{ sub_icon_value | image_url: width: 128, format: 'png' }}"
+                srcset="{% render 'showcase-srcset', image: sub_icon_value, widths: '128,192,256', format: 'png' %}"
+                sizes="76px"
+                alt="{{ subcollection.title | escape }}"
+                width="128"
+                height="{{ 128 | divided_by: sub_icon_value.aspect_ratio | round }}"
+                loading="lazy"
+              >
+            {% elsif sub_icon_value != null %}
               {{
                 sub_icon_value
                 | image_url: width: 200
-                | image_tag: loading: 'lazy', class: 'collection-subcat__icon', alt: subcollection.title, sizes: '64px', widths: '64, 128, 192'
+                | image_tag: loading: 'lazy', class: 'collection-subcat__icon', alt: subcollection.title, sizes: '76px', widths: '64, 128, 192'
               }}
             {% else %}
               <span class="svg-wrapper collection-subcat__icon-fallback" aria-hidden="true">
