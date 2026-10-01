@@ -1,0 +1,147 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "help-cards",
+      "blocks": {
+        "question_change_of_mind": {
+          "type": "question",
+          "settings": {
+            "question": "Can I return my order if I change my mind?",
+            "summary": "Yes. You have 14 days from delivery to return most unused items. Conditions apply.",
+            "answer": "<p>If it's not quite right for your home, you can return it within <strong>14 days of delivery</strong>.</p><ul><li>The item must be unused, undamaged and in its original condition.</li><li>Custom-made and personalised items can't be returned.</li><li>The return pickup is at your cost. Our team will confirm the price before booking it.</li></ul><p>Once we've collected and checked the item, we'll process your refund.</p>",
+            "anchor_id": "change-of-mind"
+          }
+        },
+        "question_how_long": {
+          "type": "question",
+          "settings": {
+            "question": "How long do I have to return or exchange?",
+            "summary": "14 days from the day your order is delivered.",
+            "answer": "<ul><li><strong>Change of mind or exchange:</strong> 14 days from delivery.</li><li><strong>Damaged, faulty or wrong item:</strong> tell us within <strong>24 hours of delivery</strong>.</li><li><strong>Manufacturing defects</strong> that show up later are covered by our <strong>3-year warranty</strong>.</li></ul>",
+            "anchor_id": "how-long"
+          }
+        },
+        "question_start_a_return": {
+          "type": "question",
+          "settings": {
+            "question": "How do I start a return or exchange?",
+            "summary": "Contact our team with your order number and we'll arrange everything.",
+            "answer": "<ol><li>Contact us with your order number and what you'd like to return or exchange.</li><li>We'll confirm everything's eligible and tell you the pickup cost.</li><li>We book a pickup at a time that suits you.</li><li>Once we've checked the item, we send your refund or your new item.</li></ol>",
+            "anchor_id": "start-a-return"
+          }
+        },
+        "question_exchange": {
+          "type": "question",
+          "settings": {
+            "question": "Can I exchange for a different colour or size?",
+            "summary": "Yes, within 14 days. You cover the delivery and any price difference.",
+            "answer": "<p>Yes, as long as the item is unused and in its original condition, within <strong>14 days of delivery</strong>.</p><ul><li>You pay the delivery both ways: collecting the original and delivering the new one.</li><li>If the new item costs more, you pay the difference.</li><li>Your new item follows our normal delivery times.</li></ul>",
+            "anchor_id": "exchange"
+          }
+        },
+        "question_faulty": {
+          "type": "question",
+          "settings": {
+            "question": "My item arrived damaged or faulty",
+            "summary": "We're so sorry! Send us photos or a video within 24 hours and we'll make it right, free of charge.",
+            "answer": "<p>We're sorry that happened. Please send us <strong>photos or a short video within 24 hours of delivery</strong>, with your order number.</p><p>We'll repair, replace or refund it <strong>at no cost to you</strong>, including the pickup.</p><p>Tip: you can check your order before paying. See <a href=\"#inspect-before-paying\" title=\"Can I check my order before I pay?\">\"Can I check my order before I pay?\"</a></p>",
+            "anchor_id": "faulty"
+          }
+        },
+        "question_wrong_item": {
+          "type": "question",
+          "settings": {
+            "question": "I received the wrong item",
+            "summary": "Sorry about the mix-up! Contact us and we'll swap it at no cost.",
+            "answer": "<p>Please contact us <strong>within 24 hours of delivery</strong> with your order number and a photo of what arrived. Please don't assemble or use it.</p><p>We'll collect it and deliver the right item <strong>free of charge</strong>.</p>",
+            "anchor_id": "wrong-item"
+          }
+        },
+        "question_inspect_before_paying": {
+          "type": "question",
+          "settings": {
+            "question": "Can I check my order before I pay?",
+            "summary": "Yes. With cash on delivery you can inspect everything and only pay if you're happy.",
+            "answer": "<p>With <strong>cash on delivery</strong>, you can open and inspect your order at your door before paying.</p><p>If you decide not to take it, you can refuse it <strong>at no cost</strong>.</p>",
+            "anchor_id": "inspect-before-paying"
+          }
+        },
+        "question_refunds": {
+          "type": "question",
+          "settings": {
+            "question": "How do I get my refund?",
+            "summary": "Once we've collected and checked your item, your refund arrives within 7–10 working days.",
+            "answer": "<p>After we've collected and checked the item, we process your refund. It reaches you within <strong>7–10 working days</strong>.</p><ul><li><strong>Cash on delivery orders:</strong> refunded by bank transfer or mobile wallet (Vodafone Cash, Orange Cash, Etisalat Cash). We don't refund in cash.</li><li><strong>Card payments:</strong> refunded to the same card.</li><li><strong>Instalments:</strong> refunded through your instalment provider.</li></ul>",
+            "anchor_id": "refunds"
+          }
+        },
+        "question_warranty": {
+          "type": "question",
+          "settings": {
+            "question": "What does the 3-year warranty cover?",
+            "summary": "Manufacturing defects, for 3 years from delivery.",
+            "answer": "<p>Every Woodeca piece comes with a <strong>3-year warranty against manufacturing defects</strong>, from the day it's delivered.</p><p><strong>Covered:</strong> the structure, joints, fittings, hinges and drawer runners.</p><p><strong>Not covered:</strong></p><ul><li>damage from misuse, water or heat</li><li>normal wear and tear</li><li>repairs or changes not made by Woodeca</li></ul><p>To make a claim, contact us with your order number and photos. We'll repair or replace the part or the item.</p>",
+            "anchor_id": "warranty"
+          }
+        },
+        "question_non_returnable": {
+          "type": "question",
+          "settings": {
+            "question": "What can't be returned?",
+            "summary": "Custom-made and personalised items, and anything used or damaged after delivery.",
+            "answer": "<ul><li>Custom-made and personalised items.</li><li>Items that have been used, or damaged after delivery.</li><li>Returns requested more than 14 days after delivery. Faults are still covered by the warranty.</li></ul>",
+            "anchor_id": "non-returnable"
+          }
+        },
+        "question_postpone_delivery": {
+          "type": "question",
+          "settings": {
+            "question": "Can I postpone my delivery?",
+            "summary": "Yes, up to 30 days after purchase, when the order is fully paid.",
+            "answer": "<p>Moving house or not ready yet? You can postpone your delivery for <strong>up to 30 days</strong> after purchase, as long as the order is <strong>fully paid in advance</strong>. Just contact us to set a new date.</p>",
+            "anchor_id": "postpone-delivery"
+          }
+        }
+      },
+      "block_order": [
+        "question_change_of_mind",
+        "question_how_long",
+        "question_start_a_return",
+        "question_exchange",
+        "question_faulty",
+        "question_wrong_item",
+        "question_inspect_before_paying",
+        "question_refunds",
+        "question_warranty",
+        "question_non_returnable",
+        "question_postpone_delivery"
+      ],
+      "settings": {
+        "show_breadcrumbs": true,
+        "breadcrumb_home_label": "Home",
+        "breadcrumb_label": "",
+        "heading": "Returns & Warranty",
+        "subtitle": "Support when you need it",
+        "close_label": "Close",
+        "strip_text": "Still need help? Our team is happy to help.",
+        "strip_button_label": "Contact us",
+        "strip_button_link": "/pages/contact-us",
+        "show_phone": true,
+        "padding-block-start": 32,
+        "padding-block-end": 64
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
