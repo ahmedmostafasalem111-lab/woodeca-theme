@@ -1,0 +1,56 @@
+{% comment %}
+  App blocks only (e.g. the Judge.me review widget on the product page), with
+  the same width and vertical padding settings as the other showcase sections.
+  A plain section loop rather than Horizon's _blocks wrapper: theme check
+  flags app blocks placed in _blocks as missing theme blocks.
+{% endcomment %}
+<div
+  class="section section--{{ section.settings.section_width }} showcase-apps spacing-style"
+  style="{% render 'spacing-padding', settings: section.settings %}"
+>
+  {%- for block in section.blocks -%}
+    {% render block %}
+  {%- endfor -%}
+</div>
+
+{% schema %}
+{
+  "name": "Apps",
+  "tag": "section",
+  "class": "section-showcase-apps",
+  "blocks": [{ "type": "@app" }],
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [{ "name": "Apps" }]
+}
+{% endschema %}

@@ -288,17 +288,27 @@
         "card_stock_text": "In stock"
       }
     },
-    "reviews": {
-      "type": "showcase-product-reviews",
+    "judgeme_reviews": {
+      "type": "showcase-apps",
+      "name": "Product reviews (Judge.me)",
+      "blocks": {
+        "judge_me_reviews_review_widget": {
+          "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "review_data": "sample_data",
+            "max_width": 1200,
+            "show_shop_reviews": false,
+            "empty_state": "empty_widget"
+          }
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_review_widget"
+      ],
       "settings": {
-        "heading": "Reviews",
-        "empty_heading": "There are no reviews yet, be the first!",
-        "empty_text": "Share your experience and help other customers choose with confidence.",
-        "cta_label": "Add a review",
-        "show_ugc": true,
-        "ugc_heading": "Renovating your home? We want to see it!",
-        "ugc_text": "Send us photos of your interior and get featured in our gallery.",
-        "ugc_cta_label": "Submit a photo"
+        "section_width": "page-width",
+        "padding-block-start": 12,
+        "padding-block-end": 48
       }
     }
   },
@@ -308,6 +318,6 @@
     "why_woodeca",
     "why_we_love",
     "related_interested",
-    "reviews"
+    "judgeme_reviews"
   ]
 }

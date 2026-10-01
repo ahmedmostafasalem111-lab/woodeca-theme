@@ -256,6 +256,26 @@
         {% endif %}
 
         {%- comment -%}
+          4b — Judge.me star rating, only for a product that has reviews, so the
+          info block keeps its spacing everywhere else. Judge.me's own badge
+          markup: the server-rendered stars from its metafield, which the
+          Judge.me core app embed then takes over (tapping it jumps to the
+          reviews widget further down the page). data-template matches what
+          Judge.me's own badge app block outputs (as on the live theme); with
+          "product" Judge.me's settings would hide it on product pages.
+        {%- endcomment -%}
+        {%- assign review_count = product.metafields.reviews.rating_count.value | default: 0 -%}
+        {% if review_count > 0 %}
+          <div
+            class="product-buybox__rating jdgm-widget jdgm-preview-badge"
+            data-id="{{ product.id }}"
+            data-template="manual-installation"
+          >
+            {{- product.metafields.judgeme.badge -}}
+          </div>
+        {% endif %}
+
+        {%- comment -%}
           5 — Price row: current price and the struck-through compare-at price on
           the same line, followed by the tax note.
         {%- endcomment -%}
@@ -638,6 +658,13 @@
     .product-buybox__display-name {
       font-size: 22px;
     }
+  }
+
+  /* Stars sit 6px under the title (12px buy-box gap − 6) and keep the 12px to the price. */
+  .product-buybox__rating {
+    margin-block-start: -6px;
+    font-size: var(--font-size--sm);
+    line-height: 1.4;
   }
 
   .product-buybox__full-title {
