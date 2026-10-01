@@ -1,0 +1,411 @@
+{% comment %}
+  Help-centre article page: breadcrumb, title and subtitle, then a grid of
+  question cards. Each card opens its full answer in a dialog (a centred modal
+  on desktop, a bottom sheet on phones). Built for Returns & Warranty and meant
+  to be reused for Shipping and FAQ pages.
+
+  - Every answer is in the HTML (inside its closed <dialog>), so search engines
+    and no-JS visitors still get the content; a card with an empty answer isn't
+    rendered at all.
+  - Each card's anchor id is its deep link: /pages/returns#faulty opens that
+    card's answer on load, and opening a card puts its anchor in the URL.
+  - FAQPage structured data is built from the same blocks.
+{% endcomment %}
+{%- liquid
+  assign heading = section.settings.heading
+  assign breadcrumb_label = section.settings.breadcrumb_label | default: heading
+-%}
+{%- render 'showcase-prose' -%}
+
+<div
+  class="section section--page-width help-cards spacing-style"
+  style="{% render 'spacing-padding', settings: section.settings %}"
+>
+  <div class="help-cards__inner">
+    {% if section.settings.show_breadcrumbs %}
+      {% render 'showcase-breadcrumbs', current: breadcrumb_label, home_label: section.settings.breadcrumb_home_label %}
+    {% endif %}
+
+    <header class="help-cards__header">
+      {% if heading != blank %}
+        <h1 class="help-cards__heading">{{ heading }}</h1>
+      {% endif %}
+      {% if section.settings.subtitle != blank %}
+        <p class="help-cards__subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </header>
+
+    <help-cards-component class="help-cards__component">
+      <ul class="help-cards__grid" role="list">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign answer_plain = block.settings.answer | strip_html | strip
+            if block.settings.question == blank or answer_plain == blank
+              continue
+            endif
+            assign anchor = block.settings.anchor_id | default: block.settings.question | handleize
+          -%}
+          <li class="help-cards__item" id="{{ anchor | escape }}" {{ block.shopify_attributes }}>
+            <button
+              type="button"
+              class="help-card"
+              id="HelpCard-{{ block.id }}"
+              aria-haspopup="dialog"
+              aria-controls="HelpAnswer-{{ block.id }}"
+              aria-labelledby="HelpCardQuestion-{{ block.id }}"
+              {% if block.settings.summary != blank %}aria-describedby="HelpCardSummary-{{ block.id }}"{% endif %}
+              data-help-open
+            >
+              <span class="help-card__question" id="HelpCardQuestion-{{ block.id }}">{{ block.settings.question }}</span>
+              {% if block.settings.summary != blank %}
+                <span class="help-card__summary" id="HelpCardSummary-{{ block.id }}">{{ block.settings.summary }}</span>
+              {% endif %}
+            </button>
+
+            <dialog
+              class="help-card__dialog"
+              id="HelpAnswer-{{ block.id }}"
+              aria-labelledby="HelpAnswerTitle-{{ block.id }}"
+              data-anchor="{{ anchor | escape }}"
+            >
+              <div class="help-card__dialog-panel">
+                <div class="help-card__dialog-header">
+                  <h2 class="help-card__dialog-title" id="HelpAnswerTitle-{{ block.id }}">
+                    {{- block.settings.question -}}
+                  </h2>
+                  <button
+                    type="button"
+                    class="help-card__close"
+                    aria-label="{{ section.settings.close_label | default: 'Close' | escape }}"
+                    data-help-close
+                  >
+                    <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
+                  </button>
+                </div>
+                <div class="help-card__answer showcase-prose">
+                  {{- block.settings.answer -}}
+                </div>
+              </div>
+            </dialog>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </help-cards-component>
+
+    {% if section.settings.strip_text != blank or section.settings.strip_button_label != blank %}
+      <div class="help-cards__strip">
+        {% if section.settings.strip_text != blank %}
+          <p class="help-cards__strip-text">{{ section.settings.strip_text }}</p>
+        {% endif %}
+        <div class="help-cards__strip-actions">
+          {% if section.settings.strip_button_label != blank and section.settings.strip_button_link != blank %}
+            <a class="help-cards__strip-button" href="{{ section.settings.strip_button_link }}">
+              {{- section.settings.strip_button_label -}}
+            </a>
+          {% endif %}
+          {% if section.settings.show_phone %}
+            {% render 'showcase-store-phone', class: 'help-cards__strip-phone' %}
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{%- comment -%} FAQPage structured data from the same cards. {%- endcomment -%}
+{%- capture faq_entities -%}
+  {%- assign faq_count = 0 -%}
+  {%- for block in section.blocks -%}
+    {%- assign answer_plain = block.settings.answer | strip_html | strip -%}
+    {%- if block.settings.question == blank or answer_plain == blank -%}{%- continue -%}{%- endif -%}
+    {%- if faq_count > 0 -%},{%- endif -%}
+    {"@type":"Question","name":{{ block.settings.question | json }},"acceptedAnswer":{"@type":"Answer","text":{{ block.settings.answer | json }}}}
+    {%- assign faq_count = faq_count | plus: 1 -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- assign faq_entities = faq_entities | strip -%}
+{% if faq_entities != blank %}
+  <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{{ faq_entities }}]}
+  </script>
+{% endif %}
+
+<script src="{{ 'help-cards.js' | asset_url }}" type="module" fetchpriority="low"></script>
+
+{% stylesheet %}
+  .help-cards__inner {
+    width: 100%;
+    max-width: 1000px;
+    margin-inline: auto;
+  }
+
+  .help-cards__header {
+    padding-block-end: var(--padding-xl);
+    border-block-end: var(--border-width-sm, 1px) solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    margin-block-end: var(--margin-2xl);
+  }
+
+  .help-cards__heading {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .help-cards__subtitle {
+    margin: var(--margin-sm) 0 0;
+    font-size: var(--font-size--md);
+  }
+
+  .help-cards__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .help-cards__item {
+    display: flex;
+    min-width: 0;
+  }
+
+  .help-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin: 0;
+    padding: 24px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    border-radius: 8px;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .help-card:hover {
+    border-color: rgb(var(--color-foreground-rgb) / var(--opacity-30));
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5));
+  }
+
+  .help-card:focus-visible {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 2px;
+  }
+
+  .help-card__question {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .help-card__summary {
+    display: -webkit-box;
+    overflow: hidden;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-muted-text, 0.6));
+    font-size: var(--font-size--md);
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+  }
+
+  /* ---- Answer dialog: centred modal; bottom sheet on phones ---- */
+  .help-card__dialog {
+    width: min(640px, calc(100vw - 32px));
+    max-height: min(80vh, 760px);
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    box-shadow: 0 16px 48px rgb(0 0 0 / 0.18);
+    overscroll-behavior: contain;
+  }
+
+  .help-card__dialog::backdrop {
+    background-color: rgb(0 0 0 / 0.45);
+  }
+
+  .help-card__dialog-panel {
+    padding: 28px 32px 32px;
+  }
+
+  .help-card__dialog-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--gap-md);
+    margin-block-end: var(--margin-md);
+  }
+
+  .help-card__dialog-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .help-card__close {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin: -8px -8px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .help-card__close:hover {
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5));
+  }
+
+  .help-card__close .svg-wrapper,
+  .help-card__close svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* The page behind an open answer doesn't scroll (phones scroll the window,
+     desktop scrolls .page-wrapper). */
+  html.help-cards-open,
+  html.help-cards-open .page-wrapper {
+    overflow: hidden;
+  }
+
+  /* ---- "Still need help?" ---- */
+  .help-cards__strip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-md) var(--gap-xl);
+    margin-block-start: var(--margin-3xl);
+    padding-block-start: var(--padding-2xl);
+    border-block-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .help-cards__strip-text {
+    margin: 0;
+    font-size: var(--font-size--lg);
+    font-weight: 600;
+  }
+
+  .help-cards__strip-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--gap-md) var(--gap-xl);
+  }
+
+  .help-cards__strip-button {
+    padding: var(--padding-md) var(--padding-2xl);
+    border-radius: 999px;
+    background-color: #1c1c1c;
+    color: #ffffff;
+    font-size: var(--font-size--md);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .help-cards__strip-phone {
+    color: inherit;
+    font-size: var(--font-size--md);
+    font-weight: 600;
+  }
+
+  @media screen and (max-width: 749px) {
+    .help-card__dialog {
+      width: 100%;
+      max-width: none;
+      max-height: 85vh;
+      margin: auto 0 0;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .help-card__dialog-panel {
+      padding: 20px 16px calc(24px + env(safe-area-inset-bottom));
+    }
+
+    .help-cards__strip {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+    }
+
+    .help-cards__strip-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .help-cards__strip-button {
+      text-align: center;
+    }
+  }
+
+  @media screen and (max-width: 599px) {
+    .help-cards__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .help-card {
+      padding: 20px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Help cards",
+  "tag": "section",
+  "class": "section-help-cards",
+  "blocks": [
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "question", "label": "Question" },
+        { "type": "text", "id": "summary", "label": "Summary", "info": "Shown on the card, cut off after four lines." },
+        { "type": "richtext", "id": "answer", "label": "Answer", "info": "A card without an answer isn't shown." },
+        { "type": "text", "id": "anchor_id", "label": "Anchor id", "info": "Deep link, e.g. faulty opens this answer at /pages/returns#faulty. Lowercase letters, numbers and hyphens." }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "checkbox", "id": "show_breadcrumbs", "label": "Show breadcrumbs", "default": true },
+    { "type": "text", "id": "breadcrumb_home_label", "label": "Breadcrumb home label", "default": "Home" },
+    { "type": "text", "id": "breadcrumb_label", "label": "Breadcrumb page label", "info": "Defaults to the heading." },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Returns & Warranty" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Support when you need it" },
+    { "type": "text", "id": "close_label", "label": "Close button label (screen readers)", "default": "Close" },
+    { "type": "header", "content": "Still need help?" },
+    { "type": "text", "id": "strip_text", "label": "Text", "default": "Still need help? Our team is happy to help." },
+    { "type": "text", "id": "strip_button_label", "label": "Button label", "default": "Contact us" },
+    { "type": "url", "id": "strip_button_link", "label": "Button link" },
+    { "type": "checkbox", "id": "show_phone", "label": "Show the phone number", "info": "Uses the phone number set in the header.", "default": true },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding-block-start", "label": "Top padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 32 },
+    { "type": "range", "id": "padding-block-end", "label": "Bottom padding", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "presets": [
+    {
+      "name": "Help cards",
+      "blocks": [
+        { "type": "question", "settings": { "question": "How long do I have to return a product?", "summary": "14 days from the day your order is delivered.", "answer": "<p>You have 14 days from delivery.</p>", "anchor_id": "how-long" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

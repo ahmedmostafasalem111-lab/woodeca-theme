@@ -1,0 +1,49 @@
+{%- doc -%}
+  Breadcrumb trail in the product page's style: Home / [parent /] current page.
+
+  @param {string} current - Label of the current page.
+  @param {string} [home_label] - Default 'Home'.
+  @param {string} [parent_label] - Optional middle crumb, e.g. 'Blog'.
+  @param {string} [parent_url] - Link for the middle crumb.
+  @param {string} [class] - Extra class on the <nav>.
+
+  @example
+  {% render 'showcase-breadcrumbs', current: page.title %}
+{%- enddoc -%}
+<nav class="showcase-breadcrumbs {{ class }}" aria-label="Breadcrumb">
+  <a href="{{ routes.root_url }}">{{ home_label | default: 'Home' }}</a>
+  {%- if parent_label != blank -%}
+    <span aria-hidden="true">/</span>
+    {%- if parent_url != blank -%}
+      <a href="{{ parent_url }}">{{ parent_label }}</a>
+    {%- else -%}
+      <span>{{ parent_label }}</span>
+    {%- endif -%}
+  {%- endif -%}
+  {%- if current != blank -%}
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">{{ current }}</span>
+  {%- endif -%}
+</nav>
+
+{% stylesheet %}
+  /* Same look as the product page breadcrumbs (.product-breadcrumbs). */
+  .showcase-breadcrumbs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--gap-3xs);
+    margin-block-end: var(--margin-lg);
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+  }
+
+  .showcase-breadcrumbs a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .showcase-breadcrumbs a:hover {
+    text-decoration: underline;
+  }
+{% endstylesheet %}

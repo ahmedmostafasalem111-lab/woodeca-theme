@@ -10,6 +10,7 @@
   Spec rows are declared as blocks, so which specs appear (and in what order) is
   editable per store without touching Liquid.
 {% endcomment %}
+{%- render 'showcase-prose' -%}
 
 {% liquid
   assign ns = section.settings.metafield_namespace | default: 'custom'
@@ -288,7 +289,7 @@
       {%- comment -%} ---- Description ---- {%- endcomment -%}
       {% if has_description_tab %}
         <div
-          class="product-specs__panel product-specs__prose"
+          class="product-specs__panel product-specs__prose showcase-prose"
           ref="panels[]"
           data-panel="description"
           role="tabpanel"
@@ -307,7 +308,7 @@
       {%- comment -%} ---- Care instructions ---- {%- endcomment -%}
       {% if has_care_tab %}
         <div
-          class="product-specs__panel product-specs__prose"
+          class="product-specs__panel product-specs__prose showcase-prose"
           ref="panels[]"
           data-panel="care"
           role="tabpanel"
@@ -377,42 +378,8 @@
     font-weight: 600;
   }
 
-  /* Rich text coming from the product body or the care metafield. */
-  .product-specs__prose {
-    max-width: 72ch;
-    font-size: var(--font-size--sm);
-    line-height: 1.7;
-  }
-
-  .product-specs__prose > :first-child {
-    margin-block-start: 0;
-  }
-
-  .product-specs__prose > :last-child {
-    margin-block-end: 0;
-  }
-
-  /*
-    Description and Care Instructions share this one style. Headings typed into
-    a description (h1–h6) read like Care Instructions' bold lines: body size and
-    line height, bold, paragraph spacing — not the theme's 32px headings. The
-    tags stay; only their look changes. Colour is left to the theme.
-  */
-  .product-specs__prose :is(h1, h2, h3, h4, h5, h6) {
-    margin-block: 1em;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: 700;
-    line-height: inherit;
-    letter-spacing: inherit;
-    text-transform: none;
-  }
-
-  /* Bold words inside a sentence read at normal weight (the description marks
-     those lines, see showcase-prose-mixed-bold). */
-  .product-specs__prose [data-prose-mixed] :is(strong, b) {
-    font-weight: inherit;
-  }
+  /* Rich text from the product body or the care metafield: the shared
+     .showcase-prose style (snippets/showcase-prose). */
 
   .product-specs__diagram {
     display: flex;

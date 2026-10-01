@@ -1,0 +1,49 @@
+{%- doc -%}
+  The shared long-form text style (`.showcase-prose`): the product page's
+  Description and Care Instructions tabs, help-centre answers, legal pages and
+  blog articles all read the same. Outputs nothing; render it from any file
+  that uses the class so the style is in scope there.
+
+  @example
+  {% render 'showcase-prose' %}
+  <div class="showcase-prose">{{ page.content }}</div>
+{%- enddoc -%}
+
+{% stylesheet %}
+  /* Rich text: product body, care metafield, help answers, legal and article bodies. */
+  .showcase-prose {
+    max-width: 72ch;
+    font-size: var(--font-size--sm);
+    line-height: 1.7;
+  }
+
+  .showcase-prose > :first-child {
+    margin-block-start: 0;
+  }
+
+  .showcase-prose > :last-child {
+    margin-block-end: 0;
+  }
+
+  /*
+    Description and Care Instructions share this one style. Headings typed into
+    a description (h1–h6) read like Care Instructions' bold lines: body size and
+    line height, bold, paragraph spacing — not the theme's 32px headings. The
+    tags stay; only their look changes. Colour is left to the theme.
+  */
+  .showcase-prose :is(h1, h2, h3, h4, h5, h6) {
+    margin-block: 1em;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 700;
+    line-height: inherit;
+    letter-spacing: inherit;
+    text-transform: none;
+  }
+
+  /* Bold words inside a sentence read at normal weight (the description marks
+     those lines, see showcase-prose-mixed-bold). */
+  .showcase-prose [data-prose-mixed] :is(strong, b) {
+    font-weight: inherit;
+  }
+{% endstylesheet %}

@@ -275,6 +275,14 @@
           </a>
         {% endif %}
 
+        {%- comment -%}
+          The phone number, published for other sections (help pages, legal
+          pages) through snippets/showcase-store-phone.
+        {%- endcomment -%}
+        {% if section.settings.phone_number != blank %}
+          <span hidden data-store-phone="{{ section.settings.phone_number | escape }}"></span>
+        {% endif %}
+
         {%- comment -%} Phone sits between account and cart. {%- endcomment -%}
         {% if section.settings.show_phone and section.settings.phone_number != blank %}
           {% assign icon_call_href = section.settings.phone_number | remove: ' ' | remove: '(' | remove: ')' | remove: '-' %}

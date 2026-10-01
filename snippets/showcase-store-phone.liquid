@@ -1,0 +1,44 @@
+{%- doc -%}
+  The store's phone number as a tel: link, taken from the header's "Phone
+  number" setting so it's set in one place only. A section can't read another
+  section's settings in Liquid, so the header publishes the number on a hidden
+  [data-store-phone] element and this copies it in. With no number set (or no
+  JavaScript) nothing is shown.
+
+  @param {string} [class] - Class for the link.
+  @param {boolean} [show_icon] - Show the phone icon before the number. Default true.
+
+  @example
+  {% render 'showcase-store-phone', class: 'help-cards__strip-phone' %}
+{%- enddoc -%}
+<a class="showcase-store-phone {{ class }}" data-store-phone-link hidden>
+  {%- unless show_icon == false -%}
+    <span class="svg-wrapper showcase-store-phone__icon" aria-hidden="true">{{- 'icon-phone.svg' | inline_asset_content -}}</span>
+  {%- endunless -%}
+  <span class="showcase-store-phone__number"></span>
+</a>
+<script>
+  (() => {
+    const link = document.currentScript?.previousElementSibling;
+    const number = document.querySelector('[data-store-phone]')?.getAttribute('data-store-phone')?.trim();
+    if (!(link instanceof HTMLAnchorElement) || !number) return;
+    link.href = 'tel:' + number.replace(/[\s()-]/g, '');
+    link.querySelector('.showcase-store-phone__number').textContent = number;
+    link.hidden = false;
+  })();
+</script>
+
+{% stylesheet %}
+  .showcase-store-phone:not([hidden]) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-2xs);
+    text-decoration: none;
+  }
+
+  .showcase-store-phone__icon,
+  .showcase-store-phone__icon svg {
+    width: 20px;
+    height: 20px;
+  }
+{% endstylesheet %}
