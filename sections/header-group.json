@@ -52,7 +52,7 @@
           "settings": {
             "label": "For Bussiness",
             "menu": "",
-            "link": ""
+            "link": "shopify://pages/woodeca-for-bussiness"
           }
         },
         "utility_business": {
@@ -60,14 +60,14 @@
           "settings": {
             "label": "For Designers",
             "menu": "",
-            "link": ""
+            "link": "shopify://pages/woodeca-for-designers"
           }
         },
         "promo_express": {
           "type": "promo_link",
           "settings": {
             "label": "Ready To Ship",
-            "link": "",
+            "link": "shopify://collections/ready-to-ship",
             "highlight": false
           }
         },
@@ -161,8 +161,38 @@
         "nav_font_size": "var(--font-size--md)",
         "nav_label": "Main navigation",
         "menu_label": "Menu",
+        "drawer_bar_background": "#111111",
+        "drawer_bar_text": "#ffffff",
+        "menu_close_label": "Close menu",
+        "menu_back_label": "Back to menu",
+        "menu_icon_namespace": "custom",
+        "menu_icon_key": "tile_icon",
+        "help_heading": "Need Help?",
+        "help_phone_label": "",
+        "help_email": "support@woodeca.com",
+        "help_email_label": "",
+        "show_language_switcher": true,
+        "product_menu_label": "Shop By Product",
+        "mobile_product_menu": "main-menu",
+        "room_menu_label": "Shop By Room",
+        "mobile_room_menu": "main-menu",
+        "bestsellers_label": "Ready To Ship",
+        "bestsellers_link": "shopify://collections/ready-to-ship",
+        "show_returns": true,
+        "returns_label": "Exchange & Returns",
+        "returns_link": "",
+        "show_warranty": true,
+        "warranty_label": "Warranty",
+        "warranty_link": "",
+        "show_business": true,
+        "business_label": "For Business",
+        "business_link": "",
         "search_placeholder": "Search Home",
         "search_submit_label": "Search",
+        "search_close_label": "Close search",
+        "popular_heading": "Popular searches",
+        "popular_queries": "Sofas, Beds, T.V Units, Wardrobes, Dining tables",
+        "search_empty_text": "No matches yet. Try a different word.",
         "show_account": true,
         "account_label": "Account",
         "account_link": "",
@@ -171,9 +201,9 @@
         "show_mobile_chat": false,
         "mobile_chat_label": "Chat",
         "mobile_chat_link": "",
+        "show_mobile_call": true,
         "show_mobile_location": true,
         "mobile_location_link": "",
-        "show_mobile_call": true,
         "sticky_main_row": true,
         "promo_font_size": "var(--font-size--sm)",
         "promo_highlight_color": "#e8342a",
@@ -184,14 +214,7 @@
         "promo_text_color": "#1c1c1c",
         "search_background_color": "#f2f2f0",
         "cart_bubble_background": "#e8705a",
-        "cart_bubble_text": "#ffffff",
-        "mobile_product_menu": "main-menu",
-        "mobile_room_menu": "main-menu",
-        "help_heading": "Need Help?",
-        "help_phone_label": "",
-        "help_email": "support@woodeca.com",
-        "help_email_label": "",
-        "show_language_switcher": true
+        "cart_bubble_text": "#ffffff"
       }
     }
   },
