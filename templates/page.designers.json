@@ -184,42 +184,27 @@
       }
     },
     "projects": {
-      "type": "showcase-info-cards",
-      "blocks": {
-        "proj_1": {
-          "type": "card",
-          "settings": {
-            "heading": "",
-            "subtext": ""
-          }
-        },
-        "proj_2": {
-          "type": "card",
-          "settings": {
-            "heading": "",
-            "subtext": ""
-          }
-        },
-        "proj_3": {
-          "type": "card",
-          "settings": {
-            "heading": "",
-            "subtext": ""
-          }
-        }
-      },
-      "block_order": [
-        "proj_1",
-        "proj_2",
-        "proj_3"
-      ],
+      "type": "b2b-media-cards",
+      "block_order": [],
+      "blocks": {},
       "settings": {
-        "heading": "",
-        "columns": 3,
-        "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32,
-        "show_section": false
+        "heading": "Partner projects",
+        "heading_size": "md",
+        "text": "Homes and spaces designed by our partners, furnished by Woodeca.",
+        "body": "",
+        "tags": "",
+        "layout": "masonry",
+        "columns": "2",
+        "ratio": "2 / 3",
+        "card_style": "overlay",
+        "image_sizes": "(min-width: 990px) 555px, 100vw",
+        "band": false,
+        "button_label": "",
+        "button_link": "",
+        "file_label": "",
+        "file_url": "",
+        "prev_label": "Previous",
+        "next_label": "Next"
       }
     },
     "cta_final": {
