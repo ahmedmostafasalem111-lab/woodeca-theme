@@ -230,34 +230,6 @@
         "next_label": "Next"
       }
     },
-    "cta_mid": {
-      "type": "showcase-cta-band",
-      "settings": {
-        "heading": "",
-        "subheading": "",
-        "button_label": "",
-        "button_link": "#b2b-enquiry",
-        "alignment": "center",
-        "section_width": "page-width",
-        "background_color": "#f6f6f6",
-        "padding-block-start": 40,
-        "padding-block-end": 40
-      }
-    },
-    "awards": {
-      "type": "showcase-logo-marquee",
-      "settings": {
-        "show_heading": true,
-        "heading": "",
-        "scroll_speed": 40,
-        "direction": "left",
-        "logo_height": 44,
-        "grayscale": true,
-        "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32
-      }
-    },
     "projects": {
       "type": "b2b-media-cards",
       "block_order": [],
@@ -453,74 +425,6 @@
         "next_label": "Next"
       }
     },
-    "stats": {
-      "type": "showcase-stat-row",
-      "blocks": {
-        "stat_1": {
-          "type": "stat",
-          "settings": {
-            "value": "",
-            "suffix": "",
-            "label": ""
-          }
-        },
-        "stat_2": {
-          "type": "stat",
-          "settings": {
-            "value": "",
-            "suffix": "",
-            "label": ""
-          }
-        },
-        "stat_3": {
-          "type": "stat",
-          "settings": {
-            "value": "",
-            "suffix": "",
-            "label": ""
-          }
-        },
-        "stat_4": {
-          "type": "stat",
-          "settings": {
-            "value": "",
-            "suffix": "",
-            "label": ""
-          }
-        },
-        "stat_5": {
-          "type": "stat",
-          "settings": {
-            "value": "",
-            "suffix": "",
-            "label": ""
-          }
-        },
-        "stat_6": {
-          "type": "stat",
-          "settings": {
-            "value": "",
-            "suffix": "",
-            "label": ""
-          }
-        }
-      },
-      "block_order": [
-        "stat_1",
-        "stat_2",
-        "stat_3",
-        "stat_4",
-        "stat_5",
-        "stat_6"
-      ],
-      "settings": {
-        "heading": "",
-        "columns": 6,
-        "section_width": "page-width",
-        "padding-block-start": 40,
-        "padding-block-end": 40
-      }
-    },
     "enquiry": {
       "type": "b2b-enquiry",
       "blocks": {
@@ -620,12 +524,9 @@
     "benefits",
     "intro",
     "manufacturing",
-    "cta_mid",
-    "awards",
     "projects",
     "process",
     "directions",
-    "stats",
     "enquiry"
   ]
 }
