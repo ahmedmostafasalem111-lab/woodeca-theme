@@ -259,42 +259,27 @@
       }
     },
     "projects": {
-      "type": "showcase-info-cards",
-      "blocks": {
-        "proj_1": {
-          "type": "card",
-          "settings": {
-            "heading": "",
-            "subtext": ""
-          }
-        },
-        "proj_2": {
-          "type": "card",
-          "settings": {
-            "heading": "",
-            "subtext": ""
-          }
-        },
-        "proj_3": {
-          "type": "card",
-          "settings": {
-            "heading": "",
-            "subtext": ""
-          }
-        }
-      },
-      "block_order": [
-        "proj_1",
-        "proj_2",
-        "proj_3"
-      ],
+      "type": "b2b-media-cards",
+      "block_order": [],
+      "blocks": {},
       "settings": {
-        "show_section": false,
-        "heading": "",
-        "columns": 3,
-        "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32
+        "heading": "Completed projects",
+        "heading_size": "lg",
+        "text": "A selection of hotels, offices and homes we have furnished.",
+        "body": "",
+        "tags": "",
+        "layout": "carousel",
+        "columns": "4",
+        "ratio": "2 / 3",
+        "card_style": "overlay",
+        "image_sizes": "(min-width: 990px) 25vw, 300px",
+        "band": false,
+        "button_label": "",
+        "button_link": "",
+        "file_label": "",
+        "file_url": "",
+        "prev_label": "Previous projects",
+        "next_label": "Next projects"
       }
     },
     "process": {
