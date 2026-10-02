@@ -16,6 +16,7 @@
           "type": "assurance",
           "settings": {
             "text": "3 Year Warranty",
+            "link": "/pages/returns#warranty",
             "icon": "shield"
           }
         },
@@ -23,6 +24,7 @@
           "type": "assurance",
           "settings": {
             "text": "Exchange & Return within 14 Days",
+            "link": "/pages/returns#change-of-mind",
             "icon": "return"
           }
         },
@@ -51,10 +53,16 @@
         "show_breadcrumbs": true,
         "breadcrumb_home_label": "Home",
         "thumb_limit": 0,
+        "thumb_label": "View image",
         "show_share": true,
+        "share_label": "Share",
         "title_size": "var(--font-size--2xl)",
         "show_stock_badge": false,
+        "in_stock_label": "In stock",
+        "high_stock_label": "In stock: more than %count% pcs.",
+        "low_stock_label": "In stock: %count% pcs.",
         "stock_threshold": 20,
+        "out_of_stock_label": "Out of stock",
         "add_to_cart_label": "Add To Cart",
         "sold_out_label": "Sold out",
         "show_buy_now": true,
@@ -91,7 +99,9 @@
         "delivery_estimate_note": "excluding holidays",
         "variant_option_name": "Color",
         "variant_group_label": "Basic collection",
+        "from_label": "From",
         "show_in_stock_toggle": true,
+        "in_stock_filter_label": "In stock",
         "show_sticky_bar": true,
         "specs_anchor": "specifications",
         "specs_anchor_label": "Characteristics",
@@ -99,7 +109,21 @@
         "delivery_anchor_label": "Delivery and assembly",
         "show_delivery_teaser": false,
         "delivery_teaser_text": "Delivery available across all served areas",
-        "metafield_namespace": "custom"
+        "series_row_label": "All products in the series",
+        "collection_row_label": "All products in the collection",
+        "bonus_prefix": "up to",
+        "bonus_suffix": "bonuses",
+        "instalment_suffix": "per month with",
+        "instalment_provider": "instalments",
+        "metafield_namespace": "custom",
+        "section_width": "page-width",
+        "text_color": "",
+        "accent_color": "#e8342a",
+        "gallery_background": "#f2f2f0",
+        "cta_background": "#333333",
+        "cta_text_color": "#ffffff",
+        "padding-block-start": 24,
+        "padding-block-end": 40
       }
     },
     "specs": {
@@ -109,84 +133,108 @@
           "type": "spec",
           "settings": {
             "label": "Body material",
-            "metafield_key": "body_material"
+            "metafield_key": "body_material",
+            "is_link": false,
+            "link_url": ""
           }
         },
         "s2": {
           "type": "spec",
           "settings": {
             "label": "Legs / supports material",
-            "metafield_key": "legs_material"
+            "metafield_key": "legs_material",
+            "is_link": false,
+            "link_url": ""
           }
         },
         "s3": {
           "type": "spec",
           "settings": {
             "label": "Heel pads",
-            "metafield_key": "heel_pads"
+            "metafield_key": "heel_pads",
+            "is_link": false,
+            "link_url": ""
           }
         },
         "s4": {
           "type": "spec",
           "settings": {
             "label": "Max load",
-            "metafield_key": "max_load"
+            "metafield_key": "max_load",
+            "is_link": false,
+            "link_url": ""
           }
         },
         "s5": {
           "type": "spec",
           "settings": {
             "label": "Max load per shelf",
-            "metafield_key": "max_load_shelf"
+            "metafield_key": "max_load_shelf",
+            "is_link": false,
+            "link_url": ""
           }
         },
         "s6": {
           "type": "spec",
           "settings": {
             "label": "Body color",
-            "metafield_key": "body_color"
+            "metafield_key": "body_color",
+            "is_link": false,
+            "link_url": ""
           }
         },
         "s7": {
           "type": "spec",
           "settings": {
             "label": "Supports",
-            "metafield_key": "supports"
+            "metafield_key": "supports",
+            "is_link": false,
+            "link_url": ""
           }
         },
         "s8": {
           "type": "spec",
           "settings": {
             "label": "Support adjustment",
-            "metafield_key": "support_adjustment"
+            "metafield_key": "support_adjustment",
+            "is_link": false,
+            "link_url": ""
           }
         },
         "s9": {
           "type": "spec",
           "settings": {
             "label": "Warranty",
-            "metafield_key": "warranty"
+            "metafield_key": "warranty",
+            "is_link": false,
+            "link_url": ""
           }
         },
         "s10": {
           "type": "spec",
           "settings": {
             "label": "Country of origin",
-            "metafield_key": "country_of_origin"
+            "metafield_key": "country_of_origin",
+            "is_link": false,
+            "link_url": ""
           }
         },
         "s11": {
           "type": "spec",
           "settings": {
             "label": "Series",
-            "metafield_key": "series_name"
+            "metafield_key": "series_name",
+            "is_link": false,
+            "link_url": ""
           }
         },
         "s12": {
           "type": "spec",
           "settings": {
             "label": "Collection",
-            "metafield_key": "collection_name"
+            "metafield_key": "collection_name",
+            "is_link": false,
+            "link_url": ""
           }
         }
       },
@@ -206,13 +254,23 @@
       ],
       "settings": {
         "anchor_id": "specifications",
+        "heading": "",
         "metafield_namespace": "custom",
+        "tabs_label": "Specification views",
         "tab_specs_label": "Specifications",
         "tab_description_label": "Description",
         "tab_care_label": "Care Instructions",
         "tab_additional_label": "Additional",
+        "dimensions_caption_label": "Dimensions (L x W x H)",
+        "clearance_caption_label": "Clearance from the floor",
+        "delivery_caption_label": "Delivery option",
         "files_heading": "Useful files",
-        "columns": 2
+        "file_fallback_label": "Download",
+        "columns": 2,
+        "section_width": "page-width",
+        "text_color": "",
+        "padding-block-start": 56,
+        "padding-block-end": 56
       }
     },
     "why_woodeca": {
@@ -259,9 +317,19 @@
       ],
       "settings": {
         "heading": "Why Woodeca",
+        "heading_size": "var(--font-size--3xl)",
         "columns": 4,
+        "show_numbers": false,
+        "mobile_layout": "grid",
+        "icon_size": 64,
         "show_mission": false,
-        "section_width": "page-width"
+        "mission": "<p>Our mission is to make it easy to create a home you'll love with modern, thoughtfully designed furniture built to last.</p>",
+        "mission_size": "var(--font-size--2xl)",
+        "section_width": "page-width",
+        "band_background": "#f5f5f5",
+        "text_color": "",
+        "padding-block-start": 0,
+        "padding-block-end": 0
       }
     },
     "why_we_love": {
@@ -274,23 +342,40 @@
         "show_numbers": true,
         "metafield_namespace": "custom",
         "metafield_key": "why_we_love_it_slides",
-        "section_width": "page-width"
+        "section_width": "page-width",
+        "padding-block-start": 40,
+        "padding-block-end": 40
       }
     },
     "related_interested": {
       "type": "showcase-product-related",
       "settings": {
         "heading": "You may also like",
+        "metafield_namespace": "custom",
         "enable_tabs": false,
+        "tab_a_label": "In a different color",
+        "tab_b_label": "Similar products",
         "source_a": "recommendations",
+        "collection_a": "",
+        "metafield_key_a": "related_products",
+        "source_b": "recommendations",
+        "collection_b": "",
+        "metafield_key_b": "similar_products",
+        "products_limit": 12,
         "columns": 4,
         "columns_mobile": 2,
-        "card_stock_text": "In stock"
+        "show_swatches": true,
+        "show_reviews": true,
+        "card_stock_text": "In stock",
+        "section_width": "page-width",
+        "background_color": "",
+        "text_color": "",
+        "padding-block-start": 48,
+        "padding-block-end": 48
       }
     },
     "judgeme_reviews": {
       "type": "showcase-apps",
-      "name": "Product reviews (Judge.me)",
       "blocks": {
         "judge_me_reviews_review_widget": {
           "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
@@ -305,6 +390,7 @@
       "block_order": [
         "judge_me_reviews_review_widget"
       ],
+      "name": "Product reviews (Judge.me)",
       "settings": {
         "section_width": "page-width",
         "padding-block-start": 12,
