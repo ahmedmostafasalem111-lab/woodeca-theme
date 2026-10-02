@@ -1,0 +1,71 @@
+{%- doc -%}
+  Shared style for a row of link tabs (blog tag tabs, legal-page tabs):
+  uppercase 12px, letter-spacing 0.84px, the active tab underlined 1.6px in the
+  text colour. Centred on desktop; on phones one horizontally scrollable row
+  with no visible scrollbar and no page overflow. Outputs nothing; render it
+  from any file that uses the classes.
+
+  @example
+  {% render 'showcase-tabs-nav' %}
+  <nav class="showcase-tabs" aria-label="Blog topics">
+    <ul class="showcase-tabs__list" role="list">
+      <li><a class="showcase-tabs__link" href="/blogs/news" aria-current="page">All posts</a></li>
+    </ul>
+  </nav>
+{%- enddoc -%}
+
+{% stylesheet %}
+  .showcase-tabs {
+    max-width: 100%;
+    border-block-end: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .showcase-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .showcase-tabs__list {
+    display: flex;
+    gap: 32px;
+    width: max-content;
+    margin: 0 auto;
+    padding: 0 16px;
+    list-style: none;
+  }
+
+  .showcase-tabs__link {
+    position: relative;
+    display: block;
+    padding: 18px 0 16px;
+    color: inherit;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.84px;
+    line-height: 16px;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* The underline is a 1.6px bar (a 1.6px border would be snapped to 1px). */
+  .showcase-tabs__link::after {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    height: 1.6px;
+    background-color: transparent;
+    content: '';
+  }
+
+  .showcase-tabs__link:hover::after {
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-30));
+  }
+
+  .showcase-tabs__link[aria-current='page']::after {
+    background-color: currentcolor;
+  }
+{% endstylesheet %}

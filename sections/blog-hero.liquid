@@ -1,0 +1,168 @@
+{% comment %}
+  Blog listing hero (Mocka-style split): breadcrumb, then a light panel with
+  the H1 and intro on the left (~37%) and an image bleeding to the right edge
+  (~63%, 906×475 at 1440). Phones: the image first, then the text panel.
+  Optional dark pill button over the image's bottom-right corner.
+{% endcomment %}
+{%- liquid
+  assign heading = section.settings.heading | default: blog.title
+  assign crumb = blog.title | default: heading
+-%}
+<div class="section section--page-width blog-hero__crumbs">
+  {% render 'showcase-breadcrumbs', current: crumb, home_label: section.settings.breadcrumb_home_label %}
+</div>
+
+<div class="blog-hero{% if section.settings.image == blank %} blog-hero--no-image{% endif %}">
+  <div class="blog-hero__panel" style="background-color: {{ section.settings.panel_background | default: '#f2f2f0' }};">
+    <h1 class="blog-hero__heading">{{ heading }}</h1>
+    {% if section.settings.text != blank %}
+      <div class="blog-hero__text">{{ section.settings.text }}</div>
+    {% endif %}
+  </div>
+
+  {% if section.settings.image != blank %}
+    <div class="blog-hero__media">
+      {{
+        section.settings.image
+        | image_url: width: 1800
+        | image_tag:
+          class: 'blog-hero__image',
+          loading: 'eager',
+          fetchpriority: 'high',
+          widths: '390, 600, 750, 900, 1200, 1500, 1800',
+          sizes: '(min-width: 990px) 63vw, 100vw',
+          alt: ''
+      }}
+      {% if section.settings.button_label != blank and section.settings.button_link != blank %}
+        <a class="blog-hero__button" href="{{ section.settings.button_link }}">
+          <span class="svg-wrapper" aria-hidden="true">{{- 'icon-cart.svg' | inline_asset_content -}}</span>
+          {{ section.settings.button_label }}
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .blog-hero__crumbs {
+    padding-block-start: var(--padding-md);
+  }
+
+  .blog-hero__crumbs .showcase-breadcrumbs {
+    margin-block-end: var(--margin-md);
+  }
+
+  .blog-hero {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .blog-hero__media {
+    position: relative;
+    aspect-ratio: 375 / 231;
+    overflow: hidden;
+  }
+
+  .blog-hero__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .blog-hero__panel {
+    padding: 24px 16px;
+  }
+
+  .blog-hero__heading {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  .blog-hero__text {
+    max-width: 340px;
+    margin-block-start: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .blog-hero__text > :first-child {
+    margin-block-start: 0;
+  }
+
+  .blog-hero__text > :last-child {
+    margin-block-end: 0;
+  }
+
+  .blog-hero__button {
+    position: absolute;
+    inset-block-end: 16px;
+    inset-inline-end: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background-color: #1c1c1c;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .blog-hero__button .svg-wrapper,
+  .blog-hero__button svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .blog-hero {
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    .blog-hero__panel {
+      display: flex;
+      flex: 0 0 37%;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 48px;
+    }
+
+    .blog-hero--no-image .blog-hero__panel {
+      flex-basis: 100%;
+      min-height: 240px;
+    }
+
+    .blog-hero__media {
+      flex: 1 1 63%;
+      aspect-ratio: 906 / 475;
+    }
+
+    .blog-hero__button {
+      inset-block-end: 32px;
+      inset-inline-end: 32px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Blog hero",
+  "tag": "section",
+  "class": "section-blog-hero",
+  "settings": [
+    { "type": "text", "id": "breadcrumb_home_label", "label": "Breadcrumb home label", "default": "Home" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Blog", "info": "Defaults to the blog's title." },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Ideas, tips and inspiration to help you make your home feel like yours, from choosing the right wardrobe to styling a small bedroom.</p>" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "button_label", "label": "Button label", "info": "Shown over the image. Leave blank to hide." },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "color", "id": "panel_background", "label": "Text panel background", "default": "#f2f2f0" }
+  ],
+  "presets": [{ "name": "Blog hero" }]
+}
+{% endschema %}

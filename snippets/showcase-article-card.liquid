@@ -1,0 +1,129 @@
+{%- doc -%}
+  Blog article card (Mocka-style): image, title, three-line excerpt, READ MORE.
+  The image is the article's own, else the first image in its content; with no
+  image at all a neutral block keeps the grid even (no placeholder art).
+
+  @param {object} article - The article.
+  @param {boolean} [eager] - Load the image eagerly (first row). Default false.
+  @param {string} [read_more_label] - Default 'Read more'.
+
+  @example
+  {% render 'showcase-article-card', article: article, eager: true %}
+{%- enddoc -%}
+{%- liquid
+  assign content_image_src = blank
+  if article.image == blank and article.content contains '<img'
+    assign after_img = article.content | split: '<img' | slice: 1, 1 | first
+    assign content_image_src = after_img | split: 'src="' | slice: 1, 1 | first | split: '"' | first
+  endif
+
+  if article.excerpt != blank
+    assign excerpt = article.excerpt | strip_html | strip
+  else
+    assign excerpt = article.content | strip_html | strip | truncatewords: 40
+  endif
+
+  assign loading = 'lazy'
+  if eager
+    assign loading = 'eager'
+  endif
+-%}
+<article class="article-card">
+  <a class="article-card__media" href="{{ article.url }}" tabindex="-1" aria-hidden="true">
+    {%- if article.image != blank -%}
+      {{
+        article.image
+        | image_url: width: 900
+        | image_tag:
+          class: 'article-card__image',
+          loading: loading,
+          widths: '360, 480, 640, 720, 900',
+          sizes: '(min-width: 990px) calc((100vw - 144px) / 3), (min-width: 750px) calc((100vw - 56px) / 2), calc(100vw - 32px)',
+          alt: ''
+      }}
+    {%- elsif content_image_src != blank -%}
+      <img class="article-card__image" src="{{ content_image_src }}" alt="" loading="{{ loading }}" width="427" height="395">
+    {%- endif -%}
+  </a>
+  <h2 class="article-card__title"><a href="{{ article.url }}">{{ article.title }}</a></h2>
+  {%- if excerpt != blank -%}
+    <p class="article-card__excerpt">{{ excerpt }}</p>
+  {%- endif -%}
+  <a class="article-card__more" href="{{ article.url }}">
+    {{- read_more_label | default: 'Read more' -}}
+    <span class="visually-hidden">: {{ article.title }}</span>
+  </a>
+</article>
+
+{% stylesheet %}
+  .article-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .article-card__media {
+    display: block;
+    aspect-ratio: 343 / 295;
+    overflow: hidden;
+    /* Neutral block when there is no image. */
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5));
+  }
+
+  .article-card__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .article-card__title {
+    margin: 24px 0 0;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  .article-card__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .article-card__title a:hover {
+    text-decoration: underline;
+  }
+
+  .article-card__excerpt {
+    display: -webkit-box;
+    margin: 12px 0 0;
+    overflow: hidden;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-muted-text, 0.6));
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+
+  .article-card__more {
+    align-self: flex-start;
+    margin-block-start: 16px;
+    color: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.84px;
+    text-decoration: underline;
+    text-transform: uppercase;
+    text-underline-offset: 0.25em;
+  }
+
+  @media screen and (min-width: 990px) {
+    .article-card__media {
+      aspect-ratio: 427 / 395;
+    }
+
+    .article-card__title {
+      margin-block-start: 32px;
+    }
+  }
+{% endstylesheet %}

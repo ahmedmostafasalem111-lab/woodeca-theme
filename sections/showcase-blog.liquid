@@ -1,0 +1,145 @@
+{% comment %}
+  Blog listing: tag tabs (ALL POSTS + one per tag), a 3/2/1 grid of article
+  cards, numbered pagination (12 per page), and an empty state when the blog
+  has no articles yet.
+{% endcomment %}
+{%- render 'showcase-tabs-nav' -%}
+{%- assign per_page = section.settings.articles_per_page | default: 12 -%}
+
+{% if blog.all_tags.size > 0 %}
+  <nav class="showcase-tabs blog-tags" aria-label="{{ section.settings.tags_label | default: 'Blog topics' | escape }}">
+    <ul class="showcase-tabs__list" role="list">
+      <li>
+        <a class="showcase-tabs__link" href="{{ blog.url }}" {% if current_tags == blank %}aria-current="page"{% endif %}>
+          {{- section.settings.all_label | default: 'All posts' -}}
+        </a>
+      </li>
+      {%- for tag in blog.all_tags -%}
+        <li>
+          <a
+            class="showcase-tabs__link"
+            href="{{ blog.url }}/tagged/{{ tag | handle }}"
+            {% if current_tags contains tag %}aria-current="page"{% endif %}
+          >
+            {{- tag | replace: '-', ' ' -}}
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+{% endif %}
+
+<div class="blog-list">
+  {% paginate blog.articles by per_page %}
+    {% if blog.articles.size > 0 %}
+      <ul class="blog-list__grid" role="list">
+        {%- for article in blog.articles -%}
+          {%- liquid
+            assign eager = false
+            if paginate.current_page == 1 and forloop.index <= 3
+              assign eager = true
+            endif
+          -%}
+          <li class="blog-list__item">
+            {% render 'showcase-article-card', article: article, eager: eager, read_more_label: section.settings.read_more_label %}
+          </li>
+        {%- endfor -%}
+      </ul>
+      {% render 'pagination-controls', paginate: paginate %}
+    {% else %}
+      <div class="blog-list__empty">
+        <p class="blog-list__empty-text">{{ section.settings.empty_text | default: 'New articles are on the way.' }}</p>
+        {% if section.settings.empty_button_label != blank %}
+          <a class="blog-list__empty-button" href="{{ section.settings.empty_button_link | default: routes.all_products_collection_url }}">
+            {{- section.settings.empty_button_label -}}
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% endpaginate %}
+</div>
+
+{% stylesheet %}
+  .blog-tags {
+    margin-block-end: 32px;
+  }
+
+  .blog-list {
+    padding: 0 16px 64px;
+  }
+
+  .blog-list__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .blog-list .pagination {
+    margin-block-start: 48px;
+  }
+
+  .blog-list__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding-block: 64px;
+    text-align: center;
+  }
+
+  .blog-list__empty-text {
+    margin: 0;
+    font-size: 20px;
+  }
+
+  .blog-list__empty-button {
+    padding: 12px 28px;
+    border-radius: 999px;
+    background-color: #1c1c1c;
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  @media screen and (min-width: 750px) {
+    .blog-list {
+      padding-inline: 24px;
+    }
+
+    .blog-list__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .blog-list {
+      padding-inline: 48px;
+    }
+
+    .blog-list__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      row-gap: 48px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Blog posts",
+  "tag": "section",
+  "class": "section-showcase-blog",
+  "settings": [
+    { "type": "range", "id": "articles_per_page", "label": "Articles per page", "min": 6, "max": 24, "step": 3, "default": 12 },
+    { "type": "text", "id": "tags_label", "label": "Topic tabs label (screen readers)", "default": "Blog topics" },
+    { "type": "text", "id": "all_label", "label": "All posts tab", "default": "All posts" },
+    { "type": "text", "id": "read_more_label", "label": "Read more label", "default": "Read more" },
+    { "type": "header", "content": "No articles yet" },
+    { "type": "text", "id": "empty_text", "label": "Text", "default": "New articles are on the way." },
+    { "type": "text", "id": "empty_button_label", "label": "Button label", "default": "Shop the collection" },
+    { "type": "url", "id": "empty_button_link", "label": "Button link" }
+  ]
+}
+{% endschema %}
