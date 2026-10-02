@@ -1,32 +1,15 @@
 {
   "sections": {
     "hero": {
-      "type": "showcase-hero",
-      "blocks": {
-        "slide_1": {
-          "type": "slide",
-          "settings": {
-            "eyebrow": "",
-            "heading": "Partner with Woodeca",
-            "subheading": "Furnish full projects at factory-direct pricing, backed by a dedicated account manager and reliable delivery across Egypt.",
-            "link_text": "Register your interest",
-            "link": "#designer-enquiry"
-          }
-        }
-      },
-      "block_order": ["slide_1"],
+      "type": "b2b-hero",
       "settings": {
-        "carousel_label": "Page hero",
-        "height": 520,
-        "height_mobile": 420,
-        "heading_size": "var(--font-size--5xl)",
-        "autoplay": false,
-        "show_arrows": false,
-        "show_dots": false,
-        "section_width": "full-width",
-        "text_color": "#ffffff",
-        "overlay_color": "#000000",
-        "overlay_opacity": 40
+        "image": "shopify://shop_images/ElaraBuffet200cmBrown4.webp",
+        "overlay_opacity": 45,
+        "size": "compact",
+        "heading": "Partner with Woodeca",
+        "text": "Trade pricing, material samples and a dedicated contact for interior designers and architects.",
+        "button_label": "Join the program",
+        "button_link": "#enquiry"
       }
     },
     "advantages": {
@@ -81,7 +64,14 @@
           }
         }
       },
-      "block_order": ["adv_1", "adv_2", "adv_3", "adv_4", "adv_5", "adv_6"],
+      "block_order": [
+        "adv_1",
+        "adv_2",
+        "adv_3",
+        "adv_4",
+        "adv_5",
+        "adv_6"
+      ],
       "settings": {
         "heading": "",
         "columns": 6,
@@ -133,7 +123,11 @@
           }
         }
       },
-      "block_order": ["term_1", "term_2", "term_3"],
+      "block_order": [
+        "term_1",
+        "term_2",
+        "term_3"
+      ],
       "settings": {
         "heading": "How the partnership works",
         "columns": 3,
@@ -205,11 +199,33 @@
     "projects": {
       "type": "showcase-info-cards",
       "blocks": {
-        "proj_1": { "type": "card", "settings": { "heading": "", "subtext": "" } },
-        "proj_2": { "type": "card", "settings": { "heading": "", "subtext": "" } },
-        "proj_3": { "type": "card", "settings": { "heading": "", "subtext": "" } }
+        "proj_1": {
+          "type": "card",
+          "settings": {
+            "heading": "",
+            "subtext": ""
+          }
+        },
+        "proj_2": {
+          "type": "card",
+          "settings": {
+            "heading": "",
+            "subtext": ""
+          }
+        },
+        "proj_3": {
+          "type": "card",
+          "settings": {
+            "heading": "",
+            "subtext": ""
+          }
+        }
       },
-      "block_order": ["proj_1", "proj_2", "proj_3"],
+      "block_order": [
+        "proj_1",
+        "proj_2",
+        "proj_3"
+      ],
       "settings": {
         "heading": "",
         "columns": 3,
