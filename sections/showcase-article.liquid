@@ -1,0 +1,238 @@
+{% comment %}
+  Blog article: breadcrumb (Home / Blog / title), date, H1, featured image and
+  body in a centred ~720px reading column, then "More from the blog" (three
+  other articles as cards) and a link back to the blog. BlogPosting
+  structured data. Comments are not shown.
+{% endcomment %}
+{%- render 'showcase-prose' -%}
+<div class="section section--page-width article-page">
+  <div class="article-page__inner">
+    {% render 'showcase-breadcrumbs',
+      current: article.title,
+      parent_label: blog.title,
+      parent_url: blog.url,
+      home_label: section.settings.breadcrumb_home_label
+    %}
+
+    <header class="article-page__header">
+      {% if section.settings.show_date %}
+        <p class="article-page__date">
+          <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: '%-d %B %Y' | upcase }}</time>
+        </p>
+      {% endif %}
+      <h1 class="article-page__title">{{ article.title }}</h1>
+    </header>
+
+    {% if article.image != blank %}
+      <div class="article-page__image-wrap">
+        {{
+          article.image
+          | image_url: width: 1440
+          | image_tag:
+            class: 'article-page__image',
+            loading: 'eager',
+            fetchpriority: 'high',
+            widths: '390, 600, 720, 960, 1200, 1440',
+            sizes: '(min-width: 752px) 720px, calc(100vw - 32px)',
+            alt: article.image.alt | default: article.title
+        }}
+      </div>
+    {% endif %}
+
+    <div class="article-page__body showcase-prose">
+      {{ article.content }}
+    </div>
+
+    <a class="article-page__back" href="{{ blog.url }}">
+      <span class="svg-wrapper" aria-hidden="true">{{- 'icon-arrow-left.svg' | inline_asset_content -}}</span>
+      {{ section.settings.back_label | default: 'Back to blog' }}
+    </a>
+  </div>
+</div>
+
+{%- liquid
+  assign more_count = 0
+  capture more_cards
+    for other in blog.articles limit: 8
+      if other.id == article.id
+        continue
+      endif
+      if more_count >= 3
+        break
+      endif
+      echo '<li class="article-more__item">'
+      render 'showcase-article-card', article: other, read_more_label: section.settings.read_more_label
+      echo '</li>'
+      assign more_count = more_count | plus: 1
+    endfor
+  endcapture
+-%}
+{% if more_count > 0 %}
+  <div class="article-more">
+    <h2 class="article-more__heading">{{ section.settings.more_heading | default: 'More from the blog' }}</h2>
+    <ul class="article-more__grid" role="list">{{ more_cards }}</ul>
+  </div>
+{% endif %}
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": {{ article.title | json }},
+    {%- if article.image != blank %}
+    "image": [{{ article.image | image_url: width: 1440 | prepend: 'https:' | json }}],
+    {%- endif %}
+    "datePublished": {{ article.published_at | date: '%Y-%m-%dT%H:%M:%S%z' | json }},
+    "dateModified": {{ article.updated_at | date: '%Y-%m-%dT%H:%M:%S%z' | json }},
+    "author": { "@type": "Organization", "name": "Woodeca" },
+    "publisher": { "@type": "Organization", "name": {{ shop.name | json }} },
+    "mainEntityOfPage": {{ request.origin | append: article.url | json }}
+  }
+</script>
+
+{% stylesheet %}
+  .article-page {
+    padding-block: 16px 48px;
+  }
+
+  .article-page__inner {
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+  }
+
+  .article-page__header {
+    margin-block: 24px;
+  }
+
+  .article-page__date {
+    margin: 0 0 12px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.84px;
+    line-height: 16px;
+  }
+
+  .article-page__title {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1.25;
+  }
+
+  .article-page__image-wrap {
+    margin-block-end: 32px;
+  }
+
+  .article-page__image,
+  .article-page__body img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Articles read at 16/26 with real section headings, on top of the shared prose style. */
+  .article-page__body.showcase-prose {
+    max-width: none;
+    font-size: 16px;
+    line-height: 26px;
+  }
+
+  .article-page__body.showcase-prose :is(h2, h3) {
+    margin-block: 40px 12px;
+    font-family: var(--font-heading--family);
+    font-weight: 400;
+    line-height: 1.25;
+  }
+
+  .article-page__body.showcase-prose h2 {
+    font-size: 26px;
+  }
+
+  .article-page__body.showcase-prose h3 {
+    font-size: 20px;
+  }
+
+  .article-page__body.showcase-prose :is(p, ul, ol, figure, img) {
+    margin-block: 0 16px;
+  }
+
+  .article-page__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-block-start: 40px;
+    color: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.84px;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .article-page__back .svg-wrapper,
+  .article-page__back svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .article-more {
+    padding: 48px 16px 64px;
+    border-block-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .article-more__heading {
+    margin: 0 0 32px;
+    font-size: 24px;
+    font-weight: 400;
+    text-align: center;
+  }
+
+  .article-more__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media screen and (min-width: 750px) {
+    .article-more {
+      padding-inline: 24px;
+    }
+
+    .article-more__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .article-page__title {
+      font-size: 30px;
+    }
+
+    .article-more {
+      padding-inline: 48px;
+    }
+
+    .article-more__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Blog article",
+  "tag": "section",
+  "class": "section-showcase-article",
+  "settings": [
+    { "type": "text", "id": "breadcrumb_home_label", "label": "Breadcrumb home label", "default": "Home" },
+    { "type": "checkbox", "id": "show_date", "label": "Show date", "default": true },
+    { "type": "text", "id": "more_heading", "label": "More articles heading", "default": "More from the blog" },
+    { "type": "text", "id": "read_more_label", "label": "Read more label", "default": "Read more" },
+    { "type": "text", "id": "back_label", "label": "Back link label", "default": "Back to blog" }
+  ]
+}
+{% endschema %}
