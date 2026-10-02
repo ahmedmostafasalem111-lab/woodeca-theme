@@ -135,20 +135,28 @@
       }
     },
     "picks": {
-      "type": "showcase-product-carousel",
+      "type": "b2b-picks",
       "settings": {
         "heading": "This season's picks for designers",
-        "description": "",
-        "products_limit": 12,
-        "columns": 4,
-        "columns_mobile": 1,
-        "peek_mobile": 0.8,
-        "show_arrows": true,
-        "show_progress": true,
+        "heading_size": "md",
+        "text": "",
+        "products": [
+          "arlo-160cm-buffet",
+          "rimal-180cm-buffet",
+          "talia-200cm-t-v-unit",
+          "niyra-4-door-wardrobe-1",
+          "solra-emerlard-velvet-bed-180cm",
+          "elara-150cm-buffet",
+          "aspen-flip-shoe-cabinet",
+          "emilia-makeup-vanity"
+        ],
+        "collection": "",
+        "limit": 8,
+        "more_template": "[count] more in [collection]",
+        "show_swatches": true,
         "show_quick_add": true,
-        "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32
+        "prev_label": "Previous",
+        "next_label": "Next"
       }
     },
     "cta_after_carousel": {
