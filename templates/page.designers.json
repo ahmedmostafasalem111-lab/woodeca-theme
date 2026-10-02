@@ -13,74 +13,66 @@
       }
     },
     "advantages": {
-      "type": "showcase-why",
+      "type": "b2b-icon-row",
       "blocks": {
-        "adv_1": {
-          "type": "feature",
+        "item_1": {
+          "type": "item",
           "settings": {
-            "icon": "store",
-            "title": "Full catalogue access",
-            "description": "Every Woodeca collection, available for project specification."
+            "icon": "factory",
+            "line_1": "Factory-direct",
+            "line_2": "prices"
           }
         },
-        "adv_2": {
-          "type": "feature",
+        "item_2": {
+          "type": "item",
           "settings": {
-            "icon": "chat",
-            "title": "Dedicated account manager",
-            "description": "One point of contact from first brief to final delivery."
+            "icon": "ruler",
+            "line_1": "Custom sizes",
+            "line_2": "& finishes"
           }
         },
-        "adv_3": {
-          "type": "feature",
+        "item_3": {
+          "type": "item",
+          "settings": {
+            "icon": "discount",
+            "line_1": "Trade",
+            "line_2": "discount"
+          }
+        },
+        "item_4": {
+          "type": "item",
+          "settings": {
+            "icon": "account",
+            "line_1": "Dedicated",
+            "line_2": "contact"
+          }
+        },
+        "item_5": {
+          "type": "item",
+          "settings": {
+            "icon": "swatch",
+            "line_1": "Material",
+            "line_2": "samples"
+          }
+        },
+        "item_6": {
+          "type": "item",
           "settings": {
             "icon": "truck",
-            "title": "Reliable delivery",
-            "description": "Clear timelines you can build a project schedule around."
-          }
-        },
-        "adv_4": {
-          "type": "feature",
-          "settings": {
-            "icon": "card",
-            "title": "Trade pricing",
-            "description": "Preferential rates on every order, scaled to project size."
-          }
-        },
-        "adv_5": {
-          "type": "feature",
-          "settings": {
-            "icon": "star",
-            "title": "Custom specification",
-            "description": "Fabric, finish, and dimension options beyond the standard catalogue."
-          }
-        },
-        "adv_6": {
-          "type": "feature",
-          "settings": {
-            "icon": "shield",
-            "title": "Fast quoting",
-            "description": "Get pricing back quickly enough to keep your client moving."
+            "line_1": "Delivery & assembly",
+            "line_2": "across Egypt"
           }
         }
       },
       "block_order": [
-        "adv_1",
-        "adv_2",
-        "adv_3",
-        "adv_4",
-        "adv_5",
-        "adv_6"
+        "item_1",
+        "item_2",
+        "item_3",
+        "item_4",
+        "item_5",
+        "item_6"
       ],
-      "settings": {
-        "heading": "",
-        "columns": 6,
-        "mobile_layout": "carousel",
-        "show_mission": false,
-        "section_width": "page-width",
-        "padding-block-start": 48,
-        "padding-block-end": 32
-      }
+      "settings": {}
     },
     "intro": {
       "type": "showcase-media-promo",

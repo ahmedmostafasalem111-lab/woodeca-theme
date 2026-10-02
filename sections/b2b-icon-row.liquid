@@ -1,0 +1,122 @@
+{% comment %}
+  One row of outline icons with two-line labels (divan.ru designers page,
+  under the hero). Desktop: all in one row. Phones: 3 per row.
+{% endcomment %}
+{%- render 'b2b-styles' -%}
+{%- assign items = section.blocks | where: 'type', 'item' -%}
+{% if items.size > 0 %}
+  <div class="section section--page-width b2b-icon-row">
+    <ul class="b2b-icon-row__list" role="list" style="--b2b-icon-count: {{ items.size }};">
+      {%- for block in items -%}
+        <li class="b2b-icon-row__item" {{ block.shopify_attributes }}>
+          <span class="b2b-icon-row__icon" aria-hidden="true">{% render 'b2b-icon', name: block.settings.icon %}</span>
+          <span class="b2b-icon-row__label">
+            {{- block.settings.line_1 -}}
+            {%- if block.settings.line_2 != blank -%}<br>{{ block.settings.line_2 }}{%- endif -%}
+          </span>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .b2b-icon-row {
+    padding-block: 32px;
+    border-block-end: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .b2b-icon-row__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .b2b-icon-row__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .b2b-icon-row__icon {
+    display: inline-flex;
+    width: 52px;
+    height: 52px;
+    color: var(--color-foreground);
+  }
+
+  .b2b-icon-row__icon svg {
+    width: 100%;
+    height: 100%;
+    --icon-stroke-width: 1px;
+  }
+
+  .b2b-icon-row__label {
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  @media screen and (min-width: 990px) {
+    .b2b-icon-row {
+      padding-block: 40px;
+    }
+
+    .b2b-icon-row__list {
+      grid-template-columns: repeat(var(--b2b-icon-count, 6), minmax(0, 1fr));
+      grid-auto-flow: column;
+      gap: 24px;
+    }
+
+    .b2b-icon-row__icon {
+      width: 80px;
+      height: 80px;
+    }
+
+    .b2b-icon-row__label {
+      font-size: 14px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "B2B icon row",
+  "tag": "section",
+  "class": "section-b2b-icon-row",
+  "max_blocks": 8,
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Icon",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            { "value": "factory", "label": "Factory" },
+            { "value": "ruler", "label": "Ruler (sizes)" },
+            { "value": "discount", "label": "Price tag" },
+            { "value": "account", "label": "Person" },
+            { "value": "chat", "label": "Chat" },
+            { "value": "truck", "label": "Truck" },
+            { "value": "shield", "label": "Shield" },
+            { "value": "swatch", "label": "Swatches" },
+            { "value": "store", "label": "Store" },
+            { "value": "checkmark", "label": "Checkmark" }
+          ],
+          "default": "checkmark"
+        },
+        { "type": "text", "id": "line_1", "label": "Label, line 1" },
+        { "type": "text", "id": "line_2", "label": "Label, line 2" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "B2B icon row" }]
+}
+{% endschema %}
