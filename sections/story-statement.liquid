@@ -1,0 +1,53 @@
+{% comment %}
+  Story page statement band: one big centred line on the site's warm
+  off-white (#f2f2f0, the same background the category tiles, gallery and
+  chat button use).
+{% endcomment %}
+{% if section.settings.text != blank %}
+  <div
+    class="story-statement"
+    style="background-color: {{ section.settings.background_color | default: '#f2f2f0' }};"
+  >
+    <p class="story-statement__text">{{ section.settings.text }}</p>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .story-statement {
+    padding: 32px 16px;
+  }
+
+  .story-statement__text {
+    max-width: 1330px;
+    margin: 0 auto;
+    font-family: var(--font-heading--family);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.35;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  @media screen and (min-width: 990px) {
+    .story-statement {
+      padding: 96px 40px;
+    }
+
+    .story-statement__text {
+      font-size: 30px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Story statement",
+  "tag": "section",
+  "class": "section-story-statement",
+  "settings": [
+    { "type": "textarea", "id": "text", "label": "Text" },
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#f2f2f0" }
+  ],
+  "presets": [{ "name": "Story statement" }]
+}
+{% endschema %}
