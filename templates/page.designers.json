@@ -84,41 +84,40 @@
       }
     },
     "terms": {
-      "type": "showcase-info-cards",
+      "type": "b2b-cards",
       "blocks": {
-        "term_1": {
+        "card_1": {
           "type": "card",
           "settings": {
-            "heading": "Full project furnishing",
-            "subtext": "From a single statement piece to a complete space, specified and delivered as one order."
+            "icon": "checkmark",
+            "title": "Trade discount on your projects",
+            "text": "Order for your clients' projects at special trade prices, with full or partial furnishing handled by our team."
           }
         },
-        "term_2": {
+        "card_2": {
           "type": "card",
           "settings": {
-            "heading": "Trade pricing on every order",
-            "subtext": "Preferential rates that scale with project size, agreed upfront."
-          }
-        },
-        "term_3": {
-          "type": "card",
-          "settings": {
-            "heading": "One dedicated contact",
-            "subtext": "A single account manager who follows your project through, not a rotating support queue."
+            "icon": "checkmark",
+            "title": "A discount code for your clients",
+            "text": "Get your own code to share with clients, so they enjoy a special price when they order from Woodeca."
           }
         }
       },
       "block_order": [
-        "term_1",
-        "term_2",
-        "term_3"
+        "card_1",
+        "card_2"
       ],
       "settings": {
         "heading": "How the partnership works",
-        "columns": 3,
-        "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32
+        "heading_size": "md",
+        "text": "We make furnishing your projects simple and rewarding.",
+        "card_style": "plain",
+        "columns": "2",
+        "band": false,
+        "button_label": "Join the program",
+        "button_link": "#enquiry",
+        "request_type": "Join the program",
+        "note": "Our team will contact you after you register."
       }
     },
     "cta_before_carousel": {
