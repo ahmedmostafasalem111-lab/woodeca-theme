@@ -169,18 +169,65 @@
       }
     },
     "manufacturing": {
-      "type": "showcase-media-promo",
+      "type": "b2b-media-cards",
+      "blocks": {
+        "card_1": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/Niyra2DoorWardrobe-Black4.webp",
+            "title": "",
+            "subtitle": "",
+            "collection": "",
+            "link": "",
+            "request_type": ""
+          }
+        },
+        "card_2": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/Niyra2DoorWardrobe-Black5.webp",
+            "title": "",
+            "subtitle": "",
+            "collection": "",
+            "link": "",
+            "request_type": ""
+          }
+        },
+        "card_3": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/EmiliaGreyMakeupVanities3.jpg",
+            "title": "",
+            "subtitle": "",
+            "collection": "",
+            "link": "",
+            "request_type": ""
+          }
+        }
+      },
+      "block_order": [
+        "card_1",
+        "card_2",
+        "card_3"
+      ],
       "settings": {
-        "show_section": true,
-        "media_position": "start",
-        "image_ratio": "3 / 2",
-        "eyebrow": "",
-        "heading": "",
-        "body": "",
+        "heading": "Made in our own factory",
+        "heading_size": "lg",
+        "text": "",
+        "body": "<p>Every piece is produced in our factory in Borg El Arab, Alexandria, and checked before it leaves. Because we control production, we can adapt sizes, colours and finishes to your project.</p>",
+        "tags": "Own factory, Made to order, Quality checked, 3-year warranty",
+        "layout": "row",
+        "columns": "3",
+        "ratio": "4 / 3",
+        "card_style": "label",
+        "image_sizes": "(min-width: 990px) 33vw, 300px",
+        "band": false,
         "button_label": "",
-        "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32
+        "button_link": "",
+        "file_label": "",
+        "file_url": "",
+        "prev_label": "Previous",
+        "next_label": "Next"
       }
     },
     "cta_mid": {
