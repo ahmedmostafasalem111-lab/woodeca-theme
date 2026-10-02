@@ -1,0 +1,396 @@
+{% comment %}
+  Legal page (Terms & Conditions): breadcrumb, H1, "Last updated", intro and
+  the policy tabs; then numbered sections (one block each) with a table of
+  contents — sticky in a left column on desktop with scroll-spy, a collapsed
+  "Jump to a section" list on phones. A contact card closes the page.
+  Every section is in the HTML; JavaScript only adds the scroll-spy.
+{% endcomment %}
+{%- render 'showcase-prose' -%}
+{%- liquid
+  assign heading = section.settings.heading | default: page.title
+  assign sections_list = section.blocks | where: 'type', 'legal_section'
+-%}
+
+<div class="section section--page-width legal-page" id="LegalTop-{{ section.id }}">
+  <div class="legal-page__inner">
+    <header class="legal-page__header">
+      {% render 'showcase-breadcrumbs', current: heading, home_label: section.settings.breadcrumb_home_label %}
+      <h1 class="legal-page__heading">{{ heading }}</h1>
+      {% if section.settings.last_updated != blank %}
+        <p class="legal-page__updated">
+          {{- section.settings.last_updated_label | default: 'Last updated:' }} {{ section.settings.last_updated -}}
+        </p>
+      {% endif %}
+      {% if section.settings.intro != blank %}
+        <div class="legal-page__intro">{{ section.settings.intro }}</div>
+      {% endif %}
+      {% render 'legal-nav', class: 'legal-page__nav' %}
+    </header>
+
+    <legal-page-component class="legal-page__layout">
+      {%- capture toc_items -%}
+        {%- for block in sections_list -%}
+          {%- liquid
+            if block.settings.title == blank
+              continue
+            endif
+            assign anchor = block.settings.anchor_id | default: block.settings.title | handleize
+          -%}
+          <li><a class="legal-toc__link" href="#{{ anchor | escape }}" data-anchor="{{ anchor | escape }}">{{ forloop.index }}. {{ block.settings.title }}</a></li>
+        {%- endfor -%}
+      {%- endcapture -%}
+
+      {%- comment -%} Phones: collapsed list at the top. {%- endcomment -%}
+      <details class="legal-toc legal-toc--mobile">
+        <summary class="legal-toc__summary">
+          {{- section.settings.jump_label | default: 'Jump to a section' -}}
+          <span class="svg-wrapper legal-toc__chevron" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+        </summary>
+        <ol class="legal-toc__list" role="list">{{ toc_items }}</ol>
+      </details>
+
+      {%- comment -%} Desktop: sticky contents column. {%- endcomment -%}
+      <nav class="legal-toc legal-toc--desktop" aria-label="{{ section.settings.toc_label | default: 'Contents' | escape }}">
+        <p class="legal-toc__title">{{ section.settings.toc_label | default: 'Contents' }}</p>
+        <ol class="legal-toc__list" role="list">{{ toc_items }}</ol>
+      </nav>
+
+      <div class="legal-page__content">
+        {%- for block in sections_list -%}
+          {%- liquid
+            if block.settings.title == blank
+              continue
+            endif
+            assign anchor = block.settings.anchor_id | default: block.settings.title | handleize
+          -%}
+          <section class="legal-section" id="{{ anchor | escape }}" aria-labelledby="LegalHeading-{{ block.id }}" {{ block.shopify_attributes }}>
+            <h2 class="legal-section__heading" id="LegalHeading-{{ block.id }}">
+              <span class="legal-section__number">{{ forloop.index }}.</span> {{ block.settings.title }}
+            </h2>
+            <div class="legal-section__body showcase-prose">{{ block.settings.body }}</div>
+          </section>
+        {%- endfor -%}
+
+        <a class="legal-page__top" href="#LegalTop-{{ section.id }}">
+          {{- section.settings.back_to_top_label | default: 'Back to top' -}}
+        </a>
+
+        <aside class="legal-contact" aria-labelledby="LegalContact-{{ section.id }}">
+          <h2 class="legal-contact__heading" id="LegalContact-{{ section.id }}">
+            {{- section.settings.contact_heading | default: 'Questions about these terms?' -}}
+          </h2>
+          <div class="legal-contact__details">
+            {% if section.settings.contact_email != blank %}
+              <a class="legal-contact__email" href="mailto:{{ section.settings.contact_email }}">{{ section.settings.contact_email }}</a>
+            {% endif %}
+            {% if section.settings.show_phone %}
+              {% render 'showcase-store-phone', class: 'legal-contact__phone' %}
+            {% endif %}
+          </div>
+          {% if section.settings.contact_button_label != blank %}
+            <a class="legal-contact__button" href="{{ section.settings.contact_button_link | default: '/pages/contact-us' }}">
+              {{- section.settings.contact_button_label -}}
+            </a>
+          {% endif %}
+        </aside>
+      </div>
+    </legal-page-component>
+  </div>
+</div>
+
+{%- comment -%}
+  Print view: just the terms. Inline because the theme's compiled section CSS
+  is loaded for screens only.
+{%- endcomment -%}
+<style media="print">
+  #header-group,
+  .shopify-section-group-header-group,
+  .shopify-section-group-footer-group,
+  footer,
+  .legal-toc,
+  .legal-page__nav,
+  .legal-page__top,
+  .floating-chat,
+  [class*='floating-widgets'] {
+    display: none !important;
+  }
+
+  .legal-page__layout {
+    display: block;
+  }
+
+  .legal-section {
+    break-inside: avoid-page;
+  }
+</style>
+
+<script src="{{ 'legal-page.js' | asset_url }}" type="module" fetchpriority="low"></script>
+
+{% stylesheet %}
+  .legal-page {
+    /* Pinned header + 24px; legal-page.js keeps it exact. */
+    --legal-sticky-offset: 121px;
+    padding-block: 16px 64px;
+  }
+
+  .legal-page__inner {
+    width: 100%;
+    max-width: 1060px;
+    margin-inline: auto;
+  }
+
+  .legal-page__heading {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  .legal-page__updated {
+    margin: 8px 0 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-muted-text, 0.6));
+    font-size: 13px;
+  }
+
+  .legal-page__intro {
+    max-width: 720px;
+    margin-block-start: 16px;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .legal-page__intro > :first-child {
+    margin-block-start: 0;
+  }
+
+  .legal-page__intro > :last-child {
+    margin-block-end: 0;
+  }
+
+  .legal-page__nav {
+    margin-block: 24px 32px;
+  }
+
+  /* ---- Contents ---- */
+  .legal-toc__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .legal-toc__link {
+    display: block;
+    padding: 6px 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-subdued-text, 0.8));
+    font-size: 14px;
+    line-height: 1.4;
+    text-decoration: none;
+  }
+
+  .legal-toc__link:hover {
+    text-decoration: underline;
+  }
+
+  .legal-toc__link[aria-current='true'] {
+    color: var(--color-foreground);
+    font-weight: 600;
+  }
+
+  .legal-toc--desktop {
+    display: none;
+  }
+
+  .legal-toc--mobile {
+    margin-block-end: 24px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    border-radius: 8px;
+  }
+
+  .legal-toc__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .legal-toc__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .legal-toc__chevron,
+  .legal-toc__chevron svg {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+  }
+
+  .legal-toc--mobile[open] .legal-toc__chevron {
+    transform: rotate(180deg);
+  }
+
+  .legal-toc--mobile .legal-toc__list {
+    padding: 0 16px 12px;
+  }
+
+  /* ---- Sections ---- */
+  .legal-section {
+    padding-block: 40px;
+    border-block-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    /* The heading (after the 40px top padding) lands ~24px under the header. */
+    scroll-margin-top: calc(var(--legal-sticky-offset) - 40px);
+  }
+
+  .legal-section:first-child {
+    padding-block-start: 0;
+    border-block-start: 0;
+  }
+
+  .legal-section__heading {
+    margin: 0 0 16px;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .legal-section__body.showcase-prose {
+    max-width: none;
+    font-size: 15px;
+  }
+
+  .legal-section__body a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .legal-section__body :is(ul, ol) {
+    padding-inline-start: 1.25em;
+  }
+
+  .legal-section__body li + li {
+    margin-block-start: 0.35em;
+  }
+
+  .legal-page__top {
+    display: inline-block;
+    margin-block: 8px 40px;
+    color: inherit;
+    font-size: 14px;
+    text-decoration: underline;
+  }
+
+  /* ---- Contact card ---- */
+  .legal-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px;
+    border-radius: 12px;
+    background-color: #f2f2f0;
+  }
+
+  .legal-contact__heading {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .legal-contact__details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+  }
+
+  .legal-contact__email,
+  .legal-contact__phone {
+    color: inherit;
+    font-size: 15px;
+  }
+
+  .legal-contact__button {
+    align-self: flex-start;
+    padding: 12px 28px;
+    border-radius: 999px;
+    background-color: #1c1c1c;
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  @media screen and (min-width: 990px) {
+    .legal-page__heading {
+      font-size: 36px;
+    }
+
+    .legal-page {
+      --legal-sticky-offset: 221px;
+    }
+
+    .legal-page__layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 720px);
+      gap: 64px;
+      align-items: start;
+    }
+
+    .legal-toc--mobile {
+      display: none;
+    }
+
+    .legal-toc--desktop {
+      position: sticky;
+      top: var(--legal-sticky-offset);
+      display: block;
+      max-height: calc(100vh - var(--legal-sticky-offset) - 24px);
+      overflow-y: auto;
+    }
+
+    .legal-toc__title {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.84px;
+      text-transform: uppercase;
+    }
+  }
+
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Legal page",
+  "tag": "section",
+  "class": "section-legal-page",
+  "blocks": [
+    {
+      "type": "legal_section",
+      "name": "Section",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "text", "id": "anchor_id", "label": "Anchor id", "info": "Link to this section with #anchor-id. Lowercase letters, numbers and hyphens." },
+        { "type": "richtext", "id": "body", "label": "Text" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "text", "id": "breadcrumb_home_label", "label": "Breadcrumb home label", "default": "Home" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Terms & Conditions", "info": "Defaults to the page title." },
+    { "type": "text", "id": "last_updated_label", "label": "Last updated label", "default": "Last updated:" },
+    { "type": "text", "id": "last_updated", "label": "Last updated date", "info": "e.g. 2 October 2026" },
+    { "type": "richtext", "id": "intro", "label": "Intro" },
+    { "type": "text", "id": "toc_label", "label": "Contents label", "default": "Contents" },
+    { "type": "text", "id": "jump_label", "label": "Phone contents label", "default": "Jump to a section" },
+    { "type": "text", "id": "back_to_top_label", "label": "Back to top label", "default": "Back to top" },
+    { "type": "header", "content": "Contact card" },
+    { "type": "text", "id": "contact_heading", "label": "Heading", "default": "Questions about these terms?" },
+    { "type": "text", "id": "contact_email", "label": "Email", "default": "Hello@Woodeca.com" },
+    { "type": "checkbox", "id": "show_phone", "label": "Show the phone number", "info": "Uses the phone number set in the header.", "default": true },
+    { "type": "text", "id": "contact_button_label", "label": "Button label", "default": "Contact us" },
+    { "type": "url", "id": "contact_button_link", "label": "Button link" }
+  ]
+}
+{% endschema %}
