@@ -120,20 +120,6 @@
         "note": "Our team will contact you after you register."
       }
     },
-    "cta_before_carousel": {
-      "type": "showcase-cta-band",
-      "settings": {
-        "heading": "Ready to start a project?",
-        "subheading": "",
-        "button_label": "Register your interest",
-        "button_link": "#designer-enquiry",
-        "alignment": "center",
-        "section_width": "page-width",
-        "background_color": "#f6f6f6",
-        "padding-block-start": 40,
-        "padding-block-end": 40
-      }
-    },
     "picks": {
       "type": "b2b-picks",
       "settings": {
@@ -157,19 +143,6 @@
         "show_quick_add": true,
         "prev_label": "Previous",
         "next_label": "Next"
-      }
-    },
-    "cta_after_carousel": {
-      "type": "showcase-cta-band",
-      "settings": {
-        "heading": "Ready to start a project?",
-        "subheading": "",
-        "button_label": "Register your interest",
-        "button_link": "#designer-enquiry",
-        "alignment": "space-between",
-        "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32
       }
     },
     "samples": {
@@ -207,40 +180,108 @@
         "next_label": "Next"
       }
     },
-    "cta_final": {
-      "type": "showcase-cta-band",
-      "settings": {
-        "heading": "Ready to start a project?",
-        "subheading": "",
-        "button_label": "Register your interest",
-        "button_link": "#designer-enquiry",
-        "alignment": "center",
-        "section_width": "page-width",
-        "background_color": "#f6f6f6",
-        "padding-block-start": 40,
-        "padding-block-end": 40
-      }
-    },
     "enquiry": {
-      "type": "showcase-enquiry-form",
+      "type": "b2b-enquiry",
+      "blocks": {
+        "field_1": {
+          "type": "field",
+          "settings": {
+            "label": "Name",
+            "key": "name",
+            "kind": "text",
+            "required": true,
+            "options": "",
+            "placeholder": ""
+          }
+        },
+        "field_2": {
+          "type": "field",
+          "settings": {
+            "label": "Studio / company",
+            "key": "Studio / company",
+            "kind": "text",
+            "required": false,
+            "options": "",
+            "placeholder": ""
+          }
+        },
+        "field_3": {
+          "type": "field",
+          "settings": {
+            "label": "Phone",
+            "key": "phone",
+            "kind": "tel",
+            "required": true,
+            "options": "",
+            "placeholder": ""
+          }
+        },
+        "field_4": {
+          "type": "field",
+          "settings": {
+            "label": "Email",
+            "key": "email",
+            "kind": "email",
+            "required": true,
+            "options": "",
+            "placeholder": ""
+          }
+        },
+        "field_5": {
+          "type": "field",
+          "settings": {
+            "label": "Instagram or portfolio link",
+            "key": "Instagram or portfolio",
+            "kind": "url",
+            "required": false,
+            "options": "",
+            "placeholder": ""
+          }
+        },
+        "field_6": {
+          "type": "field",
+          "settings": {
+            "label": "Request type",
+            "key": "Request type",
+            "kind": "select",
+            "required": false,
+            "options": "Join the program, Request samples, Quote for a project",
+            "placeholder": "Choose…"
+          }
+        },
+        "field_7": {
+          "type": "field",
+          "settings": {
+            "label": "Message",
+            "key": "body",
+            "kind": "textarea",
+            "required": false,
+            "options": "",
+            "placeholder": ""
+          }
+        }
+      },
+      "block_order": [
+        "field_1",
+        "field_2",
+        "field_3",
+        "field_4",
+        "field_5",
+        "field_6",
+        "field_7"
+      ],
       "settings": {
-        "anchor_id": "designer-enquiry",
-        "heading": "Let's talk about your project",
-        "body": "<p>Tell us what you're working on and a member of our team will be in touch.</p>",
-        "subject": "Designer enquiry — Woodeca",
-        "name_label": "Name",
-        "phone_label": "Phone",
-        "email_label": "Email",
-        "message_label": "Tell us about your project",
-        "submit_label": "Register your interest",
-        "consent_text": "",
-        "success_text": "Thanks — we will be in touch shortly.",
-        "direct_label": "",
-        "phone_number": "",
-        "email_address": "",
-        "section_width": "page-width",
-        "padding-block-start": 56,
-        "padding-block-end": 72
+        "anchor_id": "enquiry",
+        "heading": "Join the Woodeca designer program",
+        "text": "Tell us about your studio and our team will contact you within 1 working day.",
+        "source": "Designers page",
+        "request_key": "Request type",
+        "files_text": "<p>Have drawings, a BOQ or a mood board? Email them to <a href=\"mailto:Hello@Woodeca.com\" title=\"Email Woodeca\">Hello@Woodeca.com</a> with your name and we'll attach them to your enquiry.</p>",
+        "submit_label": "Send",
+        "legal_text": "<p>By sending this form you agree to our <a href=\"/policies/privacy-policy\" title=\"Privacy Policy\">Privacy Policy</a></p>",
+        "success_text": "Thank you! Our team will contact you within 1 working day.",
+        "required_message": "Please fill in this field.",
+        "email_message": "Please enter a valid email address."
       }
     }
   },
@@ -249,12 +290,9 @@
     "advantages",
     "intro",
     "terms",
-    "cta_before_carousel",
     "picks",
-    "cta_after_carousel",
     "samples",
     "projects",
-    "cta_final",
     "enquiry"
   ]
 }
