@@ -1,0 +1,19 @@
+{%- doc -%}
+  Outline icon by name for the For Business / For Designers sections. Uses the
+  theme's icon set (20×20, currentColor stroke) plus icon-factory, icon-ruler
+  and icon-swatch drawn in the same style.
+
+  @param {string} name - factory, ruler, discount, account, chat, truck, shield, swatch, store, checkmark.
+
+  @example
+  {% render 'b2b-icon', name: 'factory' %}
+{%- enddoc -%}
+{%- liquid
+  case name
+    when 'factory', 'ruler', 'swatch', 'discount', 'account', 'chat', 'truck', 'shield', 'store'
+      assign file = 'icon-' | append: name | append: '.svg'
+    else
+      assign file = 'icon-checkmark.svg'
+  endcase
+  echo file | inline_asset_content
+-%}

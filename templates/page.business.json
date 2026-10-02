@@ -87,74 +87,76 @@
       }
     },
     "benefits": {
-      "type": "showcase-why",
+      "type": "b2b-cards",
       "blocks": {
-        "ben_1": {
-          "type": "feature",
+        "card_1": {
+          "type": "card",
           "settings": {
-            "icon": "store",
-            "title": "",
-            "description": ""
+            "icon": "factory",
+            "title": "Made in our own factory",
+            "text": "We design and build everything in Borg El Arab, so you deal directly with the maker."
           }
         },
-        "ben_2": {
-          "type": "feature",
+        "card_2": {
+          "type": "card",
           "settings": {
-            "icon": "card",
-            "title": "",
-            "description": ""
+            "icon": "ruler",
+            "title": "Custom sizes & finishes",
+            "text": "Need a different size, colour or finish for your project? We make it to order."
           }
         },
-        "ben_3": {
-          "type": "feature",
+        "card_3": {
+          "type": "card",
+          "settings": {
+            "icon": "discount",
+            "title": "Volume pricing",
+            "text": "Factory-direct prices, with better rates for larger and repeat orders."
+          }
+        },
+        "card_4": {
+          "type": "card",
+          "settings": {
+            "icon": "account",
+            "title": "Dedicated account manager",
+            "text": "One contact from your first enquiry to final installation."
+          }
+        },
+        "card_5": {
+          "type": "card",
           "settings": {
             "icon": "truck",
-            "title": "",
-            "description": ""
+            "title": "Delivery & installation",
+            "text": "Our own team delivers and installs on site, across Egypt."
           }
         },
-        "ben_4": {
-          "type": "feature",
+        "card_6": {
+          "type": "card",
           "settings": {
             "icon": "shield",
-            "title": "",
-            "description": ""
-          }
-        },
-        "ben_5": {
-          "type": "feature",
-          "settings": {
-            "icon": "chat",
-            "title": "",
-            "description": ""
-          }
-        },
-        "ben_6": {
-          "type": "feature",
-          "settings": {
-            "icon": "star",
-            "title": "",
-            "description": ""
+            "title": "3-year warranty",
+            "text": "Every piece is covered against manufacturing defects."
           }
         }
       },
       "block_order": [
-        "ben_1",
-        "ben_2",
-        "ben_3",
-        "ben_4",
-        "ben_5",
-        "ben_6"
+        "card_1",
+        "card_2",
+        "card_3",
+        "card_4",
+        "card_5",
+        "card_6"
       ],
       "settings": {
-        "heading": "",
-        "columns": 6,
-        "show_numbers": false,
-        "mobile_layout": "carousel",
-        "show_mission": false,
-        "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32
+        "heading": "Why work with Woodeca",
+        "heading_size": "lg",
+        "text": "",
+        "card_style": "icon",
+        "columns": "3",
+        "band": false,
+        "button_label": "Start working with us",
+        "button_link": "#enquiry",
+        "request_type": "",
+        "note": ""
       }
     },
     "intro": {
