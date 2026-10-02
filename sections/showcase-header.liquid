@@ -263,15 +263,39 @@
 
       {%- comment -%} Right-hand action icons {%- endcomment -%}
       <div class="showcase-header__actions">
+        {%- comment -%}
+          Account, on phones and desktop: the account page when signed in
+          (with a small dot), Shopify's sign-in otherwise. The same rules feed
+          the menu drawer's row (snippets/showcase-mobile-drawer).
+        {%- endcomment -%}
         {% if section.settings.show_account %}
+          {%- liquid
+            if shop.customer_accounts_enabled
+              if customer
+                assign account_href = routes.account_url
+              else
+                assign account_href = routes.account_login_url
+              endif
+            else
+              assign account_href = section.settings.account_link | default: '#'
+            endif
+            if customer
+              assign account_aria = section.settings.account_signed_in_label | default: 'My account'
+            else
+              assign account_aria = section.settings.account_sign_in_label | default: 'Sign in'
+            endif
+          -%}
           <a
-            href="{% if shop.customer_accounts_enabled %}{{ routes.account_url }}{% else %}{{ section.settings.account_link | default: '#' }}{% endif %}"
-            class="showcase-header__icon-button showcase-header__icon-button--desktop"
-            aria-label="{{ section.settings.account_label | default: 'Account' | escape }}"
+            href="{{ account_href }}"
+            class="showcase-header__icon-button showcase-header__account{% if customer %} showcase-header__account--signed-in{% endif %}"
+            aria-label="{{ account_aria | escape }}"
           >
             <span class="svg-wrapper" aria-hidden="true">
               {{- 'icon-account.svg' | inline_asset_content -}}
             </span>
+            {% if customer %}
+              <span class="showcase-header__account-dot" aria-hidden="true"></span>
+            {% endif %}
           </a>
         {% endif %}
 
@@ -831,6 +855,23 @@
     text-decoration: underline;
   }
 
+  /* Signed in: a small dot on the account icon, in the text colour. */
+  .showcase-header__account {
+    position: relative;
+  }
+
+  .showcase-header__account-dot {
+    position: absolute;
+    inset-block-start: 6px;
+    inset-inline-end: 6px;
+    width: 7px;
+    height: 7px;
+    border: 1.5px solid var(--showcase-header-background, #ffffff);
+    border-radius: 50%;
+    background-color: currentcolor;
+    box-sizing: content-box;
+  }
+
   /* ---------- Mobile-only pieces, hidden on desktop ---------- */
   .showcase-header__drawer-trigger,
   .showcase-header__icon-button--mobile {
@@ -861,10 +902,26 @@
       min-height: 56px;
     }
 
-    /* Logo centres itself between the two icon clusters. */
+    /*
+      Logo centred on the row itself, so it stays centred with two icons on the
+      left (menu, search) and three on the right (account, phone, cart).
+    */
+    .showcase-header__main-inner {
+      position: relative;
+    }
+
     .showcase-header__logo {
-      flex-grow: 1;
+      position: absolute;
+      inset-block: 0;
+      left: 50%;
+      display: flex;
+      align-items: center;
+      translate: -50% 0;
       text-align: center;
+    }
+
+    .showcase-header__actions {
+      margin-inline-start: auto;
     }
 
     .showcase-header__logo-text {
@@ -1556,6 +1613,18 @@
       "id": "account_label",
       "label": "Account accessible label",
       "default": "Account"
+    },
+    {
+      "type": "text",
+      "id": "account_signed_in_label",
+      "label": "Account label when signed in",
+      "default": "My account"
+    },
+    {
+      "type": "text",
+      "id": "account_sign_in_label",
+      "label": "Account label when signed out",
+      "default": "Sign in"
     },
     {
       "type": "url",

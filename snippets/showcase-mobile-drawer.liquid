@@ -109,12 +109,21 @@
           {% liquid
             assign account_href = section.settings.account_link
             if shop.customer_accounts_enabled
-              assign account_href = routes.account_url
+              if customer
+                assign account_href = routes.account_url
+              else
+                assign account_href = routes.account_login_url
+              endif
+            endif
+            if customer
+              assign account_row_label = section.settings.account_signed_in_label | default: 'My account'
+            else
+              assign account_row_label = section.settings.account_sign_in_label | default: 'Sign in'
             endif
           %}
           {% render 'showcase-mobile-drawer-link',
-            label: section.settings.account_label,
-            fallback_label: 'My Account',
+            label: account_row_label,
+            fallback_label: 'My account',
             link: account_href,
             image: section.settings.account_icon,
             inline_icon: 'icon-account.svg'
