@@ -1,0 +1,70 @@
+{% comment %}
+  Centred heading and paragraph (divan.ru/b2b "divan.ru для бизнеса" band),
+  optionally on the light warm-grey band. Max width ~900px.
+{% endcomment %}
+{%- render 'b2b-styles' -%}
+{% if section.settings.heading != blank or section.settings.text != blank %}
+  <div class="section section--page-width b2b-section{% if section.settings.band %} b2b-section--band{% endif %}">
+    <div class="b2b-text">
+      {% if section.settings.heading != blank %}
+        <h2 class="b2b-head__title{% if section.settings.heading_size == 'md' %} b2b-head__title--md{% endif %}">{{ section.settings.heading }}</h2>
+      {% endif %}
+      {% if section.settings.text != blank %}
+        <div class="b2b-text__body">{{ section.settings.text }}</div>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .b2b-text {
+    max-width: 900px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .b2b-text__body {
+    margin-block-start: 16px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .b2b-text__body > * {
+    margin: 0;
+  }
+
+  .b2b-text__body > * + * {
+    margin-block-start: 12px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .b2b-text__body {
+      margin-block-start: 24px;
+      font-size: 18px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "B2B text",
+  "tag": "section",
+  "class": "section-b2b-text",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading" },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        { "value": "lg", "label": "Large (44px)" },
+        { "value": "md", "label": "Medium (30px)" }
+      ],
+      "default": "lg"
+    },
+    { "type": "richtext", "id": "text", "label": "Text" },
+    { "type": "checkbox", "id": "band", "label": "Grey band background", "default": false }
+  ],
+  "presets": [{ "name": "B2B text" }]
+}
+{% endschema %}

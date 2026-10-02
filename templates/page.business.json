@@ -160,19 +160,12 @@
       }
     },
     "intro": {
-      "type": "showcase-media-promo",
+      "type": "b2b-text",
       "settings": {
-        "show_section": true,
-        "media_position": "end",
-        "image_ratio": "4 / 3",
-        "eyebrow": "",
-        "heading": "",
-        "body": "",
-        "button_label": "",
-        "button_link": "#b2b-enquiry",
-        "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32
+        "heading": "Woodeca for business",
+        "heading_size": "lg",
+        "text": "<p>We're an Egyptian furniture maker selling direct, with no middlemen and no showroom markup. That means honest prices, made-to-order flexibility and a team that stands behind every piece long after delivery.</p>",
+        "band": true
       }
     },
     "manufacturing": {
