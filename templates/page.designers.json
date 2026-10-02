@@ -75,19 +75,12 @@
       "settings": {}
     },
     "intro": {
-      "type": "showcase-media-promo",
+      "type": "b2b-text",
       "settings": {
-        "show_section": true,
-        "media_position": "end",
-        "image_ratio": "4 / 3",
-        "eyebrow": "",
-        "heading": "Designed for the way you work",
-        "body": "<p>We know a project only comes together when the furniture keeps pace with the design. That's why we work directly with designers and architects — full catalogue access, trade pricing, and a single point of contact who understands project timelines, not just individual orders.</p>",
-        "button_label": "",
-        "button_link": "#designer-enquiry",
-        "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32
+        "heading": "",
+        "heading_size": "md",
+        "text": "<p>We love working with designers and architects. Our furniture is designed to fit real Egyptian homes, and because we make everything ourselves, we can adapt sizes and finishes to your project. Join our designer program for trade pricing on your projects, a discount code for your clients and samples to present with confidence.</p>",
+        "band": false
       }
     },
     "terms": {
