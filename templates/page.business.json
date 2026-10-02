@@ -356,69 +356,101 @@
       }
     },
     "directions": {
-      "type": "showcase-category-row",
+      "type": "b2b-media-cards",
       "blocks": {
-        "dir_1": {
-          "type": "category",
+        "card_1": {
+          "type": "card",
           "settings": {
-            "label": "",
-            "link": ""
+            "image": "shopify://shop_images/Emilia3BedroomSet1.jpg",
+            "title": "Bedroom",
+            "subtitle": "",
+            "collection": "bedroom",
+            "link": "",
+            "request_type": ""
           }
         },
-        "dir_2": {
-          "type": "category",
+        "card_2": {
+          "type": "card",
           "settings": {
-            "label": "",
-            "link": ""
+            "image": "shopify://shop_images/living_banner.jpg",
+            "title": "Living Room",
+            "subtitle": "",
+            "collection": "living-room",
+            "link": "",
+            "request_type": ""
           }
         },
-        "dir_3": {
-          "type": "category",
+        "card_3": {
+          "type": "card",
           "settings": {
-            "label": "",
-            "link": ""
+            "image": "shopify://shop_images/Untitled_design_2_8a3e7865-8164-409e-a8f4-ae6f9e396cc1.jpg",
+            "title": "Kids",
+            "subtitle": "",
+            "collection": "kids",
+            "link": "",
+            "request_type": ""
           }
         },
-        "dir_4": {
-          "type": "category",
+        "card_4": {
+          "type": "card",
           "settings": {
-            "label": "",
-            "link": ""
+            "image": "shopify://shop_images/Emilia4DoorWardrobe-White3.webp",
+            "title": "Wardrobes",
+            "subtitle": "",
+            "collection": "wardrobes",
+            "link": "",
+            "request_type": ""
           }
         },
-        "dir_5": {
-          "type": "category",
+        "card_5": {
+          "type": "card",
           "settings": {
-            "label": "",
-            "link": ""
+            "image": "shopify://shop_images/2_046846e4-cef7-47ff-ac32-0ac1efd590aa.jpg",
+            "title": "Shoe Storage",
+            "subtitle": "",
+            "collection": "shoe-storage",
+            "link": "",
+            "request_type": ""
           }
         },
-        "dir_6": {
-          "type": "category",
+        "card_6": {
+          "type": "card",
           "settings": {
-            "label": "",
-            "link": ""
+            "image": "shopify://shop_images/TaliaT.vUnit200cmLightoak4.webp",
+            "title": "TV Units",
+            "subtitle": "",
+            "collection": "t-v-units",
+            "link": "",
+            "request_type": ""
           }
         }
       },
       "block_order": [
-        "dir_1",
-        "dir_2",
-        "dir_3",
-        "dir_4",
-        "dir_5",
-        "dir_6"
+        "card_1",
+        "card_2",
+        "card_3",
+        "card_4",
+        "card_5",
+        "card_6"
       ],
       "settings": {
-        "heading": "",
-        "columns": 6,
-        "columns_mobile": 2,
-        "peek_mobile": 0.5,
-        "show_arrows": true,
-        "show_progress": true,
-        "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32
+        "heading": "What we make",
+        "heading_size": "lg",
+        "text": "",
+        "body": "",
+        "tags": "",
+        "layout": "row",
+        "columns": "3",
+        "ratio": "382 / 348",
+        "card_style": "label",
+        "image_sizes": "(min-width: 990px) 28vw, 300px",
+        "band": false,
+        "button_label": "View all products",
+        "button_link": "shopify://collections/all",
+        "file_label": "",
+        "file_url": "",
+        "prev_label": "Previous",
+        "next_label": "Next"
       }
     },
     "stats": {
