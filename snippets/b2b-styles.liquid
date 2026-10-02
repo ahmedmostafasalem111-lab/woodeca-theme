@@ -1,0 +1,203 @@
+{%- doc -%}
+  Shared look for the For Business / For Designers sections (modelled on
+  divan.ru/b2b): section spacing, centred headings, pill buttons and the light
+  warm-grey (#f2f2f0) cards. Outputs nothing; every b2b-* section renders it.
+
+  @example
+  {% render 'b2b-styles' %}
+{%- enddoc -%}
+
+{% stylesheet %}
+  .b2b-section {
+    padding-block: 40px;
+  }
+
+  .b2b-section--band {
+    background-color: #f2f2f0;
+  }
+
+  .b2b-head {
+    max-width: 900px;
+    margin: 0 auto 32px;
+    text-align: center;
+  }
+
+  .b2b-head__title {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 1.15;
+  }
+
+  .b2b-head__title--md {
+    font-size: 22px;
+  }
+
+  .b2b-head__text {
+    margin: 12px 0 0;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .b2b-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-block-start: 32px;
+  }
+
+  .b2b-actions__note {
+    margin: 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-muted-text, 0.6));
+    font-size: 13px;
+  }
+
+  /* Pill buttons: black with white text (as the theme's own buttons), or white on images. */
+  .b2b-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: min(100%, 330px);
+    min-height: 50px;
+    padding: 12px 28px;
+    border: 0;
+    border-radius: 999px;
+    background-color: #1c1c1c;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+
+  .b2b-button:hover {
+    opacity: 0.88;
+  }
+
+  .b2b-button--light {
+    background-color: #ffffff;
+    color: #1c1c1c;
+  }
+
+  .b2b-card {
+    border-radius: 10px;
+    background-color: #f2f2f0;
+  }
+
+  /* Rows that swipe on phones: edge to edge, no visible scrollbar, no page overflow. */
+  .b2b-swipe {
+    display: flex;
+    gap: 15px;
+    margin-inline: calc(-1 * var(--page-margin, 16px));
+    padding-inline: var(--page-margin, 16px);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--page-margin, 16px);
+    scrollbar-width: none;
+  }
+
+  .b2b-swipe::-webkit-scrollbar {
+    display: none;
+  }
+
+  .b2b-swipe > * {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  /* Carousel arrows: desktop only. */
+  .b2b-arrow {
+    display: none;
+  }
+
+  /* The enquiry form stops below the sticky header when a CTA jumps to it. */
+  [id='enquiry'] {
+    scroll-margin-top: 110px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .b2b-section {
+      padding-block: 80px;
+    }
+
+    .b2b-head {
+      margin-block-end: 48px;
+    }
+
+    .b2b-head__title {
+      font-size: 44px;
+    }
+
+    .b2b-head__title--md {
+      font-size: 30px;
+    }
+
+    .b2b-head__text {
+      font-size: 16px;
+    }
+
+    .b2b-actions {
+      margin-block-start: 48px;
+    }
+
+    .b2b-button {
+      width: 360px;
+      font-size: 18px;
+    }
+
+    .b2b-swipe {
+      display: grid;
+      margin-inline: 0;
+      padding-inline: 0;
+      overflow: visible;
+    }
+
+    [id='enquiry'] {
+      scroll-margin-top: 210px;
+    }
+
+    .b2b-arrow {
+      position: absolute;
+      inset-block-start: 50%;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      margin-block-start: -24px;
+      border: 0;
+      border-radius: 50%;
+      background-color: #ffffff;
+      box-shadow: 0 2px 10px rgb(0 0 0 / 0.12);
+      color: #1c1c1c;
+      cursor: pointer;
+    }
+
+    .b2b-arrow[disabled] {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .b2b-arrow--prev {
+      inset-inline-start: -24px;
+    }
+
+    .b2b-arrow--next {
+      inset-inline-end: -24px;
+    }
+
+    .b2b-arrow .svg-wrapper,
+    .b2b-arrow svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+{% endstylesheet %}

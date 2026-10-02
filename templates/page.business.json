@@ -1,43 +1,55 @@
 {
   "sections": {
     "hero": {
-      "type": "showcase-hero",
-      "blocks": {
-        "slide_1": {
-          "type": "slide",
-          "settings": {
-            "eyebrow": "",
-            "heading": "",
-            "subheading": "",
-            "link_text": "",
-            "link": "#b2b-enquiry"
-          }
-        }
-      },
-      "block_order": ["slide_1"],
+      "type": "b2b-hero",
       "settings": {
-        "carousel_label": "Page hero",
-        "height": 520,
-        "height_mobile": 420,
-        "heading_size": "var(--font-size--5xl)",
-        "autoplay": false,
-        "show_arrows": false,
-        "show_dots": false,
-        "section_width": "full-width",
-        "text_color": "#ffffff",
-        "overlay_color": "#000000",
-        "overlay_opacity": 40
+        "image": "shopify://shop_images/RimalBuffet180cmLightoak2.webp",
+        "overlay_opacity": 45,
+        "size": "large",
+        "heading": "Furniture for your business, made in our own factory",
+        "text": "We furnish hotels, offices, restaurants, cafés and residential projects across Egypt, from a single order to a full fit-out.",
+        "button_label": "Discuss your project",
+        "button_link": "#enquiry"
       }
     },
     "segments": {
       "type": "showcase-info-cards",
       "blocks": {
-        "seg_1": { "type": "card", "settings": { "heading": "Hotels & Hospitality", "subtext": "" } },
-        "seg_2": { "type": "card", "settings": { "heading": "Offices & Coworking", "subtext": "" } },
-        "seg_3": { "type": "card", "settings": { "heading": "Restaurants & Cafés", "subtext": "" } },
-        "seg_4": { "type": "card", "settings": { "heading": "Retail Fit-Out", "subtext": "" } }
+        "seg_1": {
+          "type": "card",
+          "settings": {
+            "heading": "Hotels & Hospitality",
+            "subtext": ""
+          }
+        },
+        "seg_2": {
+          "type": "card",
+          "settings": {
+            "heading": "Offices & Coworking",
+            "subtext": ""
+          }
+        },
+        "seg_3": {
+          "type": "card",
+          "settings": {
+            "heading": "Restaurants & Cafés",
+            "subtext": ""
+          }
+        },
+        "seg_4": {
+          "type": "card",
+          "settings": {
+            "heading": "Retail Fit-Out",
+            "subtext": ""
+          }
+        }
       },
-      "block_order": ["seg_1", "seg_2", "seg_3", "seg_4"],
+      "block_order": [
+        "seg_1",
+        "seg_2",
+        "seg_3",
+        "seg_4"
+      ],
       "settings": {
         "show_section": true,
         "heading": "",
@@ -50,14 +62,63 @@
     "benefits": {
       "type": "showcase-why",
       "blocks": {
-        "ben_1": { "type": "feature", "settings": { "icon": "store", "title": "", "description": "" } },
-        "ben_2": { "type": "feature", "settings": { "icon": "card", "title": "", "description": "" } },
-        "ben_3": { "type": "feature", "settings": { "icon": "truck", "title": "", "description": "" } },
-        "ben_4": { "type": "feature", "settings": { "icon": "shield", "title": "", "description": "" } },
-        "ben_5": { "type": "feature", "settings": { "icon": "chat", "title": "", "description": "" } },
-        "ben_6": { "type": "feature", "settings": { "icon": "star", "title": "", "description": "" } }
+        "ben_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "store",
+            "title": "",
+            "description": ""
+          }
+        },
+        "ben_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "card",
+            "title": "",
+            "description": ""
+          }
+        },
+        "ben_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "",
+            "description": ""
+          }
+        },
+        "ben_4": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "",
+            "description": ""
+          }
+        },
+        "ben_5": {
+          "type": "feature",
+          "settings": {
+            "icon": "chat",
+            "title": "",
+            "description": ""
+          }
+        },
+        "ben_6": {
+          "type": "feature",
+          "settings": {
+            "icon": "star",
+            "title": "",
+            "description": ""
+          }
+        }
       },
-      "block_order": ["ben_1", "ben_2", "ben_3", "ben_4", "ben_5", "ben_6"],
+      "block_order": [
+        "ben_1",
+        "ben_2",
+        "ben_3",
+        "ben_4",
+        "ben_5",
+        "ben_6"
+      ],
       "settings": {
         "heading": "",
         "columns": 6,
@@ -131,11 +192,33 @@
     "projects": {
       "type": "showcase-info-cards",
       "blocks": {
-        "proj_1": { "type": "card", "settings": { "heading": "", "subtext": "" } },
-        "proj_2": { "type": "card", "settings": { "heading": "", "subtext": "" } },
-        "proj_3": { "type": "card", "settings": { "heading": "", "subtext": "" } }
+        "proj_1": {
+          "type": "card",
+          "settings": {
+            "heading": "",
+            "subtext": ""
+          }
+        },
+        "proj_2": {
+          "type": "card",
+          "settings": {
+            "heading": "",
+            "subtext": ""
+          }
+        },
+        "proj_3": {
+          "type": "card",
+          "settings": {
+            "heading": "",
+            "subtext": ""
+          }
+        }
       },
-      "block_order": ["proj_1", "proj_2", "proj_3"],
+      "block_order": [
+        "proj_1",
+        "proj_2",
+        "proj_3"
+      ],
       "settings": {
         "show_section": false,
         "heading": "",
@@ -148,14 +231,57 @@
     "process": {
       "type": "showcase-why",
       "blocks": {
-        "step_1": { "type": "feature", "settings": { "title": "", "description": "" } },
-        "step_2": { "type": "feature", "settings": { "title": "", "description": "" } },
-        "step_3": { "type": "feature", "settings": { "title": "", "description": "" } },
-        "step_4": { "type": "feature", "settings": { "title": "", "description": "" } },
-        "step_5": { "type": "feature", "settings": { "title": "", "description": "" } },
-        "step_6": { "type": "feature", "settings": { "title": "", "description": "" } }
+        "step_1": {
+          "type": "feature",
+          "settings": {
+            "title": "",
+            "description": ""
+          }
+        },
+        "step_2": {
+          "type": "feature",
+          "settings": {
+            "title": "",
+            "description": ""
+          }
+        },
+        "step_3": {
+          "type": "feature",
+          "settings": {
+            "title": "",
+            "description": ""
+          }
+        },
+        "step_4": {
+          "type": "feature",
+          "settings": {
+            "title": "",
+            "description": ""
+          }
+        },
+        "step_5": {
+          "type": "feature",
+          "settings": {
+            "title": "",
+            "description": ""
+          }
+        },
+        "step_6": {
+          "type": "feature",
+          "settings": {
+            "title": "",
+            "description": ""
+          }
+        }
       },
-      "block_order": ["step_1", "step_2", "step_3", "step_4", "step_5", "step_6"],
+      "block_order": [
+        "step_1",
+        "step_2",
+        "step_3",
+        "step_4",
+        "step_5",
+        "step_6"
+      ],
       "settings": {
         "heading": "",
         "columns": 6,
@@ -170,14 +296,57 @@
     "directions": {
       "type": "showcase-category-row",
       "blocks": {
-        "dir_1": { "type": "category", "settings": { "label": "", "link": "" } },
-        "dir_2": { "type": "category", "settings": { "label": "", "link": "" } },
-        "dir_3": { "type": "category", "settings": { "label": "", "link": "" } },
-        "dir_4": { "type": "category", "settings": { "label": "", "link": "" } },
-        "dir_5": { "type": "category", "settings": { "label": "", "link": "" } },
-        "dir_6": { "type": "category", "settings": { "label": "", "link": "" } }
+        "dir_1": {
+          "type": "category",
+          "settings": {
+            "label": "",
+            "link": ""
+          }
+        },
+        "dir_2": {
+          "type": "category",
+          "settings": {
+            "label": "",
+            "link": ""
+          }
+        },
+        "dir_3": {
+          "type": "category",
+          "settings": {
+            "label": "",
+            "link": ""
+          }
+        },
+        "dir_4": {
+          "type": "category",
+          "settings": {
+            "label": "",
+            "link": ""
+          }
+        },
+        "dir_5": {
+          "type": "category",
+          "settings": {
+            "label": "",
+            "link": ""
+          }
+        },
+        "dir_6": {
+          "type": "category",
+          "settings": {
+            "label": "",
+            "link": ""
+          }
+        }
       },
-      "block_order": ["dir_1", "dir_2", "dir_3", "dir_4", "dir_5", "dir_6"],
+      "block_order": [
+        "dir_1",
+        "dir_2",
+        "dir_3",
+        "dir_4",
+        "dir_5",
+        "dir_6"
+      ],
       "settings": {
         "heading": "",
         "columns": 6,
@@ -193,14 +362,63 @@
     "stats": {
       "type": "showcase-stat-row",
       "blocks": {
-        "stat_1": { "type": "stat", "settings": { "value": "", "suffix": "", "label": "" } },
-        "stat_2": { "type": "stat", "settings": { "value": "", "suffix": "", "label": "" } },
-        "stat_3": { "type": "stat", "settings": { "value": "", "suffix": "", "label": "" } },
-        "stat_4": { "type": "stat", "settings": { "value": "", "suffix": "", "label": "" } },
-        "stat_5": { "type": "stat", "settings": { "value": "", "suffix": "", "label": "" } },
-        "stat_6": { "type": "stat", "settings": { "value": "", "suffix": "", "label": "" } }
+        "stat_1": {
+          "type": "stat",
+          "settings": {
+            "value": "",
+            "suffix": "",
+            "label": ""
+          }
+        },
+        "stat_2": {
+          "type": "stat",
+          "settings": {
+            "value": "",
+            "suffix": "",
+            "label": ""
+          }
+        },
+        "stat_3": {
+          "type": "stat",
+          "settings": {
+            "value": "",
+            "suffix": "",
+            "label": ""
+          }
+        },
+        "stat_4": {
+          "type": "stat",
+          "settings": {
+            "value": "",
+            "suffix": "",
+            "label": ""
+          }
+        },
+        "stat_5": {
+          "type": "stat",
+          "settings": {
+            "value": "",
+            "suffix": "",
+            "label": ""
+          }
+        },
+        "stat_6": {
+          "type": "stat",
+          "settings": {
+            "value": "",
+            "suffix": "",
+            "label": ""
+          }
+        }
       },
-      "block_order": ["stat_1", "stat_2", "stat_3", "stat_4", "stat_5", "stat_6"],
+      "block_order": [
+        "stat_1",
+        "stat_2",
+        "stat_3",
+        "stat_4",
+        "stat_5",
+        "stat_6"
+      ],
       "settings": {
         "heading": "",
         "columns": 6,
