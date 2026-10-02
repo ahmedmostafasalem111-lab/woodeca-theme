@@ -13,50 +13,77 @@
       }
     },
     "segments": {
-      "type": "showcase-info-cards",
+      "type": "b2b-media-cards",
       "blocks": {
-        "seg_1": {
+        "card_1": {
           "type": "card",
           "settings": {
-            "heading": "Hotels & Hospitality",
-            "subtext": ""
+            "image": "shopify://shop_images/13_07e4852e-2a92-4001-8eb3-3a160d1d4146.jpg",
+            "title": "Hotels & Hospitality",
+            "subtitle": "",
+            "collection": "",
+            "link": "#enquiry",
+            "request_type": ""
           }
         },
-        "seg_2": {
+        "card_2": {
           "type": "card",
           "settings": {
-            "heading": "Offices & Coworking",
-            "subtext": ""
+            "image": "shopify://shop_images/12_54aa6207-2686-44fd-b541-11d78b2ffaa2.jpg",
+            "title": "Offices & Coworking",
+            "subtitle": "",
+            "collection": "",
+            "link": "#enquiry",
+            "request_type": ""
           }
         },
-        "seg_3": {
+        "card_3": {
           "type": "card",
           "settings": {
-            "heading": "Restaurants & Cafés",
-            "subtext": ""
+            "image": "shopify://shop_images/Dining_Banner.jpg",
+            "title": "Restaurants & Cafés",
+            "subtitle": "",
+            "collection": "",
+            "link": "#enquiry",
+            "request_type": ""
           }
         },
-        "seg_4": {
+        "card_4": {
           "type": "card",
           "settings": {
-            "heading": "Retail Fit-Out",
-            "subtext": ""
+            "image": "shopify://shop_images/TaliaT.vUnit200cmLightoak4.webp",
+            "title": "Residential & Compounds",
+            "subtitle": "",
+            "collection": "",
+            "link": "#enquiry",
+            "request_type": ""
           }
         }
       },
       "block_order": [
-        "seg_1",
-        "seg_2",
-        "seg_3",
-        "seg_4"
+        "card_1",
+        "card_2",
+        "card_3",
+        "card_4"
       ],
       "settings": {
-        "show_section": true,
-        "heading": "",
-        "columns": 4,
-        "section_width": "page-width",
-        "padding-block-start": 48,
-        "padding-block-end": 32
+        "heading": "For businesses of every size",
+        "heading_size": "lg",
+        "text": "From one piece to a complete project. We handle production, delivery and installation.",
+        "body": "",
+        "tags": "",
+        "layout": "row",
+        "columns": "4",
+        "ratio": "2 / 3",
+        "card_style": "label",
+        "image_sizes": "(min-width: 990px) 25vw, 300px",
+        "band": false,
+        "button_label": "",
+        "button_link": "",
+        "file_label": "Download our presentation",
+        "file_url": "",
+        "prev_label": "Previous",
+        "next_label": "Next"
       }
     },
     "benefits": {

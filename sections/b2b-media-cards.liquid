@@ -1,0 +1,430 @@
+{% comment %}
+  Image cards for the For Business / For Designers pages (divan.ru/b2b):
+  - layout "row": a grid on desktop, a swipe row on phones (segments, tiles, image strips);
+  - layout "carousel": one row with prev/next arrows on desktop, swipe on phones (projects);
+  - layout "masonry": two columns of cards at their own heights (partner projects);
+  - card style "label": a frosted pill with the title at the bottom of the image;
+  - card style "overlay": title and one-line subtitle over a dark gradient.
+  Cards are blocks (image, title, subtitle, link; a collection fills in its own
+  link). Cards without an image aren't shown, and the whole section renders
+  nothing on the storefront until at least one card has an image — in the theme
+  editor empty cards show a placeholder instead.
+{% endcomment %}
+{%- render 'b2b-styles' -%}
+{%- liquid
+  assign cards = section.blocks | where: 'type', 'card'
+  assign shown = 0
+  for block in cards
+    if block.settings.image != blank
+      assign shown = shown | plus: 1
+    endif
+  endfor
+  assign show_section = false
+  if shown > 0 or request.design_mode
+    assign show_section = true
+  endif
+  assign tags = section.settings.tags | split: ','
+-%}
+{% if show_section %}
+  <div class="section section--page-width b2b-section{% if section.settings.band %} b2b-section--band{% endif %}">
+    <div class="b2b-media b2b-media--{{ section.settings.layout }} b2b-media--{{ section.settings.card_style }}{% if section.settings.ratio == '382 / 348' %} b2b-media--tiles{% endif %}" style="--b2b-media-columns: {{ section.settings.columns }}; --b2b-media-ratio: {{ section.settings.ratio }};">
+      {% if section.settings.heading != blank or section.settings.text != blank or section.settings.body != blank %}
+        <div class="b2b-head{% if section.settings.layout == 'carousel' %} b2b-head--with-arrows{% endif %}">
+          {% if section.settings.heading != blank %}
+            <h2 class="b2b-head__title{% if section.settings.heading_size == 'md' %} b2b-head__title--md{% endif %}">{{ section.settings.heading }}</h2>
+          {% endif %}
+          {% if section.settings.text != blank %}
+            <p class="b2b-head__text">{{ section.settings.text }}</p>
+          {% endif %}
+          {% if section.settings.body != blank %}
+            <div class="b2b-head__text b2b-media__body">{{ section.settings.body }}</div>
+          {% endif %}
+          {% if section.settings.tags != blank %}
+            <ul class="b2b-media__tags" role="list">
+              {%- for tag in tags -%}
+                {%- assign tag_text = tag | strip -%}
+                {%- if tag_text != blank -%}<li class="b2b-media__tag">{{ tag_text }}</li>{%- endif -%}
+              {%- endfor -%}
+            </ul>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if shown > 0 or request.design_mode %}
+        <b2b-carousel class="b2b-media__viewport"{% if section.settings.layout != 'carousel' %} data-static{% endif %}>
+          <ul class="b2b-media__track{% if section.settings.layout != 'masonry' %} b2b-swipe{% endif %}" role="list" data-track>
+            {%- for block in cards -%}
+              {%- liquid
+                assign image = block.settings.image
+                if image == blank and request.design_mode == false
+                  continue
+                endif
+                assign title = block.settings.title
+                assign link = block.settings.link
+                if block.settings.collection != blank
+                  if title == blank
+                    assign title = block.settings.collection.title
+                  endif
+                  if link == blank
+                    assign link = block.settings.collection.url
+                  endif
+                endif
+                assign tag = 'div'
+                if link != blank
+                  assign tag = 'a'
+                endif
+              -%}
+              <li class="b2b-media__item" {{ block.shopify_attributes }}>
+                <{{ tag }} class="b2b-media__card"{% if tag == 'a' %} href="{{ link }}"{% if block.settings.request_type != blank %} data-enquiry-request="{{ block.settings.request_type | escape }}"{% endif %}{% endif %}>
+                  {%- if image != blank -%}
+                    {{
+                      image
+                      | image_url: width: 1200
+                      | image_tag:
+                        class: 'b2b-media__image',
+                        loading: 'lazy',
+                        widths: '300, 400, 500, 600, 800, 1000, 1200',
+                        sizes: section.settings.image_sizes,
+                        alt: image.alt | default: title
+                    }}
+                  {%- else -%}
+                    {{ 'lifestyle-1' | placeholder_svg_tag: 'b2b-media__image b2b-media__placeholder' }}
+                  {%- endif -%}
+                  {%- if title != blank or block.settings.subtitle != blank -%}
+                    <span class="b2b-media__caption">
+                      {%- if title != blank -%}<span class="b2b-media__title">{{ title }}</span>{%- endif -%}
+                      {%- if block.settings.subtitle != blank and section.settings.card_style == 'overlay' -%}
+                        <span class="b2b-media__subtitle">{{ block.settings.subtitle }}</span>
+                      {%- endif -%}
+                    </span>
+                  {%- endif -%}
+                </{{ tag }}>
+              </li>
+            {%- endfor -%}
+          </ul>
+          {% if section.settings.layout == 'carousel' %}
+            <button type="button" class="b2b-arrow b2b-arrow--prev" data-prev aria-label="{{ section.settings.prev_label | default: 'Previous' | escape }}">
+              <span class="svg-wrapper" aria-hidden="true">{{- 'icon-chevron-left.svg' | inline_asset_content -}}</span>
+            </button>
+            <button type="button" class="b2b-arrow b2b-arrow--next" data-next aria-label="{{ section.settings.next_label | default: 'Next' | escape }}">
+              <span class="svg-wrapper" aria-hidden="true">{{- 'icon-chevron-right.svg' | inline_asset_content -}}</span>
+            </button>
+          {% endif %}
+        </b2b-carousel>
+      {% endif %}
+
+      {% if section.settings.button_label != blank and section.settings.button_link != blank %}
+        <div class="b2b-actions">
+          <a class="b2b-button" href="{{ section.settings.button_link }}">{{ section.settings.button_label }}</a>
+        </div>
+      {% endif %}
+      {% if section.settings.file_label != blank and section.settings.file_url != blank %}
+        <div class="b2b-actions">
+          <a class="b2b-button" href="{{ section.settings.file_url }}" target="_blank" rel="noopener">{{ section.settings.file_label }}</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  <script src="{{ 'b2b.js' | asset_url }}" type="module" fetchpriority="low"></script>
+{% endif %}
+
+{% stylesheet %}
+  .b2b-media__viewport {
+    position: relative;
+    display: block;
+  }
+
+  .b2b-media__track {
+    margin-block: 0;
+    list-style: none;
+  }
+
+  .b2b-media--row .b2b-media__item,
+  .b2b-media--carousel .b2b-media__item {
+    width: 300px;
+  }
+
+  .b2b-media__card {
+    position: relative;
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+    background-color: #f2f2f0;
+    color: #ffffff;
+    text-decoration: none;
+  }
+
+  .b2b-media__image {
+    display: block;
+    width: 100%;
+    aspect-ratio: var(--b2b-media-ratio, 2 / 3);
+    height: auto;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  a.b2b-media__card:hover .b2b-media__image {
+    transform: scale(1.03);
+  }
+
+  .b2b-media__caption {
+    position: absolute;
+    inset-inline: 10px;
+    inset-block-end: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* "label": frosted pill at the bottom. */
+  .b2b-media--label .b2b-media__caption {
+    align-items: flex-start;
+  }
+
+  .b2b-media--label .b2b-media__title {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background-color: rgb(255 255 255 / 0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  /* "overlay": title and subtitle over a dark gradient. */
+  .b2b-media--overlay .b2b-media__card::after {
+    position: absolute;
+    inset: 45% 0 0;
+    background: linear-gradient(to bottom, rgb(0 0 0 / 0), rgb(0 0 0 / 0.65));
+    content: '';
+    pointer-events: none;
+  }
+
+  .b2b-media--overlay .b2b-media__caption {
+    z-index: 1;
+    inset-inline: 16px;
+    inset-block-end: 16px;
+  }
+
+  .b2b-media__title {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .b2b-media__subtitle {
+    display: -webkit-box;
+    overflow: hidden;
+    color: rgb(255 255 255 / 0.85);
+    font-size: 13px;
+    line-height: 1.4;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .b2b-media__tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .b2b-media__tag {
+    padding: 8px 16px;
+    border-radius: 999px;
+    background-color: #f2f2f0;
+    font-size: 14px;
+  }
+
+  .b2b-section--band .b2b-media__tag {
+    background-color: #ffffff;
+  }
+
+  /* Masonry: two columns, cards at their own heights. */
+  .b2b-media--masonry .b2b-media__track {
+    columns: 1;
+    column-gap: 20px;
+    padding: 0;
+  }
+
+  .b2b-media--masonry .b2b-media__item {
+    break-inside: avoid;
+    margin-block-end: 15px;
+  }
+
+  .b2b-media--masonry .b2b-media__image {
+    aspect-ratio: auto;
+  }
+
+  .b2b-media--masonry .b2b-media__card {
+    border-radius: 20px;
+  }
+
+  /* Category tiles: a 2-column grid on phones instead of a swipe row. */
+  @media screen and (max-width: 989px) {
+    .b2b-media--tiles .b2b-media__track {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-inline: 0;
+      padding-inline: 0;
+      overflow: visible;
+    }
+
+    .b2b-media--tiles .b2b-media__item {
+      width: auto;
+    }
+
+    .b2b-media--tiles .b2b-media__title {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+  }
+
+  @media screen and (min-width: 990px) {
+    .b2b-media--row .b2b-media__track {
+      grid-template-columns: repeat(var(--b2b-media-columns, 4), minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .b2b-media--row .b2b-media__item {
+      width: auto;
+    }
+
+    .b2b-media--carousel .b2b-media__track {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .b2b-media--carousel .b2b-media__item {
+      width: calc((100% - 60px) / 4);
+    }
+
+    .b2b-media--masonry .b2b-media__track {
+      columns: 2;
+      width: 100%;
+      max-width: 1130px;
+      margin-inline: auto;
+    }
+
+    /* Category tiles: divan's narrower 1200px grid (3 × ~387px). */
+    .b2b-media--tiles .b2b-media__track {
+      width: 100%;
+      max-width: 1201px;
+      margin-inline: auto;
+    }
+
+    .b2b-media--masonry .b2b-media__item {
+      margin-block-end: 20px;
+    }
+
+    .b2b-media--label .b2b-media__caption {
+      inset-inline: 15px;
+      inset-block-end: 15px;
+    }
+
+    .b2b-media__title {
+      font-size: 18px;
+    }
+
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "B2B image cards",
+  "tag": "section",
+  "class": "section-b2b-media",
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Cards without an image aren't shown." },
+        { "type": "text", "id": "title", "label": "Title", "info": "Defaults to the collection's title." },
+        { "type": "text", "id": "subtitle", "label": "Subtitle", "info": "Shown on overlay cards (e.g. projects)." },
+        { "type": "collection", "id": "collection", "label": "Collection", "info": "Optional: links the card to this collection." },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "text", "id": "request_type", "label": "Pre-select in the form", "info": "Optional, for links to #enquiry." }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading" },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        { "value": "lg", "label": "Large (44px)" },
+        { "value": "md", "label": "Medium (30px)" }
+      ],
+      "default": "lg"
+    },
+    { "type": "textarea", "id": "text", "label": "Subtitle" },
+    { "type": "richtext", "id": "body", "label": "Text" },
+    { "type": "text", "id": "tags", "label": "Tags", "info": "Comma-separated, shown as pills under the text." },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "row", "label": "Grid (swipe on phones)" },
+        { "value": "carousel", "label": "Carousel with arrows" },
+        { "value": "masonry", "label": "Two-column masonry" }
+      ],
+      "default": "row"
+    },
+    {
+      "type": "select",
+      "id": "columns",
+      "label": "Columns (desktop grid)",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "select",
+      "id": "ratio",
+      "label": "Image shape",
+      "options": [
+        { "value": "2 / 3", "label": "Portrait (321×482)" },
+        { "value": "382 / 348", "label": "Tile (382×348)" },
+        { "value": "4 / 3", "label": "Landscape 4:3" }
+      ],
+      "default": "2 / 3"
+    },
+    {
+      "type": "select",
+      "id": "card_style",
+      "label": "Card text",
+      "options": [
+        { "value": "label", "label": "Label pill" },
+        { "value": "overlay", "label": "Title and subtitle over a gradient" }
+      ],
+      "default": "label"
+    },
+    { "type": "text", "id": "image_sizes", "label": "Image sizes attribute", "default": "(min-width: 990px) 25vw, 300px", "info": "Advanced: how wide each image is shown." },
+    { "type": "checkbox", "id": "band", "label": "Grey band background", "default": false },
+    { "type": "text", "id": "button_label", "label": "Button label" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "text", "id": "file_label", "label": "Download button label", "info": "e.g. Download our presentation. Hidden until a file link is set." },
+    { "type": "url", "id": "file_url", "label": "Download file link", "info": "Upload the PDF in Content → Files and paste its link." },
+    { "type": "text", "id": "prev_label", "label": "Previous button label", "default": "Previous" },
+    { "type": "text", "id": "next_label", "label": "Next button label", "default": "Next" }
+  ],
+  "presets": [{ "name": "B2B image cards" }]
+}
+{% endschema %}
