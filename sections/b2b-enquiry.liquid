@@ -1,0 +1,317 @@
+{% comment %}
+  Enquiry form for the For Business / For Designers pages (divan.ru "Оставьте
+  заявку"): centred heading and subtitle, then a white card with the fields on
+  the left and a dashed "send us your drawings" box on the right (Shopify
+  contact forms can't take uploads). One column on phones.
+
+  Shopify's own contact form: submissions arrive by email. A hidden
+  contact[Source] says which page it came from. Fields are blocks; the keys
+  name / email / phone / body map to Shopify's standard contact fields, any
+  other key arrives as its own labelled line. A select whose key is the
+  section's "request type key" can be pre-selected by a button elsewhere on the
+  page (data-enquiry-request). After sending, Shopify's success message
+  replaces the form; errors are listed above the fields. hCaptcha is Shopify's.
+{% endcomment %}
+{%- render 'b2b-styles' -%}
+{%- liquid
+  assign anchor = section.settings.anchor_id | default: 'enquiry'
+  assign form_id = 'B2BEnquiry-' | append: section.id
+  assign fields = section.blocks | where: 'type', 'field'
+-%}
+<div class="section section--page-width b2b-section b2b-enquiry" id="{{ anchor | escape }}">
+  <div class="b2b-head">
+    {% if section.settings.heading != blank %}
+      <h2 class="b2b-head__title">{{ section.settings.heading }}</h2>
+    {% endif %}
+    {% if section.settings.text != blank %}
+      <p class="b2b-head__text">{{ section.settings.text }}</p>
+    {% endif %}
+  </div>
+
+  <div class="b2b-enquiry__card">
+    {% form 'contact', id: form_id, class: 'b2b-enquiry__form', data-b2b-form: '', data-required-message: section.settings.required_message, data-email-message: section.settings.email_message %}
+      {% if form.posted_successfully? %}
+        <p class="b2b-enquiry__success" role="status">
+          {{ section.settings.success_text | default: 'Thank you! Our team will contact you within 1 working day.' }}
+        </p>
+      {% else %}
+        {% if form.errors %}
+          <div class="b2b-enquiry__errors" role="alert">{{ form.errors | default_errors }}</div>
+        {% endif %}
+
+        {% if section.settings.source != blank %}
+          <input type="hidden" name="contact[Source]" value="{{ section.settings.source | escape }}">
+        {% endif %}
+
+        <div class="b2b-enquiry__columns">
+          <div class="b2b-enquiry__fields">
+            {%- for block in fields -%}
+              {%- liquid
+                assign key = block.settings.key | strip
+                case key
+                  when 'name', 'email', 'phone', 'body'
+                    assign field_name = 'contact[' | append: key | append: ']'
+                  else
+                    assign field_name = 'contact[' | append: block.settings.label | append: ']'
+                endcase
+                assign field_id = form_id | append: '-' | append: block.id
+                assign kind = block.settings.kind
+                assign is_request = false
+                if key == section.settings.request_key and kind == 'select'
+                  assign is_request = true
+                endif
+              -%}
+              <div class="b2b-enquiry__field{% if kind == 'textarea' %} b2b-enquiry__field--wide{% endif %}" {{ block.shopify_attributes }}>
+                <label class="b2b-enquiry__label" for="{{ field_id }}">
+                  {{- block.settings.label -}}{%- if block.settings.required -%}<span aria-hidden="true">*</span>{%- endif -%}
+                </label>
+                {%- case kind -%}
+                  {%- when 'textarea' -%}
+                    <textarea id="{{ field_id }}" name="{{ field_name | escape }}" class="b2b-enquiry__input b2b-enquiry__input--area" rows="4" {% if block.settings.required %}required{% endif %}>{{ form[key] }}</textarea>
+                  {%- when 'select' -%}
+                    {%- assign options = block.settings.options | split: ',' -%}
+                    <select id="{{ field_id }}" name="{{ field_name | escape }}" class="b2b-enquiry__input b2b-enquiry__select" {% if block.settings.required %}required{% endif %}{% if is_request %} data-request-select{% endif %}>
+                      <option value="">{{ block.settings.placeholder | default: 'Choose…' }}</option>
+                      {%- for option in options -%}
+                        {%- assign option_text = option | strip -%}
+                        <option value="{{ option_text | escape }}">{{ option_text }}</option>
+                      {%- endfor -%}
+                    </select>
+                  {%- else -%}
+                    {%- liquid
+                      case kind
+                        when 'email'
+                          assign input_type = 'email'
+                          assign autocomplete = 'email'
+                        when 'tel'
+                          assign input_type = 'tel'
+                          assign autocomplete = 'tel'
+                        when 'url'
+                          assign input_type = 'text'
+                          assign autocomplete = 'url'
+                        else
+                          assign input_type = 'text'
+                          assign autocomplete = 'off'
+                          if key == 'name'
+                            assign autocomplete = 'name'
+                          endif
+                          if key == 'Company'
+                            assign autocomplete = 'organization'
+                          endif
+                      endcase
+                    -%}
+                    <input type="{{ input_type }}" id="{{ field_id }}" name="{{ field_name | escape }}" class="b2b-enquiry__input" autocomplete="{{ autocomplete }}" {% if block.settings.placeholder != blank %}placeholder="{{ block.settings.placeholder | escape }}"{% endif %} {% if block.settings.required %}required{% endif %} value="{% if key == 'email' %}{{ form.email }}{% elsif key == 'name' %}{{ form.name }}{% endif %}">
+                {%- endcase -%}
+                <p class="b2b-enquiry__field-error" hidden></p>
+              </div>
+            {%- endfor -%}
+          </div>
+
+          {% if section.settings.files_text != blank %}
+            <div class="b2b-enquiry__files">
+              <span class="b2b-enquiry__files-icon" aria-hidden="true">{{- 'icon-file.svg' | inline_asset_content -}}</span>
+              <div class="b2b-enquiry__files-text">{{ section.settings.files_text }}</div>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="b2b-enquiry__submit">
+          <button type="submit" class="b2b-button">{{ section.settings.submit_label | default: 'Send' }}</button>
+          {% if section.settings.legal_text != blank %}
+            <div class="b2b-enquiry__legal">{{ section.settings.legal_text }}</div>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endform %}
+  </div>
+</div>
+<script src="{{ 'b2b.js' | asset_url }}" type="module" fetchpriority="low"></script>
+
+{% stylesheet %}
+  .b2b-enquiry__card {
+    width: 100%;
+    max-width: 1000px;
+    margin-inline: auto;
+    padding: 24px 16px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 1px rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .b2b-enquiry__columns {
+    display: grid;
+    gap: 24px;
+  }
+
+  .b2b-enquiry__fields {
+    display: grid;
+    gap: 16px;
+  }
+
+  .b2b-enquiry__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .b2b-enquiry__label {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .b2b-enquiry__input {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20, 0.2));
+    border-radius: 10px;
+    background-color: #ffffff;
+    color: var(--color-foreground);
+    font-family: inherit;
+    font-size: 16px;
+  }
+
+  .b2b-enquiry__input:focus-visible {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 1px;
+  }
+
+  .b2b-enquiry__input--area {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .b2b-enquiry__input[aria-invalid='true'] {
+    border-color: #e8342a;
+  }
+
+  .b2b-enquiry__field-error {
+    margin: 0;
+    color: #e8342a;
+    font-size: 13px;
+  }
+
+  .b2b-enquiry__files {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px;
+    border: 1.5px dashed rgb(var(--color-foreground-rgb) / var(--opacity-30, 0.3));
+    border-radius: 10px;
+    text-align: center;
+  }
+
+  .b2b-enquiry__files-icon,
+  .b2b-enquiry__files-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .b2b-enquiry__files-text {
+    max-width: 320px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .b2b-enquiry__files-text > * {
+    margin: 0;
+  }
+
+  .b2b-enquiry__submit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-block-start: 24px;
+  }
+
+  .b2b-enquiry__legal {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-muted-text, 0.6));
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .b2b-enquiry__legal > * {
+    margin: 0;
+  }
+
+  .b2b-enquiry__legal a {
+    color: inherit;
+  }
+
+  .b2b-enquiry__success {
+    margin: 0;
+    padding: 32px 16px;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .b2b-enquiry__errors {
+    margin-block-end: 16px;
+    color: #e8342a;
+    font-size: 14px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .b2b-enquiry__card {
+      padding: 40px;
+    }
+
+    .b2b-enquiry__columns {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 40px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "B2B enquiry form",
+  "tag": "section",
+  "class": "section-b2b-enquiry",
+  "blocks": [
+    {
+      "type": "field",
+      "name": "Field",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label" },
+        { "type": "text", "id": "key", "label": "Field key", "info": "name, email, phone or body map to Shopify's contact fields; anything else (e.g. Company) arrives as its own line in the email." },
+        {
+          "type": "select",
+          "id": "kind",
+          "label": "Type",
+          "options": [
+            { "value": "text", "label": "Text" },
+            { "value": "email", "label": "Email" },
+            { "value": "tel", "label": "Phone" },
+            { "value": "url", "label": "Link" },
+            { "value": "select", "label": "Dropdown" },
+            { "value": "textarea", "label": "Long text" }
+          ],
+          "default": "text"
+        },
+        { "type": "checkbox", "id": "required", "label": "Required", "default": false },
+        { "type": "text", "id": "options", "label": "Dropdown options", "info": "Comma-separated." },
+        { "type": "text", "id": "placeholder", "label": "Placeholder / first dropdown entry" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "text", "id": "anchor_id", "label": "Anchor id", "default": "enquiry", "info": "Buttons link here with #enquiry." },
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "textarea", "id": "text", "label": "Subtitle" },
+    { "type": "text", "id": "source", "label": "Source", "info": "Sent with every enquiry, e.g. Business page." },
+    { "type": "text", "id": "request_key", "label": "Request type key", "default": "Request type", "info": "The dropdown that buttons on the page can pre-select." },
+    { "type": "richtext", "id": "files_text", "label": "Drawings box text" },
+    { "type": "text", "id": "submit_label", "label": "Button label", "default": "Send" },
+    { "type": "richtext", "id": "legal_text", "label": "Text under the button" },
+    { "type": "text", "id": "success_text", "label": "Success message", "default": "Thank you! Our team will contact you within 1 working day." },
+    { "type": "text", "id": "required_message", "label": "Required field message", "default": "Please fill in this field." },
+    { "type": "text", "id": "email_message", "label": "Invalid email message", "default": "Please enter a valid email address." }
+  ],
+  "presets": [{ "name": "B2B enquiry form" }]
+}
+{% endschema %}

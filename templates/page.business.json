@@ -522,25 +522,95 @@
       }
     },
     "enquiry": {
-      "type": "showcase-enquiry-form",
+      "type": "b2b-enquiry",
+      "blocks": {
+        "field_1": {
+          "type": "field",
+          "settings": {
+            "label": "Name",
+            "key": "name",
+            "kind": "text",
+            "required": true,
+            "options": "",
+            "placeholder": ""
+          }
+        },
+        "field_2": {
+          "type": "field",
+          "settings": {
+            "label": "Company",
+            "key": "Company",
+            "kind": "text",
+            "required": true,
+            "options": "",
+            "placeholder": ""
+          }
+        },
+        "field_3": {
+          "type": "field",
+          "settings": {
+            "label": "Phone",
+            "key": "phone",
+            "kind": "tel",
+            "required": true,
+            "options": "",
+            "placeholder": ""
+          }
+        },
+        "field_4": {
+          "type": "field",
+          "settings": {
+            "label": "Email",
+            "key": "email",
+            "kind": "email",
+            "required": true,
+            "options": "",
+            "placeholder": ""
+          }
+        },
+        "field_5": {
+          "type": "field",
+          "settings": {
+            "label": "Business type",
+            "key": "Business type",
+            "kind": "select",
+            "required": false,
+            "options": "Hotel, Office, Restaurant or café, Residential project, Retail, Other",
+            "placeholder": "Choose…"
+          }
+        },
+        "field_6": {
+          "type": "field",
+          "settings": {
+            "label": "Project details",
+            "key": "body",
+            "kind": "textarea",
+            "required": false,
+            "options": "",
+            "placeholder": ""
+          }
+        }
+      },
+      "block_order": [
+        "field_1",
+        "field_2",
+        "field_3",
+        "field_4",
+        "field_5",
+        "field_6"
+      ],
       "settings": {
-        "anchor_id": "b2b-enquiry",
-        "heading": "",
-        "body": "",
-        "subject": "B2B enquiry — Woodeca",
-        "name_label": "Name",
-        "phone_label": "Phone",
-        "email_label": "Email",
-        "message_label": "Message",
+        "anchor_id": "enquiry",
+        "heading": "Tell us about your project",
+        "text": "Our team will contact you within 1 working day.",
+        "source": "Business page",
+        "request_key": "Business type",
+        "files_text": "<p>Have drawings, a BOQ or a mood board? Email them to <a href=\"mailto:Hello@Woodeca.com\" title=\"Email Woodeca\">Hello@Woodeca.com</a> with your name and we'll attach them to your enquiry.</p>",
         "submit_label": "Send enquiry",
-        "consent_text": "",
-        "success_text": "Thanks — we will be in touch shortly.",
-        "direct_label": "",
-        "phone_number": "",
-        "email_address": "",
-        "section_width": "page-width",
-        "padding-block-start": 56,
-        "padding-block-end": 72
+        "legal_text": "<p>By sending this form you agree to our <a href=\"/policies/privacy-policy\" title=\"Privacy Policy\">Privacy Policy</a></p>",
+        "success_text": "Thank you! Our team will contact you within 1 working day.",
+        "required_message": "Please fill in this field.",
+        "email_message": "Please enter a valid email address."
       }
     }
   },
