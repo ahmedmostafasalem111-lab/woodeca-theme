@@ -173,19 +173,14 @@
       }
     },
     "samples": {
-      "type": "showcase-media-promo",
+      "type": "b2b-banner",
       "settings": {
-        "show_section": false,
-        "media_position": "start",
-        "image_ratio": "3 / 2",
-        "eyebrow": "",
-        "heading": "",
-        "body": "",
-        "button_label": "",
-        "button_link": "#designer-enquiry",
-        "section_width": "page-width",
-        "padding-block-start": 32,
-        "padding-block-end": 32
+        "image": "shopify://shop_images/Niyra2DoorWardrobe-Black5.webp",
+        "heading": "Request material samples",
+        "text": "See our finishes and colours in person before you specify them.",
+        "button_label": "Request samples",
+        "button_link": "#enquiry",
+        "request_type": "Request samples"
       }
     },
     "projects": {

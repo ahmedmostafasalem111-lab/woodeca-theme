@@ -1,0 +1,130 @@
+{% comment %}
+  Full-width rounded image banner with text on the left (divan.ru "Заказать
+  образцы тканей"): ~1360×520 on desktop, the text over the image on phones.
+  The button can pre-select a request type in the page's enquiry form.
+  Nothing renders without an image (placeholder in the theme editor only).
+{% endcomment %}
+{%- render 'b2b-styles' -%}
+{% if section.settings.image != blank or request.design_mode %}
+  <div class="section section--page-width b2b-section">
+    <div class="b2b-banner">
+      {% if section.settings.image != blank %}
+        {{
+          section.settings.image
+          | image_url: width: 2000
+          | image_tag:
+            class: 'b2b-banner__image',
+            loading: 'lazy',
+            widths: '400, 600, 800, 1000, 1400, 2000',
+            sizes: '(min-width: 990px) calc(100vw - 80px), calc(100vw - 32px)',
+            alt: ''
+        }}
+      {% else %}
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'b2b-banner__image' }}
+      {% endif %}
+      <div class="b2b-banner__panel">
+        {% if section.settings.heading != blank %}
+          <h2 class="b2b-banner__heading">{{ section.settings.heading }}</h2>
+        {% endif %}
+        {% if section.settings.text != blank %}
+          <p class="b2b-banner__text">{{ section.settings.text }}</p>
+        {% endif %}
+        {% if section.settings.button_label != blank and section.settings.button_link != blank %}
+          <a class="b2b-button b2b-banner__button" href="{{ section.settings.button_link }}" {% if section.settings.request_type != blank %}data-enquiry-request="{{ section.settings.request_type | escape }}"{% endif %}>
+            {{- section.settings.button_label -}}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <script src="{{ 'b2b.js' | asset_url }}" type="module" fetchpriority="low"></script>
+{% endif %}
+
+{% stylesheet %}
+  .b2b-banner {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 436px;
+    overflow: hidden;
+    border-radius: 10px;
+    background-color: #f2f2f0;
+  }
+
+  .b2b-banner__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .b2b-banner__panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    margin: 15px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: rgb(255 255 255 / 0.92);
+  }
+
+  .b2b-banner__heading {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .b2b-banner__text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .b2b-banner__button {
+    margin-block-start: 8px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .b2b-banner {
+      align-items: center;
+      min-height: 520px;
+    }
+
+    .b2b-banner__panel {
+      width: auto;
+      max-width: 460px;
+      margin: 0 0 0 80px;
+      padding: 40px;
+    }
+
+    .b2b-banner__heading {
+      font-size: 30px;
+    }
+
+    .b2b-banner__text {
+      font-size: 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "B2B image banner",
+  "tag": "section",
+  "class": "section-b2b-banner",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "textarea", "id": "text", "label": "Text" },
+    { "type": "text", "id": "button_label", "label": "Button label" },
+    { "type": "url", "id": "button_link", "label": "Button link", "info": "#enquiry scrolls to the form." },
+    { "type": "text", "id": "request_type", "label": "Pre-select in the form", "info": "e.g. Request samples (must match an option in the form's select)." }
+  ],
+  "presets": [{ "name": "B2B image banner" }]
+}
+{% endschema %}
