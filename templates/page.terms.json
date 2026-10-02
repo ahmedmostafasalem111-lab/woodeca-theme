@@ -1,0 +1,218 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "legal-page",
+      "blocks": {
+        "section_about": {
+          "type": "legal_section",
+          "settings": {
+            "title": "About Woodeca",
+            "anchor_id": "about",
+            "body": "<p>woodeca.com is run by Woodeca LLC, an Egyptian furniture maker. We design and make our furniture in our own factory in Borg El Arab, Alexandria, and sell it directly to you. In these terms, \"we\", \"us\" and \"our\" mean Woodeca; \"you\" means anyone who visits our website or orders from us.</p>"
+          }
+        },
+        "section_using_our_website": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Using our website",
+            "anchor_id": "using-our-website",
+            "body": "<ul><li>You must be at least 18 years old to place an order, or have permission from a parent or guardian.</li><li>Please use our website lawfully. Don't try to break, overload or copy it, collect other visitors' information, or upload anything harmful such as viruses.</li><li>We may suspend access or cancel orders if these terms are misused.</li></ul>"
+          }
+        },
+        "section_your_account": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Your account",
+            "anchor_id": "your-account",
+            "body": "<p>If you create an account, please keep your details accurate and up to date, and keep your login private. You're responsible for orders placed through your account. If you think someone else has used it, contact us straight away.</p>"
+          }
+        },
+        "section_products": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Products, colours and measurements",
+            "anchor_id": "products",
+            "body": "<ul><li>We do our best to show every product accurately. Colours can look slightly different on different screens, and natural wood and finishes can vary a little from piece to piece.</li><li>Measurements are given in centimetres and may vary by up to ±1 cm.</li><li>Before you order, please measure your room and check that the item will fit through doors, stairways and lifts.</li></ul>"
+          }
+        },
+        "section_prices": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Prices and offers",
+            "anchor_id": "prices",
+            "body": "<ul><li>Prices are in Egyptian pounds (EGP) and include VAT.</li><li>Prices and offers can change at any time. The price you pay is the one shown when you place your order.</li><li>If we've made a clear pricing mistake, we'll contact you before dispatch, and you can choose to continue at the correct price or cancel for a full refund.</li><li>Promo codes and vouchers follow the conditions shown with them. They can't be exchanged for cash.</li></ul>"
+          }
+        },
+        "section_orders": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Placing your order",
+            "anchor_id": "orders",
+            "body": "<ul><li>After you place an order, we'll send a confirmation. We may also call or message you to confirm the details.</li><li>We may decline or cancel an order, for example if an item is out of stock, the delivery details can't be confirmed, or we suspect the order is fraudulent. If you've already paid, we'll refund you in full.</li></ul>"
+          }
+        },
+        "section_payment": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Payment",
+            "anchor_id": "payment",
+            "body": "<p>You can pay by:</p><ul><li><strong>Cash on delivery</strong>, after inspecting your order (see section 10).</li><li><strong>Debit or credit card.</strong> Card payments are processed securely by our payment provider, and we never see or store your full card details.</li><li><strong>Instalments</strong> through our instalment partners. Instalment plans are subject to the partner's approval and their own terms.</li></ul>"
+          }
+        },
+        "section_delivery": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Delivery",
+            "anchor_id": "delivery",
+            "body": "<ul><li>We deliver to the areas shown at checkout.</li><li>Estimated delivery times are shown on each product page, in working days. Friday isn't a working day.</li><li>Delivery dates are estimates. If anything delays your order, we'll let you know as soon as possible.</li><li>If your order is fully paid, you can postpone delivery by up to 30 days after purchase. Just contact us.</li><li>Please make sure someone is available to receive the order, and that there's clear access for our team.</li></ul>"
+          }
+        },
+        "section_assembly": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Assembly",
+            "anchor_id": "assembly",
+            "body": "<p>Assembly by our team is free on all products. Our team assembles your furniture when they deliver it.</p>"
+          }
+        },
+        "section_inspection": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Inspecting your order",
+            "anchor_id": "inspection",
+            "body": "<p>With cash on delivery, you can open and inspect your order at your door before paying. If you decide not to take it, you can refuse it at no cost.</p>"
+          }
+        },
+        "section_cancellation": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Cancelling an order",
+            "anchor_id": "cancellation",
+            "body": "<p>You can cancel your order free of charge at any time before it leaves our factory. Once it has been dispatched, our returns policy applies instead. If you've already paid, we'll refund you in full using the methods in our Returns &amp; Warranty policy.</p>"
+          }
+        },
+        "section_returns_and_warranty": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Returns, exchanges and warranty",
+            "anchor_id": "returns-and-warranty",
+            "body": "<ul><li>You can return or exchange most unused items within 14 days of delivery.</li><li>Damaged, faulty or wrong items must be reported within 24 hours of delivery.</li><li>Every piece has a 3-year warranty against manufacturing defects.</li></ul><p>Full details are in our <a href=\"/pages/returns\" title=\"Returns &amp; Warranty\">Returns &amp; Warranty</a> policy, which forms part of these terms.</p>"
+          }
+        },
+        "section_reviews": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Reviews and your content",
+            "anchor_id": "reviews",
+            "body": "<ul><li>When you post a review, photo or comment, you give us permission to show it on our website and social media.</li><li>Please keep it honest, respectful and about your own experience.</li><li>We may remove content that is offensive, misleading or unlawful, or that breaks someone else's rights.</li></ul>"
+          }
+        },
+        "section_our_content": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Our content and trademarks",
+            "anchor_id": "our-content",
+            "body": "<p>The Woodeca name and logo, our product designs, photos and website content belong to Woodeca. Please don't copy or use them without our written permission.</p>"
+          }
+        },
+        "section_third_party_services": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Third-party services",
+            "anchor_id": "third-party-services",
+            "body": "<p>Some services on our website are provided by trusted partners, such as payment, instalment, delivery and review providers. Their own terms apply to their services. We aren't responsible for third-party websites we link to.</p>"
+          }
+        },
+        "section_privacy": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Privacy",
+            "anchor_id": "privacy",
+            "body": "<p>We only use your personal information to process your orders, deliver them and support you, as explained in our <a href=\"/policies/privacy-policy\" title=\"Privacy Policy\">Privacy Policy</a>.</p>"
+          }
+        },
+        "section_liability": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Our responsibility to you",
+            "anchor_id": "liability",
+            "body": "<ul><li>We're responsible for providing the products and services you order as described in these terms.</li><li>We're not responsible for losses we couldn't reasonably foresee, damage caused by misuse, or delays caused by events outside our control.</li><li>Nothing in these terms limits your rights under Egyptian consumer protection law.</li></ul>"
+          }
+        },
+        "section_governing_law": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Governing law",
+            "anchor_id": "governing-law",
+            "body": "<p>These terms are governed by the laws of the Arab Republic of Egypt. If there's ever a disagreement, we'll always try to resolve it with you directly first.</p>"
+          }
+        },
+        "section_changes": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Changes to these terms",
+            "anchor_id": "changes",
+            "body": "<p>We may update these terms from time to time, and the latest version will always be on this page with its \"Last updated\" date. The terms that apply to an order are the ones in place when you placed it.</p>"
+          }
+        },
+        "section_contact": {
+          "type": "legal_section",
+          "settings": {
+            "title": "Contact us",
+            "anchor_id": "contact",
+            "body": "<p>Woodeca LLC<br>3rd Industrial Zone, Block 24, Borg El Arab, Alexandria, Egypt<br>Email: <a href=\"mailto:Hello@Woodeca.com\" title=\"Hello@Woodeca.com\">Hello@Woodeca.com</a><br>Phone: <a href=\"tel:01019531467\" title=\"01019531467\">01019531467</a></p>"
+          }
+        }
+      },
+      "block_order": [
+        "section_about",
+        "section_using_our_website",
+        "section_your_account",
+        "section_products",
+        "section_prices",
+        "section_orders",
+        "section_payment",
+        "section_delivery",
+        "section_assembly",
+        "section_inspection",
+        "section_cancellation",
+        "section_returns_and_warranty",
+        "section_reviews",
+        "section_our_content",
+        "section_third_party_services",
+        "section_privacy",
+        "section_liability",
+        "section_governing_law",
+        "section_changes",
+        "section_contact"
+      ],
+      "settings": {
+        "breadcrumb_home_label": "Home",
+        "heading": "Terms & Conditions",
+        "last_updated_label": "Last updated:",
+        "last_updated": "2 October 2026",
+        "intro": "<p>Welcome to Woodeca. These terms explain how our website works and what you can expect when you order from us. By using woodeca.com or placing an order, you agree to them, so please take a few minutes to read them.</p>",
+        "toc_label": "Contents",
+        "jump_label": "Jump to a section",
+        "back_to_top_label": "Back to top",
+        "contact_heading": "Questions about these terms?",
+        "contact_email": "Hello@Woodeca.com",
+        "show_phone": true,
+        "contact_button_label": "Contact us",
+        "contact_button_link": "/pages/contact-us"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
