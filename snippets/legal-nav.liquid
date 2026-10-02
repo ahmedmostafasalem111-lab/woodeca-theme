@@ -1,0 +1,36 @@
+{%- doc -%}
+  Tabs between the store's policy pages: Terms & Conditions, Returns &
+  Warranty, Privacy Policy. Same style as the blog topic tabs
+  (showcase-tabs-nav). The tab for the page being viewed is marked current.
+
+  @param {string} [class] - Extra class on the <nav>.
+
+  @example
+  {% render 'legal-nav' %}
+{%- enddoc -%}
+{%- render 'showcase-tabs-nav' -%}
+{%- liquid
+  assign here = request.path
+  assign privacy_url = shop.privacy_policy.url | default: '/policies/privacy-policy'
+-%}
+<nav class="showcase-tabs legal-nav {{ class }}" aria-label="Policies">
+  <ul class="showcase-tabs__list" role="list">
+    <li>
+      <a class="showcase-tabs__link" href="/pages/terms-and-conditions" {% if here contains '/pages/terms-and-conditions' or template.suffix == 'terms' %}aria-current="page"{% endif %}>Terms &amp; Conditions</a>
+    </li>
+    <li>
+      <a class="showcase-tabs__link" href="/pages/returns" {% if here contains '/pages/returns' or template.suffix == 'returns' %}aria-current="page"{% endif %}>Returns &amp; Warranty</a>
+    </li>
+    <li>
+      <a class="showcase-tabs__link" href="{{ privacy_url }}" {% if here contains '/policies/privacy-policy' %}aria-current="page"{% endif %}>Privacy Policy</a>
+    </li>
+  </ul>
+</nav>
+
+{% stylesheet %}
+  /* Under a left-aligned page heading: tabs start at the content edge. */
+  .legal-nav .showcase-tabs__list {
+    margin: 0;
+    padding: 0;
+  }
+{% endstylesheet %}

@@ -137,7 +137,8 @@
         "strip_button_link": "/pages/contact-us",
         "show_phone": true,
         "padding-block-start": 32,
-        "padding-block-end": 64
+        "padding-block-end": 64,
+        "show_legal_nav": true
       }
     }
   },

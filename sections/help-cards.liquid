@@ -33,6 +33,9 @@
       {% if section.settings.subtitle != blank %}
         <p class="help-cards__subtitle">{{ section.settings.subtitle }}</p>
       {% endif %}
+      {% if section.settings.show_legal_nav %}
+        {% render 'legal-nav', class: 'help-cards__legal-nav' %}
+      {% endif %}
     </header>
 
     <help-cards-component class="help-cards__component">
@@ -155,6 +158,16 @@
   .help-cards__subtitle {
     margin: var(--margin-sm) 0 0;
     font-size: var(--font-size--md);
+  }
+
+  .help-cards__legal-nav {
+    margin-block-start: 24px;
+  }
+
+  /* The tabs carry their own bottom rule; no second line under the header. */
+  .help-cards__header:has(.help-cards__legal-nav) {
+    padding-block-end: 0;
+    border-block-end: 0;
   }
 
   .help-cards__grid {
@@ -389,6 +402,7 @@
     { "type": "text", "id": "breadcrumb_label", "label": "Breadcrumb page label", "info": "Defaults to the heading." },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Returns & Warranty" },
     { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Support when you need it" },
+    { "type": "checkbox", "id": "show_legal_nav", "label": "Show policy tabs", "info": "Terms & Conditions / Returns & Warranty / Privacy Policy, under the heading.", "default": false },
     { "type": "text", "id": "close_label", "label": "Close button label (screen readers)", "default": "Close" },
     { "type": "header", "content": "Still need help?" },
     { "type": "text", "id": "strip_text", "label": "Text", "default": "Still need help? Our team is happy to help." },
