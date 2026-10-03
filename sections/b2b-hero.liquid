@@ -81,9 +81,10 @@
     object-fit: cover;
   }
 
-  /* The image is positioned against the hero; the wrapper takes no space. */
+  /* Laid over the hero so it takes no grid/flex slot; the image fills it. */
   .b2b-hero__picture {
-    display: contents;
+    position: absolute;
+    inset: 0;
   }
 
   .b2b-hero__overlay {

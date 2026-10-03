@@ -136,9 +136,10 @@
     object-fit: cover;
   }
 
-  /* The image is positioned against the hero; the wrapper takes no space. */
+  /* Laid over the hero so it takes no grid/flex slot; the image fills it. */
   .story-hero__picture {
-    display: contents;
+    position: absolute;
+    inset: 0;
   }
 
   /* Fades in over the poster once it is actually playing. */
