@@ -3,9 +3,8 @@
   centred heading ("woodeca."). 376:496 on phones, 1440:648 from 750px.
 
   The image is the poster and the fallback, and it is the page's LCP image
-  (eager, fetchpriority high, and preloaded through a Link header so the
-  download starts before the CSS and scripts; 375–1920px srcset, phones get
-  ≤750px). A video only starts downloading once the page
+  (eager, fetchpriority high, and preloaded from <head> at high priority —
+  copied there by layout/theme.liquid; 375–1920px srcset, phones get ≤750px). A video only starts downloading once the page
   has loaded and gone idle (story-hero.js), and never with Save-Data, a 2G/3G
   connection or reduced motion — then the image stays. No video and no image:
   a solid dark band with the heading.
@@ -58,6 +57,14 @@
   {% endif %}
 >
   {% if image != blank %}
+  {%- comment -%}
+    Copied into <head> by layout/theme.liquid, so the hero download
+    starts at high priority before the CSS and scripts. Same srcset/sizes as
+    the image below, so the browser reuses it.
+  {%- endcomment -%}
+  <link data-hero-preload rel="preload" as="image" fetchpriority="high" href="{{ image | image_url: width: 1920 }}" imagesrcset="{{ image | image_url: width: 375 }} 375w, {{ image | image_url: width: 550 }} 550w, {{ image | image_url: width: 750 }} 750w, {{ image | image_url: width: 1100 }} 1100w, {{ image | image_url: width: 1500 }} 1500w, {{ image | image_url: width: 1920 }} 1920w" imagesizes="100vw">
+  {%- comment -%} The image's own srcset is the same list, so the preload is reused. {%- endcomment -%}
+  {%- capture hero_srcset -%}{{ image | image_url: width: 375 }} 375w, {{ image | image_url: width: 550 }} 550w, {{ image | image_url: width: 750 }} 750w, {{ image | image_url: width: 1100 }} 1100w, {{ image | image_url: width: 1500 }} 1500w, {{ image | image_url: width: 1920 }} 1920w{%- endcapture -%}
     {{
       image
       | image_url: width: 1920
@@ -65,8 +72,7 @@
         class: 'story-hero__media story-hero__image',
         loading: 'eager',
         fetchpriority: 'high',
-        preload: true,
-        widths: '375, 550, 750, 1100, 1500, 1920',
+        srcset: hero_srcset,
         sizes: '100vw',
         alt: ''
     }}

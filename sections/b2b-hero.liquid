@@ -1,8 +1,8 @@
 {% comment %}
   Image hero (divan.ru/b2b style): full-bleed image under a dark overlay, a
   centred H1 and subtitle in white, and a white pill button (usually #enquiry).
-  The image is the LCP: eager, fetchpriority high and preloaded through a Link
-  header (375–1920px srcset; phones get ≤750px). No image: a solid band in
+  The image is the LCP: eager, fetchpriority high and preloaded from <head> at
+  high priority (layout/theme.liquid; 375–1920px srcset, phones get ≤750px). No image: a solid band in
   the theme's dark palette colour, text unchanged.
 {% endcomment %}
 {%- render 'b2b-styles' -%}
@@ -15,6 +15,14 @@
   style="--b2b-hero-overlay: {{ overlay }}; --b2b-hero-empty: {{ settings.color_palette.color1 | default: '#333333' }};"
 >
   {% if image != blank %}
+  {%- comment -%}
+    Copied into <head> by layout/theme.liquid, so the hero download
+    starts at high priority before the CSS and scripts. Same srcset/sizes as
+    the image below, so the browser reuses it.
+  {%- endcomment -%}
+  <link data-hero-preload rel="preload" as="image" fetchpriority="high" href="{{ image | image_url: width: 1920 }}" imagesrcset="{{ image | image_url: width: 375 }} 375w, {{ image | image_url: width: 550 }} 550w, {{ image | image_url: width: 750 }} 750w, {{ image | image_url: width: 1100 }} 1100w, {{ image | image_url: width: 1500 }} 1500w, {{ image | image_url: width: 1920 }} 1920w" imagesizes="100vw">
+  {%- comment -%} The image's own srcset is the same list, so the preload is reused. {%- endcomment -%}
+  {%- capture hero_srcset -%}{{ image | image_url: width: 375 }} 375w, {{ image | image_url: width: 550 }} 550w, {{ image | image_url: width: 750 }} 750w, {{ image | image_url: width: 1100 }} 1100w, {{ image | image_url: width: 1500 }} 1500w, {{ image | image_url: width: 1920 }} 1920w{%- endcapture -%}
     {{
       image
       | image_url: width: 1920
@@ -22,8 +30,7 @@
         class: 'b2b-hero__image',
         loading: 'eager',
         fetchpriority: 'high',
-        preload: true,
-        widths: '375, 550, 750, 1100, 1500, 1920',
+        srcset: hero_srcset,
         sizes: '100vw',
         alt: ''
     }}

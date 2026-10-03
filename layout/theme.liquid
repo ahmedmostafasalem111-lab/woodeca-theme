@@ -36,6 +36,20 @@
     {% endif %}
 
     {%- render 'meta-tags' -%}
+    {%- comment -%}
+      Photo-hero pages (Our Story, For Business, For Designers): copy the hero
+      section's preload tag (marked data-hero-preload) into <head>, so the hero
+      image downloads at high priority before the CSS and scripts. A section
+      can't write into <head>, and content_for_layout is only readable here in
+      the layout, not in a snippet.
+    {%- endcomment -%}
+    {%- liquid
+      assign hero_templates = 'story,business,designers' | split: ','
+      if template.name == 'page' and hero_templates contains template.suffix and content_for_layout contains 'data-hero-preload'
+        assign hero_tag = content_for_layout | split: 'data-hero-preload' | slice: 1, 1 | first | split: '>' | first
+        echo '<link data-hero-preload' | append: hero_tag | append: '>'
+      endif
+    -%}
     {%- render 'stylesheets' -%}
     {%- render 'fonts' -%}
     {%- render 'scripts' -%}
