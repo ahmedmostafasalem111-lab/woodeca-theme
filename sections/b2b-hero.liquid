@@ -1,7 +1,8 @@
 {% comment %}
   Image hero (divan.ru/b2b style): full-bleed image under a dark overlay, a
   centred H1 and subtitle in white, and a white pill button (usually #enquiry).
-  The image is the LCP: eager, fetchpriority high. No image: a solid band in
+  The image is the LCP: eager, fetchpriority high and preloaded through a Link
+  header (375–1920px srcset; phones get ≤750px). No image: a solid band in
   the theme's dark palette colour, text unchanged.
 {% endcomment %}
 {%- render 'b2b-styles' -%}
@@ -16,12 +17,13 @@
   {% if image != blank %}
     {{
       image
-      | image_url: width: 2880
+      | image_url: width: 1920
       | image_tag:
         class: 'b2b-hero__image',
         loading: 'eager',
         fetchpriority: 'high',
-        widths: '390, 600, 750, 900, 1100, 1440, 1800, 2200, 2880',
+        preload: true,
+        widths: '375, 550, 750, 1100, 1500, 1920',
         sizes: '100vw',
         alt: ''
     }}

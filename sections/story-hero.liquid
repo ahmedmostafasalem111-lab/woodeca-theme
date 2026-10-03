@@ -3,7 +3,9 @@
   centred heading ("woodeca."). 376:496 on phones, 1440:648 from 750px.
 
   The image is the poster and the fallback, and it is the page's LCP image
-  (eager, fetchpriority high). A video only starts downloading once the page
+  (eager, fetchpriority high, and preloaded through a Link header so the
+  download starts before the CSS and scripts; 375–1920px srcset, phones get
+  ≤750px). A video only starts downloading once the page
   has loaded and gone idle (story-hero.js), and never with Save-Data, a 2G/3G
   connection or reduced motion — then the image stays. No video and no image:
   a solid dark band with the heading.
@@ -58,12 +60,13 @@
   {% if image != blank %}
     {{
       image
-      | image_url: width: 2880
+      | image_url: width: 1920
       | image_tag:
         class: 'story-hero__media story-hero__image',
         loading: 'eager',
         fetchpriority: 'high',
-        widths: '390, 600, 750, 900, 1100, 1440, 1800, 2200, 2880',
+        preload: true,
+        widths: '375, 550, 750, 1100, 1500, 1920',
         sizes: '100vw',
         alt: ''
     }}
