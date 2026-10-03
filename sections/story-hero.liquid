@@ -4,7 +4,8 @@
 
   The image is the poster and the fallback, and it is the page's LCP image
   (eager, fetchpriority high, and preloaded from <head> at high priority —
-  copied there by layout/theme.liquid; 375–1920px srcset, phones get ≤750px). A video only starts downloading once the page
+  copied there by layout/theme.liquid). Phones get 375–750px files whatever
+  their pixel density, wider screens 750–1920px. A video only starts downloading once the page
   has loaded and gone idle (story-hero.js), and never with Save-Data, a 2G/3G
   connection or reduced motion — then the image stays. No video and no image:
   a solid dark band with the heading.
@@ -58,13 +59,17 @@
 >
   {% if image != blank %}
   {%- comment -%}
-    Copied into <head> by layout/theme.liquid, so the hero download
-    starts at high priority before the CSS and scripts. Same srcset/sizes as
-    the image below, so the browser reuses it.
+    Phones (under 750px) get the 375–750px files whatever their pixel density;
+    wider screens get 750–1920px. Both preload tags are copied into <head> by
+    layout/theme.liquid, so the download starts at high priority before the CSS
+    and scripts; the media, srcset and sizes match the <picture> below, so the
+    browser reuses the preloaded file.
   {%- endcomment -%}
-  <link data-hero-preload rel="preload" as="image" fetchpriority="high" href="{{ image | image_url: width: 1920 }}" imagesrcset="{{ image | image_url: width: 375 }} 375w, {{ image | image_url: width: 550 }} 550w, {{ image | image_url: width: 750 }} 750w, {{ image | image_url: width: 1100 }} 1100w, {{ image | image_url: width: 1500 }} 1500w, {{ image | image_url: width: 1920 }} 1920w" imagesizes="100vw">
-  {%- comment -%} The image's own srcset is the same list, so the preload is reused. {%- endcomment -%}
-  {%- capture hero_srcset -%}{{ image | image_url: width: 375 }} 375w, {{ image | image_url: width: 550 }} 550w, {{ image | image_url: width: 750 }} 750w, {{ image | image_url: width: 1100 }} 1100w, {{ image | image_url: width: 1500 }} 1500w, {{ image | image_url: width: 1920 }} 1920w{%- endcapture -%}
+  <link data-hero-preload rel="preload" as="image" fetchpriority="high" media="(max-width: 749px)" imagesrcset="{{ image | image_url: width: 375 }} 375w, {{ image | image_url: width: 550 }} 550w, {{ image | image_url: width: 750 }} 750w" imagesizes="100vw">
+  <link data-hero-preload rel="preload" as="image" fetchpriority="high" media="(min-width: 750px)" imagesrcset="{{ image | image_url: width: 750 }} 750w, {{ image | image_url: width: 1100 }} 1100w, {{ image | image_url: width: 1500 }} 1500w, {{ image | image_url: width: 1920 }} 1920w" imagesizes="100vw">
+  {%- capture hero_srcset -%}{{ image | image_url: width: 750 }} 750w, {{ image | image_url: width: 1100 }} 1100w, {{ image | image_url: width: 1500 }} 1500w, {{ image | image_url: width: 1920 }} 1920w{%- endcapture -%}
+  <picture class="story-hero__picture">
+    <source media="(max-width: 749px)" srcset="{{ image | image_url: width: 375 }} 375w, {{ image | image_url: width: 550 }} 550w, {{ image | image_url: width: 750 }} 750w" sizes="100vw">
     {{
       image
       | image_url: width: 1920
@@ -76,6 +81,7 @@
         sizes: '100vw',
         alt: ''
     }}
+  </picture>
   {% endif %}
 
   {% if src_desktop != blank %}
@@ -128,6 +134,11 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  /* The image is positioned against the hero; the wrapper takes no space. */
+  .story-hero__picture {
+    display: contents;
   }
 
   /* Fades in over the poster once it is actually playing. */
