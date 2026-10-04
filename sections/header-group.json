@@ -50,7 +50,7 @@
         "utility_buyers": {
           "type": "utility_right",
           "settings": {
-            "label": "For Bussiness",
+            "label": "For Business",
             "menu": "",
             "link": "shopify://pages/woodeca-for-business"
           }
@@ -195,6 +195,8 @@
         "search_empty_text": "No matches yet. Try a different word.",
         "show_account": true,
         "account_label": "Account",
+        "account_signed_in_label": "My account",
+        "account_sign_in_label": "Sign in",
         "account_link": "",
         "cart_label": "Cart",
         "show_cart_count": true,
