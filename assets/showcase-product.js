@@ -243,6 +243,10 @@ class ShowcaseProductComponent extends Component {
     const url = new URL(window.location.href);
     url.searchParams.set('variant', String(variant.id));
     window.history.replaceState({}, '', url);
+
+    // The set builder (set products) recomputes the price, instalments,
+    // delivery and buttons from its own selection after this.
+    this.dispatchEvent(new CustomEvent('showcase:variant-change', { detail: { variant } }));
   }
 
   /**
