@@ -31,6 +31,13 @@
   assign collection_name = product.metafields[ns]['collection_name'].value
   assign collection_link = product.metafields[ns]['collection_link'].value
 
+  # Set products (bedroom sets): the set builder replaces quantity + Add to cart.
+  assign set_components = product.metafields.custom.set_components.value
+  assign is_set = false
+  if set_components != blank and set_components.size > 0
+    assign is_set = true
+  endif
+
   assign media_list = product.media | where: 'media_type', 'image'
   if media_list.size == 0
     assign media_list = product.images
@@ -358,7 +365,17 @@
         {%- comment -%}
           10 — Quantity. Lives inside the form so its value posts with the add,
           and the buttons are wired through the component rather than inline JS.
+          Set products get the set builder instead: Add to cart, the "Your set"
+          box and the "Customise your set" drawer.
         {%- endcomment -%}
+        {% if is_set %}
+          {% render 'showcase-set-builder',
+            product: product,
+            selected_variant: selected_variant,
+            section: section,
+            components: set_components
+          %}
+        {% else %}
         <div class="product-buybox__actions">
           {% form 'product', product, id: form_id, class: 'product-buybox__form' %}
             <input
@@ -429,6 +446,7 @@
           {% endform %}
 
         </div>
+        {% endif %}
 
         {%- comment -%} ---------- Delivery teaser ---------- {%- endcomment -%}
         {% if section.settings.show_delivery_teaser %}
@@ -500,7 +518,8 @@
       product: product,
       selected_variant: selected_variant,
       section: section,
-      form_id: form_id
+      form_id: form_id,
+      set_builder: is_set
     %}
   {% endif %}
 </showcase-product-component>
@@ -1223,6 +1242,90 @@
       "id": "quantity_up_label",
       "label": "Increase quantity label",
       "default": "Increase quantity"
+    },
+    {
+      "type": "header",
+      "content": "Set builder",
+      "info": "Only on set products: products whose \"Set components\" metafield is filled. It replaces quantity and Add to cart, and Buy It Now is not shown."
+    },
+    {
+      "type": "text",
+      "id": "set_box_heading",
+      "label": "Box heading",
+      "default": "Your set"
+    },
+    {
+      "type": "text",
+      "id": "set_pieces_label",
+      "label": "Pieces label",
+      "default": "pieces"
+    },
+    {
+      "type": "text",
+      "id": "set_customise_label",
+      "label": "Customise button and drawer heading",
+      "default": "Customise your set"
+    },
+    {
+      "type": "text",
+      "id": "set_add_piece_label",
+      "label": "Add piece label",
+      "default": "Add"
+    },
+    {
+      "type": "text",
+      "id": "set_remove_label",
+      "label": "Remove piece label",
+      "default": "Remove"
+    },
+    {
+      "type": "text",
+      "id": "set_save_label",
+      "label": "Save button label",
+      "default": "Save selection"
+    },
+    {
+      "type": "text",
+      "id": "set_reset_label",
+      "label": "Reset link label",
+      "default": "Reset to full set"
+    },
+    {
+      "type": "text",
+      "id": "set_total_label",
+      "label": "Drawer total label",
+      "default": "Total"
+    },
+    {
+      "type": "text",
+      "id": "set_empty_label",
+      "label": "Nothing selected label",
+      "default": "Add at least one piece"
+    },
+    {
+      "type": "text",
+      "id": "set_sold_out_label",
+      "label": "Sold out label",
+      "default": "Sold out in [colour]",
+      "info": "[colour] is replaced with the colour name."
+    },
+    {
+      "type": "text",
+      "id": "set_fabric_label",
+      "label": "Fabric label",
+      "default": "Fabric"
+    },
+    {
+      "type": "text",
+      "id": "set_change_label",
+      "label": "Change fabric link",
+      "default": "change"
+    },
+    {
+      "type": "text",
+      "id": "set_close_label",
+      "label": "Close drawer label",
+      "default": "Close"
     },
     {
       "type": "header",

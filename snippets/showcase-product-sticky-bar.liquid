@@ -19,6 +19,7 @@
   @param {object} selected_variant - The currently selected variant.
   @param {object} section - The section, for labels and anchor ids.
   @param {string} form_id - Id of the hero's product form, so this bar's buttons submit it.
+  @param {boolean} [set_builder] - Set product: Add To Cart is handled by the set builder (no form to submit) and Buy It Now is not offered.
 
   @example
   {% render 'showcase-product-sticky-bar', product: product, selected_variant: variant, section: section, form_id: id %}
@@ -61,8 +62,12 @@
       </span>
 
       <button
-        type="submit"
-        form="{{ form_id }}"
+        {% if set_builder %}
+          type="button"
+        {% else %}
+          type="submit"
+          form="{{ form_id }}"
+        {% endif %}
         class="product-sticky-bar__add"
         ref="stickyAddButton"
         {% unless selected_variant.available %}disabled{% endunless %}
@@ -74,7 +79,7 @@
         {%- endif -%}
       </button>
 
-      {% if section.settings.show_buy_now %}
+      {% if section.settings.show_buy_now and set_builder != true %}
         <button
           type="button"
           class="product-sticky-bar__buy"

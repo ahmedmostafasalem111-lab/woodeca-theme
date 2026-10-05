@@ -1,0 +1,996 @@
+{% doc %}
+  Set builder for set products (bedroom sets): replaces the quantity + Add to
+  cart form when the product has `custom.set_components` filled.
+
+  Each component is a "Set component" metaobject: a piece product, its role,
+  default quantity (0 = optional extra), max quantity, an optional fixed option
+  value (the bed's size), an optional colour map ("Mint Green = Beige", for
+  pieces whose colours aren't the set's, i.e. beds) and whether the customer may
+  change that piece's colour (the bed fabric).
+
+  Renders:
+  - the data the script works from (every component's variants with prices,
+    images, dimensions and lead times);
+  - an Add to cart button (one /cart/add.js call with every selected piece);
+  - the "Your set" box, its rows rendered here for the selected colour so the
+    first paint is complete and nothing shifts when the script starts;
+  - the "Customise your set" drawer: one card per component, set pieces first,
+    then extras. The script fills prices and images for the chosen colour.
+
+  The headline price, compare-at, save badge, instalments, delivery date and
+  sticky bar belong to the product section; the script recomputes them from the
+  selection. The set product's own variant price is only what collection cards
+  show.
+
+  @param {object} product - The set product.
+  @param {object} selected_variant - The set colour selected on load.
+  @param {object} section - The product section, for labels and instalment plans.
+  @param {object[]} components - product.metafields.custom.set_components.value
+
+  @example
+  {% render 'showcase-set-builder', product: product, selected_variant: selected_variant, section: section, components: set_components %}
+{% enddoc %}
+
+{%- liquid
+  assign ns = section.settings.metafield_namespace | default: 'custom'
+
+  # Which of the set product's options is the colour (1-based; 0 = none).
+  assign set_colour_position = 0
+  for set_option in product.options_with_values
+    assign set_option_name = set_option.name | downcase
+    if set_option_name == 'color' or set_option_name == 'colour'
+      assign set_colour_position = set_option.position
+    endif
+  endfor
+  assign set_colour = ''
+  if set_colour_position > 0
+    assign set_colour_index = set_colour_position | minus: 1
+    assign set_colour = selected_variant.options[set_colour_index]
+  endif
+
+  assign label_box = section.settings.set_box_heading | default: 'Your set'
+  assign label_pieces = section.settings.set_pieces_label | default: 'pieces'
+  assign label_customise = section.settings.set_customise_label | default: 'Customise your set'
+  assign label_add_piece = section.settings.set_add_piece_label | default: 'Add'
+  assign label_remove = section.settings.set_remove_label | default: 'Remove'
+  assign label_save = section.settings.set_save_label | default: 'Save selection'
+  assign label_reset = section.settings.set_reset_label | default: 'Reset to full set'
+  assign label_empty = section.settings.set_empty_label | default: 'Add at least one piece'
+  assign label_sold_out = section.settings.set_sold_out_label | default: 'Sold out in [colour]'
+  assign label_fabric = section.settings.set_fabric_label | default: 'Fabric'
+  assign label_change = section.settings.set_change_label | default: 'change'
+  assign label_total = section.settings.set_total_label | default: 'Total'
+  assign label_add_to_cart = section.settings.add_to_cart_label | default: 'Add to cart'
+  assign label_close = section.settings.set_close_label | default: 'Close'
+
+  # Instalment plans, as the instalment snippets compute them: provider rows
+  # "<block id>-<months>" with a rate, or the generic month blocks.
+  capture provider_plans
+    render 'showcase-instalment-plans', section: section
+  endcapture
+  assign provider_entries = provider_plans | strip | split: ';'
+  assign generic_plans = section.blocks | where: 'type', 'instalment_plan'
+
+  # Pieces in the default set, for the box header before the script runs.
+  assign default_count = 0
+  for component in components
+    if component.product.value != blank
+      assign default_count = component.default_quantity.value | default: 0 | plus: default_count
+    endif
+  endfor
+-%}
+
+<showcase-set-builder-component
+  class="set-builder"
+  data-colour-position="{{ set_colour_position }}"
+>
+  <script type="application/json" ref="data">
+    {
+      "setTitle": {{ product.title | json }},
+      "colour": {{ set_colour | json }},
+      "headlineMonths": {{ section.settings.instalment_headline_months | default: 6 }},
+      "periodSuffix": {{ section.settings.instalment_short_period | default: 'mo' | json }},
+      "plans": [
+        {%- if provider_entries.size > 0 -%}
+          {%- for entry in provider_entries -%}
+            {%- assign parts = entry | split: '|' -%}
+            {"key": {{ parts[0] | append: '-' | append: parts[1] | json }}, "months": {{ parts[1] | times: 1 }}, "rateBp": {{ parts[2] | times: 1 }}}
+            {%- unless forloop.last %},{% endunless -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- for block in generic_plans -%}
+            {%- assign plan_months = block.settings.months | default: 3 -%}
+            {"key": {{ plan_months | append: '' | json }}, "months": {{ plan_months }}, "rateBp": 0}
+            {%- unless forloop.last %},{% endunless -%}
+          {%- endfor -%}
+        {%- endif -%}
+      ],
+      "providers": {{ provider_entries.size }},
+      "labels": {
+        "pieces": {{ label_pieces | json }},
+        "addToCart": {{ label_add_to_cart | json }},
+        "empty": {{ label_empty | json }},
+        "soldOut": {{ label_sold_out | json }},
+        "fabric": {{ label_fabric | json }},
+        "change": {{ label_change | json }},
+        "remove": {{ label_remove | json }}
+      },
+      "components": [
+        {%- assign wrote_component = false -%}
+        {%- for component in components -%}
+          {%- assign piece = component.product.value -%}
+          {%- if piece == blank -%}{%- continue -%}{%- endif -%}
+          {%- liquid
+            assign piece_colour_index = -1
+            for piece_option in piece.options_with_values
+              assign piece_option_name = piece_option.name | downcase
+              if piece_option_name == 'color' or piece_option_name == 'colour'
+                assign piece_colour_index = piece_option.position | minus: 1
+              endif
+            endfor
+            assign lead_min = piece.metafields[ns]['delivery_lead_min'].value | default: section.settings.delivery_lead_min_default | times: 1
+            assign lead_max = piece.metafields[ns]['delivery_lead_max'].value | default: section.settings.delivery_lead_max_default | times: 1
+            if lead_max < lead_min
+              assign lead_max = lead_min
+            endif
+            assign piece_dims = piece.metafields[ns]['dimensions_summary'].value
+            assign colour_lines = component.colour_map.value | newline_to_br | split: '<br />'
+          -%}
+          {%- if wrote_component %},{% endif -%}
+          {%- assign wrote_component = true -%}
+          {
+            "index": {{ forloop.index0 }},
+            "role": {{ component.role.value | json }},
+            "defaultQty": {{ component.default_quantity.value | default: 0 }},
+            "maxQty": {{ component.max_quantity.value | default: 4 }},
+            "optionValue": {{ component.option_value.value | strip | json }},
+            "changeColour": {% if component.customer_can_change_colour.value == true %}true{% else %}false{% endif %},
+            "colourMap": {
+              {%- assign wrote_line = false -%}
+              {%- for line in colour_lines -%}
+                {%- assign pair = line | strip | split: '=' -%}
+                {%- if pair.size == 2 -%}
+                  {%- if wrote_line %},{% endif -%}
+                  {{- pair[0] | strip | json }}: {{ pair[1] | strip | json -}}
+                  {%- assign wrote_line = true -%}
+                {%- endif -%}
+              {%- endfor -%}
+            },
+            "title": {{ piece.title | json }},
+            "url": {{ piece.url | json }},
+            "colourIndex": {{ piece_colour_index }},
+            "leadMin": {{ lead_min }},
+            "leadMax": {{ lead_max }},
+            "variants": [
+              {%- for variant in piece.variants -%}
+                {%- assign variant_image = variant.featured_image | default: piece.featured_image -%}
+                {
+                  "id": {{ variant.id }},
+                  "options": {{ variant.options | json }},
+                  "price": {{ variant.price }},
+                  "compare": {{ variant.compare_at_price | default: 0 }},
+                  "available": {{ variant.available | json }},
+                  "image": {% if variant_image != blank %}{{ variant_image | image_url: width: 400 | json }}{% else %}null{% endif %},
+                  "dims": {{ variant.metafields[ns]['dimensions_summary'].value | default: piece_dims | json }}
+                }
+                {%- unless forloop.last %},{% endunless -%}
+              {%- endfor -%}
+            ]
+          }
+        {%- endfor -%}
+      ]
+    }
+  </script>
+
+  {%- comment -%}
+    Add to cart. Inside .product-buybox__actions so it takes the same place and
+    look as on other products (and, like theirs, hands over to the bottom bar on
+    phones).
+  {%- endcomment -%}
+  <div class="product-buybox__actions set-builder__actions">
+    <button
+      type="button"
+      class="product-buybox__add set-builder__add"
+      ref="addButton"
+      on:click="/addToCart"
+    >
+      {{- label_add_to_cart -}}
+    </button>
+  </div>
+
+  {%- comment -%} "Your set": collapsible, open by default. {%- endcomment -%}
+  <details class="set-box" open>
+    <summary class="set-box__head">
+      <span class="set-box__title">
+        {{- label_box }} <span class="set-box__count" ref="count">({{ default_count }} {{ label_pieces }})</span>
+      </span>
+      <span class="svg-wrapper set-box__chevron" aria-hidden="true">
+        {{- 'icon-caret.svg' | inline_asset_content -}}
+      </span>
+    </summary>
+
+    <ul class="set-box__list" ref="list" role="list">
+      {%- for component in components -%}
+        {%- assign piece = component.product.value -%}
+        {%- assign quantity = component.default_quantity.value | default: 0 -%}
+        {%- if piece == blank or quantity < 1 -%}{%- continue -%}{%- endif -%}
+        {%- liquid
+          # The piece's colour for the set colour: the colour map, else the same name.
+          assign wanted = set_colour
+          assign colour_lines = component.colour_map.value | newline_to_br | split: '<br />'
+          for line in colour_lines
+            assign pair = line | strip | split: '='
+            if pair.size == 2
+              assign map_from = pair[0] | strip
+              if map_from == set_colour
+                assign wanted = pair[1] | strip
+              endif
+            endif
+          endfor
+          assign fixed_value = component.option_value.value | strip
+          assign row_variant = nil
+          for variant in piece.variants
+            if variant.options contains wanted
+              if fixed_value == blank or variant.options contains fixed_value
+                assign row_variant = variant
+                break
+              endif
+            endif
+          endfor
+          if row_variant == nil
+            continue
+          endif
+          assign row_image = row_variant.featured_image | default: piece.featured_image
+          assign row_dims = row_variant.metafields[ns]['dimensions_summary'].value | default: piece.metafields[ns]['dimensions_summary'].value
+        -%}
+        <li class="set-row">
+          <span class="set-row__media">
+            {%- if row_image != blank -%}
+              {{ row_image | image_url: width: 240 | image_tag: loading: 'lazy', alt: '', sizes: '96px', widths: '120, 240' }}
+            {%- endif -%}
+          </span>
+          <span class="set-row__text">
+            <a class="set-row__name" href="{{ piece.url }}">{{ piece.title }}</a>
+            {%- if row_dims != blank -%}
+              <span class="set-row__dims">{{ row_dims }}</span>
+            {%- endif -%}
+            {%- if component.customer_can_change_colour.value == true -%}
+              <span class="set-row__fabric">
+                {{- label_fabric }}: {{ wanted }} ·
+                <button type="button" class="set-row__change" data-index="{{ forloop.index0 }}" on:click="/openAtCard">
+                  {{- label_change -}}
+                </button>
+              </span>
+            {%- endif -%}
+            <span class="set-row__price">
+              <span class="set-row__current">{% render 'showcase-money', amount: row_variant.price %}</span>
+              {%- if row_variant.compare_at_price > row_variant.price -%}
+                <s class="set-row__compare">{% render 'showcase-money', amount: row_variant.compare_at_price %}</s>
+              {%- endif -%}
+              {%- if quantity > 1 -%}
+                <span class="set-row__qty">× {{ quantity }}</span>
+              {%- endif -%}
+            </span>
+          </span>
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    <button type="button" class="set-box__customise" on:click="/openDrawer">
+      <span class="svg-wrapper" aria-hidden="true">{{- 'icon-plus.svg' | inline_asset_content -}}</span>
+      {{ label_customise }}
+    </button>
+  </details>
+
+  {%- comment -%}
+    "Customise your set": a right-hand drawer on desktop, a bottom sheet on
+    phones, in the cart drawer's style. Changes are a draft until "Save
+    selection"; closing (button, backdrop, Esc) discards them.
+  {%- endcomment -%}
+  <div class="set-drawer" ref="drawer" hidden>
+    <div class="set-drawer__overlay" on:click="/closeDrawer"></div>
+    <div
+      class="set-drawer__panel"
+      ref="panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="SetDrawerTitle-{{ section.id }}"
+      tabindex="-1"
+    >
+      <div class="set-drawer__head">
+        <div class="set-drawer__heading">
+          <h2 class="set-drawer__title" id="SetDrawerTitle-{{ section.id }}">{{ label_customise }}</h2>
+          <button type="button" class="set-drawer__reset" on:click="/resetDraft">{{ label_reset }}</button>
+        </div>
+        <button type="button" class="set-drawer__close" on:click="/closeDrawer" aria-label="{{ label_close | escape }}">
+          <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
+        </button>
+      </div>
+
+      <div class="set-drawer__body" ref="drawerBody">
+        <ul class="set-drawer__grid" role="list">
+          {%- for component in components -%}
+            {%- assign piece = component.product.value -%}
+            {%- if piece == blank -%}{%- continue -%}{%- endif -%}
+            {%- assign card_index = forloop.index0 -%}
+            <li class="set-card" ref="cards[]" data-index="{{ card_index }}">
+              <div class="set-card__media">
+                <img class="set-card__image" alt="" width="400" height="400" loading="lazy" hidden>
+                <button
+                  type="button"
+                  class="set-card__remove"
+                  data-index="{{ forloop.index0 }}"
+                  on:click="/removePiece"
+                  aria-label="{{ label_remove | escape }}: {{ piece.title | escape }}"
+                >
+                  <span class="svg-wrapper" aria-hidden="true">{{- 'icon-close.svg' | inline_asset_content -}}</span>
+                </button>
+              </div>
+              <a class="set-card__name" href="{{ piece.url }}">{{ piece.title }}</a>
+              <p class="set-card__dims" data-dims></p>
+
+              {%- if component.customer_can_change_colour.value == true -%}
+                {%- for piece_option in piece.options_with_values -%}
+                  {%- assign piece_option_name = piece_option.name | downcase -%}
+                  {%- unless piece_option_name == 'color' or piece_option_name == 'colour' -%}{%- continue -%}{%- endunless -%}
+                  <fieldset class="set-card__fabric">
+                    <legend class="set-card__fabric-legend">
+                      {{ label_fabric }}: <span data-fabric-name></span>
+                    </legend>
+                    <div class="set-card__chips">
+                      {%- for value in piece_option.values -%}
+                        {%- assign chip_id = 'SetFabric-' | append: section.id | append: '-' | append: card_index | append: '-' | append: forloop.index -%}
+                        <input
+                          type="radio"
+                          class="set-card__chip-input visually-hidden"
+                          id="{{ chip_id }}"
+                          name="SetFabric-{{ section.id }}-{{ card_index }}"
+                          value="{{ value.name | escape }}"
+                          data-index="{{ card_index }}"
+                          on:change="/chooseFabric"
+                        >
+                        <label class="set-card__chip" for="{{ chip_id }}" title="{{ value.name | escape }}">
+                          {%- if value.swatch -%}
+                            <span class="set-card__swatch">
+                              {% render 'swatch', swatch: value.swatch, mode: 'unscaled', label: value.name %}
+                            </span>
+                            <span class="visually-hidden">{{ value.name }}</span>
+                          {%- else -%}
+                            {{ value.name }}
+                          {%- endif -%}
+                        </label>
+                      {%- endfor -%}
+                    </div>
+                  </fieldset>
+                {%- endfor -%}
+              {%- endif -%}
+
+              <p class="set-card__price">
+                <span class="set-card__current" data-price></span>
+                <s class="set-card__compare" data-compare></s>
+              </p>
+              <p class="set-card__sold-out" data-sold-out hidden></p>
+
+              <div class="set-card__controls">
+                <button type="button" class="set-card__add" data-index="{{ forloop.index0 }}" on:click="/addPiece">
+                  {{- label_add_piece -}}
+                </button>
+                <div class="product-quantity__control set-card__stepper">
+                  <button
+                    type="button"
+                    class="product-quantity__step"
+                    data-index="{{ forloop.index0 }}"
+                    data-step="-1"
+                    on:click="/stepPiece"
+                    aria-label="{{ section.settings.quantity_down_label | default: 'Decrease quantity' | escape }}: {{ piece.title | escape }}"
+                  >
+                    <span class="svg-wrapper" aria-hidden="true">{{- 'icon-minus.svg' | inline_asset_content -}}</span>
+                  </button>
+                  <output class="set-card__qty" data-qty aria-live="polite"></output>
+                  <button
+                    type="button"
+                    class="product-quantity__step"
+                    data-index="{{ forloop.index0 }}"
+                    data-step="1"
+                    on:click="/stepPiece"
+                    aria-label="{{ section.settings.quantity_up_label | default: 'Increase quantity' | escape }}: {{ piece.title | escape }}"
+                  >
+                    <span class="svg-wrapper" aria-hidden="true">{{- 'icon-plus.svg' | inline_asset_content -}}</span>
+                  </button>
+                </div>
+              </div>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      <div class="set-drawer__foot">
+        <p class="set-drawer__total">
+          <span class="set-drawer__total-label">{{ label_total }}</span>
+          <span class="set-drawer__total-value" ref="draftTotal"></span>
+          <s class="set-drawer__total-compare" ref="draftCompare"></s>
+        </p>
+        <button type="button" class="set-drawer__save" on:click="/saveDraft">{{ label_save }}</button>
+      </div>
+    </div>
+  </div>
+</showcase-set-builder-component>
+
+<script src="{{ 'showcase-set-builder.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  /* ---------- "Your set" box (divan-style composition box) ---------- */
+  .set-box {
+    margin-block-start: var(--margin-lg);
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    border-radius: 8px;
+  }
+
+  .set-box__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-sm);
+    padding: var(--padding-lg);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .set-box__head::-webkit-details-marker {
+    display: none;
+  }
+
+  .set-box__title {
+    font-size: var(--font-size--lg);
+    font-weight: 600;
+  }
+
+  .set-box__count {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--sm);
+    font-weight: 400;
+  }
+
+  .set-box__chevron {
+    flex: 0 0 auto;
+    transition: rotate 200ms var(--animation-easing, ease);
+  }
+
+  .set-box__chevron svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .set-box[open] .set-box__chevron {
+    rotate: 180deg;
+  }
+
+  .set-box__list {
+    display: grid;
+    gap: var(--gap-md);
+    margin: 0;
+    padding: 0 var(--padding-lg);
+    list-style: none;
+  }
+
+  .set-box__customise {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-xs);
+    width: calc(100% - 2 * var(--padding-lg));
+    margin: var(--margin-lg) var(--padding-lg) var(--padding-lg);
+    padding: var(--padding-md);
+    border: none;
+    border-radius: 6px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5, 0.05));
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .set-box__customise svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .set-row {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: var(--gap-md);
+    align-items: start;
+  }
+
+  .set-row--unavailable {
+    opacity: var(--opacity-50);
+  }
+
+  .set-row__media {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    background-color: var(--product-gallery-background, #f2f2f0);
+    overflow: hidden;
+  }
+
+  .set-row__media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .set-row__text {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .set-row__name {
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .set-row__dims,
+  .set-row__fabric,
+  .set-row__note {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+  }
+
+  .set-row__change {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--color-foreground);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .set-row__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+  }
+
+  .set-row__current {
+    font-weight: 700;
+  }
+
+  .set-row__compare {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--xs);
+  }
+
+  .set-row__qty {
+    font-size: var(--font-size--sm);
+  }
+
+  /* ---------- Drawer / bottom sheet ---------- */
+  .set-drawer[hidden] {
+    display: none;
+  }
+
+  .set-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 2147482990;
+  }
+
+  .set-drawer__overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgb(0 0 0 / 0.45);
+    opacity: 0;
+    transition: opacity 240ms var(--animation-easing, ease);
+  }
+
+  .set-drawer--open .set-drawer__overlay {
+    opacity: 1;
+  }
+
+  /* Phones: a bottom sheet. */
+  .set-drawer__panel {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    display: flex;
+    flex-direction: column;
+    max-height: 92dvh;
+    border-radius: 16px 16px 0 0;
+    background-color: var(--color-background, #ffffff);
+    color: var(--color-foreground);
+    translate: 0 100%;
+    transition: translate 240ms var(--animation-easing, ease);
+    outline: none;
+  }
+
+  .set-drawer--open .set-drawer__panel {
+    translate: 0 0;
+  }
+
+  .set-drawer__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--gap-sm);
+    flex: 0 0 auto;
+    padding: var(--padding-md) var(--padding-lg);
+    border-block-end: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .set-drawer__heading {
+    display: grid;
+    gap: 2px;
+  }
+
+  .set-drawer__title {
+    margin: 0;
+    font-size: var(--font-size--lg);
+    font-weight: 700;
+  }
+
+  .set-drawer__reset {
+    justify-self: start;
+    padding: 0;
+    border: none;
+    background: none;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .set-drawer__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-5, 0.05));
+    color: var(--color-foreground);
+    cursor: pointer;
+  }
+
+  .set-drawer__close svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .set-drawer__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: var(--padding-lg);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .set-drawer__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--gap-md);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .set-drawer__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-md);
+    flex: 0 0 auto;
+    padding: var(--padding-md) var(--padding-lg);
+    padding-block-end: calc(var(--padding-md) + env(safe-area-inset-bottom, 0px));
+    border-block-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+  }
+
+  .set-drawer__total {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 8px;
+    margin: 0;
+  }
+
+  .set-drawer__total-label {
+    width: 100%;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+  }
+
+  .set-drawer__total-value {
+    font-size: var(--font-size--lg);
+    font-weight: 700;
+  }
+
+  .set-drawer__total-compare {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--xs);
+  }
+
+  .set-drawer__save {
+    flex: 0 0 auto;
+    padding: var(--padding-md) var(--padding-xl);
+    border: none;
+    border-radius: var(--style-border-radius-buttons-primary, 4px);
+    background-color: var(--product-cta-background);
+    color: var(--product-cta-text);
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ---------- Cards ---------- */
+  .set-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: var(--padding-sm);
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
+    border-radius: 8px;
+  }
+
+  .set-card--selected {
+    border-color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+  }
+
+  .set-card--sold-out .set-card__media,
+  .set-card--sold-out .set-card__name,
+  .set-card--sold-out .set-card__dims,
+  .set-card--sold-out .set-card__price {
+    opacity: var(--opacity-50);
+  }
+
+  .set-card__media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: 6px;
+    background-color: var(--product-gallery-background, #f2f2f0);
+    overflow: hidden;
+  }
+
+  .set-card__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .set-card__remove {
+    position: absolute;
+    inset-block-start: 8px;
+    inset-inline-end: 8px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--color-background, #ffffff);
+    color: var(--color-foreground);
+    cursor: pointer;
+  }
+
+  .set-card__remove svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .set-card--selected .set-card__remove {
+    display: flex;
+  }
+
+  .set-card__name {
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .set-card__dims {
+    margin: 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--xs);
+  }
+
+  .set-card__dims:empty {
+    display: none;
+  }
+
+  .set-card__fabric {
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+
+  .set-card__fabric-legend {
+    padding: 0;
+    margin-block-end: 6px;
+    font-size: var(--font-size--xs);
+  }
+
+  .set-card__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .set-card__chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 3px 12px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: 999px;
+    font-size: var(--font-size--xs);
+    cursor: pointer;
+  }
+
+  /* Colour swatch chips are round; text chips (no swatch set up) are pills. */
+  .set-card__chip:has(.set-card__swatch) {
+    padding: 3px;
+  }
+
+  .set-card__swatch {
+    display: block;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .set-card__swatch > * {
+    width: 100%;
+    height: 100%;
+  }
+
+  .set-card__chip-input:checked + .set-card__chip {
+    border-color: var(--color-foreground);
+    box-shadow: inset 0 0 0 1px var(--color-foreground);
+  }
+
+  .set-card__chip-input:focus-visible + .set-card__chip {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 2px;
+  }
+
+  .set-card__chip-input:disabled + .set-card__chip {
+    opacity: var(--opacity-30, 0.3);
+    cursor: not-allowed;
+  }
+
+  .set-card__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 8px;
+    margin: auto 0 0;
+  }
+
+  .set-card__current {
+    font-weight: 700;
+  }
+
+  .set-card__compare {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-50));
+    font-size: var(--font-size--xs);
+  }
+
+  .set-card__sold-out {
+    margin: 0;
+    font-size: var(--font-size--xs);
+    font-weight: 600;
+  }
+
+  .set-card__controls {
+    display: flex;
+  }
+
+  .set-card__add {
+    width: 100%;
+    padding: var(--padding-sm) var(--padding-md);
+    border: 1px solid var(--color-foreground);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-foreground);
+    font-size: var(--font-size--sm);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .set-card__add:disabled {
+    opacity: var(--opacity-50);
+    cursor: not-allowed;
+  }
+
+  .set-card__stepper {
+    display: none;
+  }
+
+  .set-card--selected .set-card__add {
+    display: none;
+  }
+
+  .set-card--selected .set-card__stepper {
+    display: inline-flex;
+  }
+
+  .set-card__stepper .product-quantity__step:disabled {
+    opacity: var(--opacity-30, 0.3);
+    cursor: not-allowed;
+  }
+
+  .set-card__qty {
+    min-width: 36px;
+    font-size: var(--font-size--sm);
+    text-align: center;
+  }
+
+  .set-drawer-locked {
+    overflow: hidden;
+  }
+
+  @media screen and (min-width: 750px) {
+    .set-drawer__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* Desktop: a right-hand drawer, as wide as two cards need. */
+  @media screen and (min-width: 990px) {
+    .set-drawer__panel {
+      inset-block: 0;
+      inset-inline: auto 0;
+      width: min(640px, 100%);
+      max-height: none;
+      height: 100%;
+      border-radius: 0;
+      translate: 100% 0;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .set-row {
+      grid-template-columns: 72px minmax(0, 1fr);
+    }
+
+    .set-card {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr);
+      column-gap: var(--gap-sm);
+    }
+
+    .set-card > :not(.set-card__media) {
+      grid-column: 2;
+    }
+
+    .set-card__media {
+      grid-row: 1 / span 6;
+      aspect-ratio: 1;
+      align-self: start;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .set-drawer__panel,
+    .set-drawer__overlay {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
