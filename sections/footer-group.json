@@ -58,51 +58,51 @@
         },
         "soc_soc_3": {
           "type": "payment",
+          "name": "Instagram",
           "settings": {
             "image": "shopify://shop_images/4_63de3c7f-28a9-4a2a-9da2-256486ddd6a9.png",
             "alt": "Instagram"
-          },
-          "name": "Instagram"
+          }
         },
         "soc_soc_4": {
           "type": "payment",
+          "name": "Pinterest",
           "settings": {
             "image": "shopify://shop_images/5.png",
             "alt": "Pinterest"
-          },
-          "name": "Pinterest"
+          }
         },
         "soc_soc_5": {
           "type": "payment",
+          "name": "TikTok",
           "settings": {
             "image": "shopify://shop_images/2.png",
             "alt": "TikTok"
-          },
-          "name": "TikTok"
+          }
         },
         "social_6FEpy7": {
           "type": "payment",
+          "name": "TikTok",
           "settings": {
             "image": "shopify://shop_images/8_c1a4bd5a-d82a-4733-a8cd-61c9a5c1c4c5.png",
             "alt": "TikTok"
-          },
-          "name": "TikTok"
+          }
         },
         "social_VEpAeY": {
           "type": "payment",
+          "name": "TikTok",
           "settings": {
             "image": "shopify://shop_images/9_05176fcb-a875-4a45-8d27-25184e419109.png",
             "alt": "TikTok"
-          },
-          "name": "TikTok"
+          }
         },
         "social_bLqrp3": {
           "type": "payment",
+          "name": "TikTok",
           "settings": {
             "image": "shopify://shop_images/7_dd50f5be-14ac-4503-80cc-a2081a5773b0.png",
             "alt": "TikTok"
-          },
-          "name": "TikTok"
+          }
         }
       },
       "block_order": [
@@ -133,9 +133,16 @@
         "email_label": "Email us",
         "email_link_text": "hello@woodeca.com",
         "email_link": "mailto:hello@woodeca.com",
+        "show_location_row": true,
+        "location_label": "Location",
+        "location_text": "Alexandria, Borg El Arab, 3rd Industrial Zone",
+        "show_tax_row": true,
+        "tax_label": "Tax ID",
+        "tax_text": "697-277-623",
         "payment_height": 32,
         "logo": "shopify://shop_images/logo_6e4f98dc-b8f6-401f-bb77-f599e87908db.png",
         "logo_height": 44,
+        "logo_blend": true,
         "acknowledgement": "<p>Copyright © Woodeca 2026 rights reserved.<br/><br/></p>",
         "legal_menu": "",
         "section_width": "page-width",
@@ -144,8 +151,7 @@
         "heading_color": "#181818",
         "text_color": "#5c5c5c",
         "padding-block-start": 0,
-        "padding-block-end": 0,
-        "logo_blend": true
+        "padding-block-end": 0
       }
     },
     "showcase_floating_widgets": {
@@ -175,6 +181,9 @@
         "remove_label": "Remove",
         "decrease_label": "Decrease quantity",
         "increase_label": "Increase quantity",
+        "stock_limit_text": "Only [count] available",
+        "adding_text": "Adding to cart…",
+        "add_error_text": "This item could not be added. Please try again.",
         "subtotal_label": "Subtotal",
         "continue_label": "Continue Shopping",
         "checkout_label": "Check Out",
