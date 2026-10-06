@@ -4,8 +4,9 @@
 
   The image is the poster and the fallback, and it is the page's LCP image
   (eager, fetchpriority high, and preloaded from <head> at high priority —
-  copied there by layout/theme.liquid). Phones get 375–750px files whatever
-  their pixel density, wider screens 750–1920px. A video only starts downloading once the page
+  copied there by layout/theme.liquid). Phones get the mobile image when one
+  is set (else the desktop image), wider screens the desktop image — see the
+  hero-picture snippet. A video only starts downloading once the page
   has loaded and gone idle (story-hero.js), and never with Save-Data, a 2G/3G
   connection or reduced motion — then the image stays. No video and no image:
   a solid dark band with the heading.
@@ -59,29 +60,17 @@
 >
   {% if image != blank %}
   {%- comment -%}
-    Phones (under 750px) get the 375–750px files whatever their pixel density;
-    wider screens get 750–1920px. Both preload tags are copied into <head> by
-    layout/theme.liquid, so the download starts at high priority before the CSS
-    and scripts; the media, srcset and sizes match the <picture> below, so the
-    browser reuses the preloaded file.
+    Phones get the mobile image when one is set. The two preload tags the
+    snippet prints are copied into <head> by layout/theme.liquid.
   {%- endcomment -%}
-  <link data-hero-preload rel="preload" as="image" fetchpriority="high" media="(max-width: 749px)" imagesrcset="{{ image | image_url: width: 375 }} 375w, {{ image | image_url: width: 550 }} 550w, {{ image | image_url: width: 750 }} 750w" imagesizes="100vw">
-  <link data-hero-preload rel="preload" as="image" fetchpriority="high" media="(min-width: 750px)" imagesrcset="{{ image | image_url: width: 750 }} 750w, {{ image | image_url: width: 1100 }} 1100w, {{ image | image_url: width: 1500 }} 1500w, {{ image | image_url: width: 1920 }} 1920w" imagesizes="100vw">
-  {%- capture hero_srcset -%}{{ image | image_url: width: 750 }} 750w, {{ image | image_url: width: 1100 }} 1100w, {{ image | image_url: width: 1500 }} 1500w, {{ image | image_url: width: 1920 }} 1920w{%- endcapture -%}
-  <picture class="story-hero__picture">
-    <source media="(max-width: 749px)" srcset="{{ image | image_url: width: 375 }} 375w, {{ image | image_url: width: 550 }} 550w, {{ image | image_url: width: 750 }} 750w" sizes="100vw">
-    {{
-      image
-      | image_url: width: 1920
-      | image_tag:
-        class: 'story-hero__media story-hero__image',
-        loading: 'eager',
-        fetchpriority: 'high',
-        srcset: hero_srcset,
-        sizes: '100vw',
-        alt: ''
-    }}
-  </picture>
+  {% render 'hero-picture',
+    image: image,
+    mobile_image: section.settings.mobile_image,
+    class: 'story-hero__media story-hero__image',
+    loading: 'eager',
+    fetchpriority: 'high',
+    preload: true
+  %}
   {% endif %}
 
   {% if src_desktop != blank %}
@@ -134,12 +123,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-
-  /* Laid over the hero so it takes no grid/flex slot; the image fills it. */
-  .story-hero__picture {
-    position: absolute;
-    inset: 0;
   }
 
   /* Fades in over the poster once it is actually playing. */
@@ -197,7 +180,8 @@
     { "type": "text", "id": "breadcrumb_home_label", "label": "Breadcrumb home label", "default": "Home" },
     { "type": "text", "id": "breadcrumb_label", "label": "Breadcrumb page label", "default": "Our Story" },
     { "type": "video", "id": "video", "label": "Video", "info": "Plays muted on a loop once the page has loaded. Not shown with data saver or a slow connection." },
-    { "type": "image_picker", "id": "image", "label": "Image", "info": "Shown before the video starts, and instead of it when there's no video." },
+    { "type": "image_picker", "id": "image", "label": "Desktop image", "info": "Shown before the video starts, and instead of it when there's no video. Desktop: 2400 × 1080 px (20:9)." },
+    { "type": "image_picker", "id": "mobile_image", "label": "Mobile image", "info": "Shown below 750 px wide (also as the video's poster there). Mobile: 1080 × 1425 px (376:496, about 3:4). Leave empty to use the desktop image. Its focal point (Shopify image editor) is kept." },
     { "type": "text", "id": "heading", "label": "Heading", "default": "woodeca." },
     { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 60, "step": 5, "unit": "%", "default": 20 }
   ],
