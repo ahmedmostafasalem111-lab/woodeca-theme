@@ -25,7 +25,7 @@
   {% if section.settings.heading != blank or section.settings.subtext != blank %}
     <div class="showcase-gallery__header">
       {% if section.settings.heading != blank %}
-        <h2 class="showcase-gallery__heading">{{ section.settings.heading }}</h2>
+        <h2 class="showcase-gallery__heading section-title">{{ section.settings.heading }}</h2>
       {% endif %}
 
       {% if section.settings.subtext != blank %}
@@ -92,17 +92,12 @@
 </div>
 
 {% stylesheet %}
+  /* Title style: .section-title (base.css); ~18px to the photos (14px on phones). */
   .showcase-gallery__header {
     display: flex;
     flex-direction: column;
     gap: var(--gap-2xs);
-    margin-block-end: var(--margin-xl);
-  }
-
-  .showcase-gallery__heading {
-    margin: 0;
-    font-size: var(--gallery-heading-size, var(--font-size--3xl));
-    line-height: var(--line-height--heading-tight);
+    margin-block-end: 18px;
   }
 
   .showcase-gallery__subtext {
@@ -173,8 +168,8 @@
   }
 
   @media screen and (max-width: 749px) {
-    .showcase-gallery__heading {
-      font-size: var(--font-size--xl);
+    .showcase-gallery__header {
+      margin-block-end: 14px;
     }
 
     .showcase-gallery__subtext {
@@ -206,6 +201,7 @@
       "type": "select",
       "id": "heading_size",
       "label": "Heading size",
+      "info": "No longer used: section titles share one style (Theme settings → Typography → Section heading font).",
       "options": [
         { "value": "var(--font-size--2xl)", "label": "Medium" },
         { "value": "var(--font-size--3xl)", "label": "Large" },

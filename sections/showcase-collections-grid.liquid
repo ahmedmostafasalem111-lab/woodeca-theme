@@ -30,7 +30,7 @@
   "
 >
   {% if section.settings.heading != blank %}
-    <h2 class="showcase-collections__heading">{{ section.settings.heading }}</h2>
+    <h2 class="showcase-collections__heading section-title">{{ section.settings.heading }}</h2>
   {% endif %}
 
 
@@ -82,10 +82,9 @@
 </div>
 
 {% stylesheet %}
+  /* Title style: .section-title (base.css); ~18px to the grid (14px on phones). */
   .showcase-collections__heading {
-    margin: 0 0 var(--margin-lg);
-    font-size: var(--collections-heading-size, var(--font-size--3xl));
-    line-height: var(--line-height--heading-tight);
+    margin: 0 0 18px;
   }
 
   .showcase-collections__grid {
@@ -190,7 +189,6 @@
 
     .showcase-collections__heading {
       margin-block-end: 14px;
-      font-size: var(--font-size--lg);
     }
 
     /* Pills stay on one line and scroll horizontally. */
@@ -305,6 +303,7 @@
       "type": "select",
       "id": "heading_size",
       "label": "Heading size",
+      "info": "No longer used: section titles share one style (Theme settings → Typography → Section heading font).",
       "options": [
         { "value": "var(--font-size--2xl)", "label": "Medium" },
         { "value": "var(--font-size--3xl)", "label": "Large" },

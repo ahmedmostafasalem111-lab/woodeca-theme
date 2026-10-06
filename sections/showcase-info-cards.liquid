@@ -43,7 +43,7 @@
   "
 >
   {% if section.settings.heading != blank %}
-    <h2 class="showcase-info__heading">{{ section.settings.heading }}</h2>
+    <h2 class="showcase-info__heading section-title">{{ section.settings.heading }}</h2>
   {% endif %}
 
   {%- capture info_cards -%}
@@ -98,10 +98,9 @@
 {% endif %}
 
 {% stylesheet %}
+  /* Title style: .section-title (base.css); ~18px to the cards (14px on phones). */
   .showcase-info__heading {
-    margin: 0 0 var(--margin-xl);
-    font-size: var(--info-heading-size, var(--font-size--3xl));
-    line-height: var(--line-height--heading-tight);
+    margin: 0 0 18px;
   }
 
   .info-card {
@@ -167,7 +166,7 @@
 
   @media screen and (max-width: 749px) {
     .showcase-info__heading {
-      font-size: var(--font-size--xl);
+      margin-block-end: 14px;
     }
 
     .info-card__title {
@@ -202,6 +201,7 @@
       "type": "select",
       "id": "heading_size",
       "label": "Heading size",
+      "info": "No longer used: section titles share one style (Theme settings → Typography → Section heading font).",
       "options": [
         { "value": "var(--font-size--2xl)", "label": "Medium" },
         { "value": "var(--font-size--3xl)", "label": "Large" },

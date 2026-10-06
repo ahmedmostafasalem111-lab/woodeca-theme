@@ -71,7 +71,7 @@
   {% if heading != blank or description != blank %}
     <div class="showcase-carousel__header">
       {% if heading != blank %}
-        <h2 class="showcase-carousel__heading">{{ heading }}</h2>
+        <h2 class="showcase-carousel__heading section-title">{{ heading }}</h2>
       {% endif %}
 
       {% if description != blank %}
@@ -137,17 +137,18 @@
 ></script>
 
 {% stylesheet %}
+  /* Title style: .section-title (base.css). Tight like divan: ~14px to the content on phones, ~18px from 990px. */
   .showcase-carousel__header {
     display: flex;
     flex-direction: column;
     gap: var(--gap-xs);
-    margin-block-end: var(--margin-xl);
+    margin-block-end: 14px;
   }
 
-  .showcase-carousel__heading {
-    margin: 0;
-    font-size: var(--showcase-heading-size, var(--font-size--3xl));
-    line-height: var(--line-height--heading-tight);
+  @media screen and (min-width: 990px) {
+    .showcase-carousel__header {
+      margin-block-end: 18px;
+    }
   }
 
   .showcase-carousel__description {
@@ -165,10 +166,6 @@
   }
 
   @media screen and (max-width: 749px) {
-    .showcase-carousel__heading {
-      font-size: var(--font-size--xl);
-    }
-
     .showcase-carousel__description {
       font-size: var(--font-size--sm);
     }
@@ -194,6 +191,7 @@
       "type": "select",
       "id": "heading_size",
       "label": "Heading size",
+      "info": "No longer used: section titles share one style (Theme settings → Typography → Section heading font).",
       "options": [
         { "value": "var(--font-size--xl)", "label": "Small" },
         { "value": "var(--font-size--2xl)", "label": "Medium" },

@@ -82,7 +82,7 @@
   {% if section.settings.heading != blank or section.settings.description != blank %}
     <div class="showcase-spotlight__header">
       {% if section.settings.heading != blank %}
-        <h2 class="showcase-spotlight__heading">{{ section.settings.heading }}</h2>
+        <h2 class="showcase-spotlight__heading section-title">{{ section.settings.heading }}</h2>
       {% endif %}
 
       {% if section.settings.description != blank %}
@@ -277,17 +277,12 @@
     scroll-margin-block-start: calc(var(--header-group-height, 0px) + 12px);
   }
 
+  /* Title style: .section-title (base.css); ~18px from the header to the photo and list. */
   .showcase-spotlight__header {
     display: flex;
     flex-direction: column;
     gap: var(--gap-sm);
-    margin-block-end: var(--margin-xl);
-  }
-
-  .showcase-spotlight__heading {
-    margin: 0;
-    font-size: var(--spotlight-heading-size, var(--font-size--3xl));
-    line-height: var(--line-height--heading-tight);
+    margin-block-end: 18px;
   }
 
   .showcase-spotlight__description {
@@ -586,10 +581,6 @@
 
     .showcase-spotlight__heading {
       margin-block-end: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      line-height: 1.3;
-      text-align: start;
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
@@ -795,6 +786,7 @@
       "type": "select",
       "id": "heading_size",
       "label": "Heading size",
+      "info": "No longer used: section titles share one style (Theme settings → Typography → Section heading font).",
       "options": [
         { "value": "var(--font-size--2xl)", "label": "Medium" },
         { "value": "var(--font-size--3xl)", "label": "Large" },

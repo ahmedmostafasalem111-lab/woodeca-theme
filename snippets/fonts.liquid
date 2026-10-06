@@ -10,3 +10,13 @@
 {%- unless settings.type_accent_font.system? -%}
   {{ settings.type_accent_font | font_url | preload_tag: as: 'font', type: 'font/woff2', fetchpriority: 'low' }}
 {%- endunless -%}
+{%- liquid
+  # Section titles: the weight-500 face only (see theme-styles-variables).
+  assign section_font = settings.section_heading_font | font_modify: 'weight', '500'
+  if section_font == blank
+    assign section_font = settings.section_heading_font
+  endif
+-%}
+{%- unless section_font.system? -%}
+  {{ section_font | font_url | preload_tag: as: 'font', type: 'font/woff2', fetchpriority: 'low' }}
+{%- endunless -%}

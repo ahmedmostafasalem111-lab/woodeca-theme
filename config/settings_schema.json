@@ -116,6 +116,13 @@
         "label": "t:options.accent"
       },
       {
+        "type": "font_picker",
+        "id": "section_heading_font",
+        "label": "Section heading font",
+        "default": "dm_sans_n5",
+        "info": "Used only for section titles (e.g. New Arrivals, Shop By Room), always at weight 500."
+      },
+      {
         "type": "header",
         "content": "t:content.text_presets"
       },

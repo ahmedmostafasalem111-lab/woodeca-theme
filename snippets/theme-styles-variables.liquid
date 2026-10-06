@@ -121,6 +121,18 @@
       echo accent_font_bold_italic | font_face: font_display: 'swap'
       assign rendered_fonts = rendered_fonts | append: accent_font_bold_italic_face_id
     endunless
+
+    # Section titles (.section-title): one face only, weight 500 — or the picked
+    # weight when the family has no 500.
+    assign section_font = settings.section_heading_font | font_modify: 'weight', '500'
+    if section_font == blank
+      assign section_font = settings.section_heading_font
+    endif
+    assign section_font_face_id = '[f]-[w]-[s]|' | replace: '[f]', section_font.family | replace: '[w]', section_font.weight | replace: '[s]', section_font.style
+    unless rendered_fonts contains section_font_face_id
+      echo section_font | font_face: font_display: 'swap'
+      assign rendered_fonts = rendered_fonts | append: section_font_face_id
+    endunless
   %}
 
   :root {
@@ -169,6 +181,9 @@
     --font-accent--family: {{ settings.type_accent_font.family }}, {{ settings.type_accent_font.fallback_families }};
     --font-accent--style: {{ settings.type_accent_font.style }};
     --font-accent--weight: {{ settings.type_accent_font.weight }};
+    --font-section-heading--family: {{ section_font.family }}, {{ section_font.fallback_families }};
+    --font-section-heading--style: {{ section_font.style }};
+    --font-section-heading--weight: {{ section_font.weight }};
 
     /* Margin sizes */
     --font-heading--spacing: 0.25em;

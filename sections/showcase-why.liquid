@@ -48,7 +48,7 @@
 
     <div class="showcase-why__band">
       {% if section.settings.heading != blank %}
-        <h2 class="showcase-why__heading">{{ section.settings.heading }}</h2>
+        <h2 class="showcase-why__heading section-title">{{ section.settings.heading }}</h2>
       {% endif %}
 
       {% if features.size > 0 %}
@@ -118,13 +118,9 @@
     padding-block: var(--padding-4xl);
   }
 
+  /* Title style: .section-title (base.css); ~18px to the content (14px on phones). */
   .showcase-why__heading {
-    margin: 0 0 var(--margin-3xl);
-    font-size: var(--why-heading-size, var(--font-size--3xl));
-    font-weight: 400;
-    line-height: var(--line-height--heading-tight);
-    text-align: center;
-    text-wrap: balance;
+    margin: 0 0 18px;
   }
 
   .showcase-why__grid {
@@ -253,8 +249,7 @@
     }
 
     .showcase-why__heading {
-      margin-block-end: var(--margin-xl);
-      font-size: var(--font-size--xl);
+      margin-block-end: 14px;
     }
 
     .showcase-why__mission {
@@ -282,6 +277,7 @@
       "type": "select",
       "id": "heading_size",
       "label": "Heading size",
+      "info": "No longer used: section titles share one style (Theme settings → Typography → Section heading font).",
       "options": [
         { "value": "var(--font-size--2xl)", "label": "Medium" },
         { "value": "var(--font-size--3xl)", "label": "Large" },

@@ -34,7 +34,7 @@
   <div class="showcase-promo__header">
     <div class="showcase-promo__intro">
       {% if section.settings.heading != blank or section.settings.heading_suffix != blank %}
-        <h2 class="showcase-promo__heading">
+        <h2 class="showcase-promo__heading section-title">
           {%- if section.settings.heading != blank -%}
             <span>{{ section.settings.heading }}</span>
           {%- endif -%}
@@ -114,12 +114,13 @@
 </div>
 
 {% stylesheet %}
+  /* Title style: .section-title (base.css); ~18px to the content (14px on phones). */
   .showcase-promo__header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--gap-lg);
-    margin-block-end: var(--margin-xl);
+    margin-block-end: 18px;
   }
 
   .showcase-promo__intro {
@@ -134,8 +135,6 @@
     flex-wrap: wrap;
     gap: var(--gap-2xs);
     margin: 0;
-    font-size: var(--promo-heading-size, var(--font-size--3xl));
-    line-height: var(--line-height--heading-tight);
   }
 
   .showcase-promo__heading-icon {
@@ -238,10 +237,7 @@
     .showcase-promo__header {
       flex-direction: column;
       align-items: stretch;
-    }
-
-    .showcase-promo__heading {
-      font-size: var(--font-size--xl);
+      margin-block-end: 14px;
     }
 
     .showcase-promo__subtext {
@@ -329,6 +325,7 @@
       "type": "select",
       "id": "heading_size",
       "label": "Heading size",
+      "info": "No longer used: section titles share one style (Theme settings → Typography → Section heading font).",
       "options": [
         { "value": "var(--font-size--2xl)", "label": "Medium" },
         { "value": "var(--font-size--3xl)", "label": "Large" },
