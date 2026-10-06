@@ -835,23 +835,23 @@
         "n1": {
           "type": "product",
           "settings": {
-            "product": "",
+            "product": "lumi-3-door-kids-wardrobe",
             "title": "Corner sofa lorem-2 milk velour",
             "price": "87,990",
             "compare_price": "",
-            "stock_text": "In stock: 1 pc.",
-            "stock_level": "low",
+            "stock_text": "",
+            "stock_level": "in",
             "url": ""
           }
         },
         "n2": {
           "type": "product",
           "settings": {
-            "product": "",
+            "product": "lumi-2-door-kids-wardrobe",
             "title": "Bed ipsum 90 velour olive",
             "price": "25,290",
             "compare_price": "",
-            "stock_text": "Available in other colors: 2 pcs.",
+            "stock_text": "",
             "stock_level": "in",
             "url": ""
           }
@@ -859,11 +859,11 @@
         "n3": {
           "type": "product",
           "settings": {
-            "product": "",
+            "product": "cloudy-kids-wardrobe",
             "title": "Bed dolor 120 velour beige",
             "price": "28,590",
             "compare_price": "",
-            "stock_text": "Available in other colors: 2 pcs.",
+            "stock_text": "",
             "stock_level": "in",
             "url": ""
           }
@@ -871,11 +871,11 @@
         "n4": {
           "type": "product",
           "settings": {
-            "product": "",
+            "product": "talia-200cm-t-v-unit",
             "title": "Amet 120 velour terracotta bed",
             "price": "47,290",
             "compare_price": "",
-            "stock_text": "In stock: 5 pcs.",
+            "stock_text": "",
             "stock_level": "in",
             "url": ""
           }
@@ -883,11 +883,11 @@
         "n5": {
           "type": "product",
           "settings": {
-            "product": "",
+            "product": "talia-160cm-t-v-unit",
             "title": "Consectetur shelf unit 180",
             "price": "19,450",
             "compare_price": "",
-            "stock_text": "In stock: 7 pcs.",
+            "stock_text": "",
             "stock_level": "in",
             "url": ""
           }
@@ -895,11 +895,11 @@
         "n6": {
           "type": "product",
           "settings": {
-            "product": "",
+            "product": "milo-200cm-t-v-unit",
             "title": "Adipiscing dining table 140",
             "price": "34,120",
             "compare_price": "",
-            "stock_text": "In stock: 3 pcs.",
+            "stock_text": "",
             "stock_level": "in",
             "url": ""
           }
