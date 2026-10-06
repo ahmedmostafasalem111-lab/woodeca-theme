@@ -655,6 +655,7 @@
         "columns": 4,
         "section_width": "page-width",
         "background_color": "#dfe7dd",
+        "card_media_background": "#FFFFFF",
         "text_color": "",
         "button_background": "#333333",
         "button_text_color": "#ffffff",
