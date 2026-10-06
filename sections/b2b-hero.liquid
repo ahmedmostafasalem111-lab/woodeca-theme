@@ -2,8 +2,8 @@
   Image hero (divan.ru/b2b style): full-bleed image under a dark overlay, a
   centred H1 and subtitle in white, and a white pill button (usually #enquiry).
   The image is the LCP: eager, fetchpriority high and preloaded from <head> at
-  high priority (layout/theme.liquid). Phones get 375–750px files whatever their
-  pixel density, wider screens 750–1920px. No image: a solid band in
+  high priority (layout/theme.liquid). Phones get the mobile image when one is
+  set (else the desktop image) — see the hero-picture snippet. No image: a solid band in
   the theme's dark palette colour, text unchanged.
 {% endcomment %}
 {%- render 'b2b-styles' -%}
@@ -17,29 +17,17 @@
 >
   {% if image != blank %}
   {%- comment -%}
-    Phones (under 750px) get the 375–750px files whatever their pixel density;
-    wider screens get 750–1920px. Both preload tags are copied into <head> by
-    layout/theme.liquid, so the download starts at high priority before the CSS
-    and scripts; the media, srcset and sizes match the <picture> below, so the
-    browser reuses the preloaded file.
+    Phones get the mobile image when one is set. The two preload tags the
+    snippet prints are copied into <head> by layout/theme.liquid.
   {%- endcomment -%}
-  <link data-hero-preload rel="preload" as="image" fetchpriority="high" media="(max-width: 749px)" imagesrcset="{{ image | image_url: width: 375 }} 375w, {{ image | image_url: width: 550 }} 550w, {{ image | image_url: width: 750 }} 750w" imagesizes="100vw">
-  <link data-hero-preload rel="preload" as="image" fetchpriority="high" media="(min-width: 750px)" imagesrcset="{{ image | image_url: width: 750 }} 750w, {{ image | image_url: width: 1100 }} 1100w, {{ image | image_url: width: 1500 }} 1500w, {{ image | image_url: width: 1920 }} 1920w" imagesizes="100vw">
-  {%- capture hero_srcset -%}{{ image | image_url: width: 750 }} 750w, {{ image | image_url: width: 1100 }} 1100w, {{ image | image_url: width: 1500 }} 1500w, {{ image | image_url: width: 1920 }} 1920w{%- endcapture -%}
-  <picture class="b2b-hero__picture">
-    <source media="(max-width: 749px)" srcset="{{ image | image_url: width: 375 }} 375w, {{ image | image_url: width: 550 }} 550w, {{ image | image_url: width: 750 }} 750w" sizes="100vw">
-    {{
-      image
-      | image_url: width: 1920
-      | image_tag:
-        class: 'b2b-hero__image',
-        loading: 'eager',
-        fetchpriority: 'high',
-        srcset: hero_srcset,
-        sizes: '100vw',
-        alt: ''
-    }}
-  </picture>
+  {% render 'hero-picture',
+    image: image,
+    mobile_image: section.settings.mobile_image,
+    class: 'b2b-hero__image',
+    loading: 'eager',
+    fetchpriority: 'high',
+    preload: true
+  %}
     <div class="b2b-hero__overlay" aria-hidden="true"></div>
   {% elsif request.design_mode %}
     {{ 'hero-apparel-1' | placeholder_svg_tag: 'b2b-hero__image b2b-hero__placeholder' }}
@@ -82,11 +70,6 @@
   }
 
   /* Laid over the hero so it takes no grid/flex slot; the image fills it. */
-  .b2b-hero__picture {
-    position: absolute;
-    inset: 0;
-  }
-
   .b2b-hero__overlay {
     position: absolute;
     inset: 0;
@@ -158,7 +141,8 @@
   "tag": "section",
   "class": "section-b2b-hero",
   "settings": [
-    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "image_picker", "id": "image", "label": "Desktop image", "info": "Desktop: 2400 × 1000 px (12:5) at Size Large, 2400 × 770 px (about 3.1:1) at Size Compact. The hero grows taller if its text needs more room." },
+    { "type": "image_picker", "id": "mobile_image", "label": "Mobile image", "info": "Shown below 750 px wide. Mobile: 1080 × 1385 px (about 4:5). Leave empty to use the desktop image. Its focal point (Shopify image editor) is kept." },
     { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 80, "step": 5, "unit": "%", "default": 45 },
     {
       "type": "select",
