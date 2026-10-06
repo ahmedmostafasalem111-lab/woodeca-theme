@@ -343,7 +343,7 @@
         "quick_add_background": "#1c1c1c",
         "quick_add_icon_color": "#ffffff",
         "padding-block-start": 28,
-        "padding-block-end": 48
+        "padding-block-end": 20
       }
     },
     "s4_spotlight": {
@@ -474,7 +474,7 @@
         "cta_background": "#333333",
         "cta_text_color": "#ffffff",
         "section_width": "page-width",
-        "padding-block-start": 48,
+        "padding-block-start": 40,
         "padding-block-end": 48
       }
     },
