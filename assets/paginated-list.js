@@ -31,7 +31,10 @@ export default class PaginatedList extends Component {
   /** @type {((value: void) => void) | null} */
   #resolvePreviousPagePromise = null;
 
-  /** @type {PaginatedListAspectRatioHelper} */
+  /**
+   * Only exists when the grid has a Horizon card gallery to measure; our showcase cards don't.
+   * @type {PaginatedListAspectRatioHelper | undefined}
+   */
   #aspectRatioHelper;
 
   connectedCallback() {
@@ -192,7 +195,7 @@ export default class PaginatedList extends Component {
 
     grid.append(...nextPageItemElements);
 
-    this.#aspectRatioHelper.processNewElements();
+    this.#aspectRatioHelper?.processNewElements();
 
     await yieldToMainThread();
 
@@ -233,7 +236,7 @@ export default class PaginatedList extends Component {
     // Prepend the new elements
     grid.prepend(...previousPageItemElements);
 
-    this.#aspectRatioHelper.processNewElements();
+    this.#aspectRatioHelper?.processNewElements();
 
     // Calculate and adjust scroll position to maintain the same view
     if (firstElement) {
