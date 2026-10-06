@@ -69,7 +69,7 @@
 -%}
 {% if more_count > 0 %}
   <div class="article-more">
-    <h2 class="article-more__heading">{{ section.settings.more_heading | default: 'More from the blog' }}</h2>
+    <h2 class="article-more__heading section-title">{{ section.settings.more_heading | default: 'More from the blog' }}</h2>
     <ul class="article-more__grid" role="list">{{ more_cards }}</ul>
   </div>
 {% endif %}
@@ -181,11 +181,15 @@
     border-block-start: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-10));
   }
 
+  /* Title style: .section-title (base.css); ~14px to the content on phones, ~18px from 990px. */
   .article-more__heading {
-    margin: 0 0 32px;
-    font-size: 24px;
-    font-weight: 400;
-    text-align: center;
+    margin: 0 0 14px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .article-more__heading {
+      margin-block-end: 18px;
+    }
   }
 
   .article-more__grid {

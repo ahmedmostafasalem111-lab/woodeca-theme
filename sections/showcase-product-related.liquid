@@ -141,7 +141,7 @@
     "
   >
     {% if section.settings.heading != blank %}
-      <h2 class="product-related__heading">{{ section.settings.heading }}</h2>
+      <h2 class="product-related__heading section-title">{{ section.settings.heading }}</h2>
     {% endif %}
 
     {% if use_tabs and has_b %}
@@ -226,21 +226,21 @@
 ></script>
 
 {% stylesheet %}
+  /* Title style: .section-title (base.css); ~14px to the content on phones, ~18px from 990px. */
   .product-related__heading {
-    margin: 0 0 var(--margin-lg);
-    font-size: var(--font-size--2xl);
-    line-height: var(--line-height--heading-tight);
+    margin: 0 0 14px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .product-related__heading {
+      margin-block-end: 18px;
+    }
   }
 
   .product-related__tablist {
     margin-block-end: var(--margin-xl);
   }
 
-  @media screen and (max-width: 749px) {
-    .product-related__heading {
-      font-size: var(--font-size--xl);
-    }
-  }
 {% endstylesheet %}
 
 {% schema %}

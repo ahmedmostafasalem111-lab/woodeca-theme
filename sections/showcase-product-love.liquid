@@ -35,7 +35,7 @@
     "
   >
     {% if section.settings.heading != blank %}
-      <h2 class="product-love__heading">{{ section.settings.heading }}</h2>
+      <h2 class="product-love__heading section-title">{{ section.settings.heading }}</h2>
     {% endif %}
 
     {%- comment -%}
@@ -74,10 +74,15 @@
 {% endif %}
 
 {% stylesheet %}
+  /* Title style: .section-title (base.css); ~14px to the content on phones, ~18px from 990px. */
   .product-love__heading {
-    margin: 0 0 var(--margin-lg);
-    font-size: var(--font-size--2xl);
-    text-align: center;
+    margin: 0 0 14px;
+  }
+
+  @media screen and (min-width: 990px) {
+    .product-love__heading {
+      margin-block-end: 18px;
+    }
   }
 
   /*

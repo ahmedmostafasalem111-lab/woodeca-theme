@@ -2236,3 +2236,26 @@ main > .shopify-section:first-child .section:not(.disable-section-top-offset) {
     font-size: 25px;
   }
 }
+
+/*
+  Judge.me's review widget title ("Customer Reviews") shares the section title style.
+  Only the heading's type, alignment and spacing below it; the widget's layout is untouched.
+*/
+.jdgm-widget .jdgm-rev-widg .jdgm-rev-widg__header .jdgm-rev-widg__title {
+  margin: 0 0 14px;
+  font-family: var(--font-section-heading--family);
+  font-style: var(--font-section-heading--style, normal);
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-align: start;
+  text-transform: none;
+}
+
+@media screen and (min-width: 990px) {
+  .jdgm-widget .jdgm-rev-widg .jdgm-rev-widg__header .jdgm-rev-widg__title {
+    margin-block-end: 18px;
+    font-size: 25px;
+  }
+}
