@@ -141,6 +141,15 @@
   fetchpriority="low"
 ></script>
 
+{%- comment -%} The swatch tap (photo swap, colour-aware links) is handled by the same script as the collection grid. {%- endcomment -%}
+{% if section.settings.show_swatches %}
+  <script
+    src="{{ 'showcase-card-slider.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
+
 {% stylesheet %}
   /* Title style: .section-title (base.css); ~18px to the content (14px on phones). */
   .showcase-promo__header {

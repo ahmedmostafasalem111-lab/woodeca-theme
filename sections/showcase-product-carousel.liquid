@@ -94,7 +94,8 @@
             product: product,
             card_index: card_position,
             stock_text: section.settings.default_stock_text,
-            show_quick_add: section.settings.show_quick_add
+            show_quick_add: section.settings.show_quick_add,
+            show_swatches: section.settings.show_swatches
           %}
         </div>
       {%- endfor -%}
@@ -110,7 +111,8 @@
             stock_text: block.settings.stock_text,
             stock_level: block.settings.stock_level,
             url: block.settings.url,
-            show_quick_add: section.settings.show_quick_add
+            show_quick_add: section.settings.show_quick_add,
+            show_swatches: section.settings.show_swatches
           %}
         </div>
       {%- endfor -%}
@@ -135,6 +137,15 @@
   type="module"
   fetchpriority="low"
 ></script>
+
+{%- comment -%} The swatch tap (photo swap, colour-aware links) is handled by the same script as the collection grid. {%- endcomment -%}
+{% if section.settings.show_swatches %}
+  <script
+    src="{{ 'showcase-card-slider.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
 
 {% stylesheet %}
   /* Title style: .section-title (base.css). Tight like divan: ~14px to the content on phones, ~18px from 990px. */
@@ -279,6 +290,12 @@
       "id": "show_quick_add",
       "label": "Show quick add-to-cart button",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "Show colour swatches",
+      "default": false
     },
     {
       "type": "select",
