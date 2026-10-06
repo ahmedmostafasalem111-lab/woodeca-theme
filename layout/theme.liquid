@@ -37,16 +37,23 @@
 
     {%- render 'meta-tags' -%}
     {%- comment -%}
-      Photo-hero pages (Our Story, For Business, For Designers): copy the hero
-      section's preload tags (marked data-hero-preload: one for phones, one for
-      wider screens) into <head>, so the hero
+      Photo-hero pages (Our Story, For Business, For Designers, and the
+      homepage's first hero slide): copy the hero's preload tags (marked
+      data-hero-preload: one for phones, one for wider screens; the phone one
+      points at the mobile image when it is set) into <head>, so the hero
       image downloads at high priority before the CSS and scripts. A section
       can't write into <head>, and content_for_layout is only readable here in
       the layout, not in a snippet.
     {%- endcomment -%}
     {%- liquid
       assign hero_templates = 'story,business,designers' | split: ','
-      if template.name == 'page' and hero_templates contains template.suffix and content_for_layout contains 'data-hero-preload'
+      assign hero_page = false
+      if template.name == 'page' and hero_templates contains template.suffix
+        assign hero_page = true
+      elsif template.name == 'index'
+        assign hero_page = true
+      endif
+      if hero_page and content_for_layout contains 'data-hero-preload'
         assign hero_parts = content_for_layout | split: 'data-hero-preload'
         for hero_part in hero_parts offset: 1 limit: 2
           assign hero_tag = hero_part | split: '>' | first

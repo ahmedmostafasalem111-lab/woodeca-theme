@@ -1,0 +1,144 @@
+{%- doc -%}
+  Hero / banner image with an optional separate phone image.
+
+  Renders a <picture>: below 750px the phone source (the mobile image, or the
+  desktop image when no mobile image is set), from 750px the desktop image.
+  Each has its own srcset, so a phone downloads only the phone file and a
+  desktop only the desktop file.
+
+  The <picture> is `display: contents`, so the <img> keeps exactly the place it
+  had in each section's layout (absolute, grid or flex child) and every
+  section's own image CSS still applies. Its <source> is hidden so it can never
+  become a layout box.
+
+  The phone source carries the phone image's own width and height, so a box
+  that follows the image's proportions takes the mobile image's shape on
+  phones. Without a mobile image both are the desktop image's: no change.
+
+  With a mobile image, the image keeps the mobile image's focal point (set in
+  the Shopify image editor) on phones, or `mobile_position` when the section
+  has its own focal point setting.
+
+  `preload: true` also prints a phone and a desktop preload tag
+  (data-hero-preload) that layout/theme.liquid copies into <head> on the pages
+  it allows, with the same srcset and sizes so the browser reuses the download.
+
+  @param {object} image - Desktop image (the section's existing image setting).
+  @param {object} [mobile_image] - Phone image; blank = use the desktop image.
+  @param {string} [class] - Class(es) for the <img>.
+  @param {string} [alt] - Alt text. Default ''.
+  @param {string} [loading] - 'eager' or 'lazy'. Default 'lazy'.
+  @param {string} [fetchpriority] - 'high', 'low' or 'auto'. Default 'auto'.
+  @param {string} [sizes] - Desktop sizes. Default '100vw'.
+  @param {string} [mobile_sizes] - Phone sizes. Default '100vw'.
+  @param {string} [mobile_position] - object-position for the mobile image on phones; default its own focal point.
+  @param {boolean} [preload] - Also print the head preload tags.
+
+  @example
+  {% render 'hero-picture', image: section.settings.image, mobile_image: section.settings.mobile_image, class: 'x__image', loading: 'eager', fetchpriority: 'high' %}
+{%- enddoc -%}
+
+{%- liquid
+  assign alt_text = alt | default: ''
+  assign load = loading | default: 'lazy'
+  assign priority = fetchpriority | default: 'auto'
+  assign desktop_sizes = sizes | default: '100vw'
+  assign phone_sizes = mobile_sizes | default: '100vw'
+
+  assign phone = image
+  assign has_mobile = false
+  if mobile_image != blank
+    assign phone = mobile_image
+    assign has_mobile = true
+  endif
+
+  capture phone_srcset
+    for w in (1..4)
+      case w
+        when 1
+          assign px = 375
+        when 2
+          assign px = 550
+        when 3
+          assign px = 750
+        when 4
+          assign px = 1100
+      endcase
+      echo phone | image_url: width: px | append: ' ' | append: px | append: 'w'
+      unless forloop.last
+        echo ', '
+      endunless
+    endfor
+  endcapture
+
+  capture desktop_srcset
+    for w in (1..4)
+      case w
+        when 1
+          assign px = 1100
+        when 2
+          assign px = 1500
+        when 3
+          assign px = 1920
+        when 4
+          assign px = 2400
+      endcase
+      echo image | image_url: width: px | append: ' ' | append: px | append: 'w'
+      unless forloop.last
+        echo ', '
+      endunless
+    endfor
+  endcapture
+
+  assign img_class = class | append: ''
+  assign img_style = ''
+  if has_mobile
+    assign img_class = img_class | append: ' hero-picture__img--mobile'
+    assign phone_position = mobile_position | default: mobile_image.presentation.focal_point | default: '50% 50%'
+    assign img_style = '--hero-picture-mobile-position: ' | append: phone_position | append: ';'
+  endif
+-%}
+
+{%- if preload -%}
+  <link data-hero-preload rel="preload" as="image" fetchpriority="high" media="(max-width: 749px)" imagesrcset="{{ phone_srcset }}" imagesizes="{{ phone_sizes }}">
+  <link data-hero-preload rel="preload" as="image" fetchpriority="high" media="(min-width: 750px)" imagesrcset="{{ desktop_srcset }}" imagesizes="{{ desktop_sizes }}">
+{%- endif -%}
+<picture class="hero-picture">
+  <source
+    media="(max-width: 749px)"
+    srcset="{{ phone_srcset }}"
+    sizes="{{ phone_sizes }}"
+    width="{{ phone.width }}"
+    height="{{ phone.height }}"
+  >
+  {{-
+    image
+    | image_url: width: 2400
+    | image_tag:
+      class: img_class,
+      loading: load,
+      fetchpriority: priority,
+      srcset: desktop_srcset,
+      sizes: desktop_sizes,
+      style: img_style,
+      alt: alt_text
+  -}}
+</picture>
+
+{% stylesheet %}
+  /* No box of its own: the <img> sits in its section's layout as before. */
+  .hero-picture {
+    display: contents;
+  }
+
+  .hero-picture > source {
+    display: none;
+  }
+
+  /* Phones with a separate mobile image: that image's focal point. */
+  @media screen and (max-width: 749px) {
+    .hero-picture > img.hero-picture__img--mobile {
+      object-position: var(--hero-picture-mobile-position, 50% 50%);
+    }
+  }
+{% endstylesheet %}
