@@ -180,7 +180,7 @@
         "text_color": "",
         "tile_background": "#f2f2f0",
         "padding-block-start": 40,
-        "padding-block-end": 40
+        "padding-block-end": 20
       }
     },
     "s3_carousel_study": {
@@ -342,7 +342,7 @@
         "discount_text_color": "#ffffff",
         "quick_add_background": "#1c1c1c",
         "quick_add_icon_color": "#ffffff",
-        "padding-block-start": 48,
+        "padding-block-start": 28,
         "padding-block-end": 48
       }
     },
