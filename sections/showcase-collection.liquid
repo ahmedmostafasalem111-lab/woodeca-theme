@@ -130,11 +130,17 @@
         class="collection-banner"
         style="--collection-banner-height: {{ section.settings.banner_height }}px;"
       >
-        {{
-          banner_image
-          | image_url: width: 2400
-          | image_tag: loading: 'eager', fetchpriority: 'high', class: 'collection-banner__image', alt: collection.title, sizes: '100vw', widths: '480, 750, 1000, 1400, 1920, 2400'
-        }}
+        {%- comment -%} Phones get the mobile banner image when one is set. {%- endcomment -%}
+        {% render 'hero-picture',
+          image: banner_image,
+          mobile_image: section.settings.banner_mobile_image,
+          class: 'collection-banner__image',
+          alt: collection.title,
+          loading: 'eager',
+          fetchpriority: 'high',
+          sizes: '(min-width: 990px) calc(100vw - 80px), calc(100vw - 32px)',
+          mobile_sizes: 'calc(100vw - 32px)'
+        %}
       </div>
     {% endif %}
   {% endif %}
@@ -836,8 +842,14 @@
     {
       "type": "image_picker",
       "id": "banner_image",
-      "label": "Banner image",
-      "info": "Leave blank to fall back to the collection's own image."
+      "label": "Desktop banner image",
+      "info": "Leave blank to fall back to the collection's own image. Desktop: 2400 × 670 px (about 3.6:1) at the default 380 px height."
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_mobile_image",
+      "label": "Mobile banner image",
+      "info": "Shown below 750 px wide, where the banner is 200 px tall. Mobile: 1080 × 603 px (about 16:9). Leave empty to use the desktop banner. Its focal point (Shopify image editor) is kept."
     },
     {
       "type": "range",
