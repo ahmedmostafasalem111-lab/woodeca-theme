@@ -15,34 +15,37 @@
         "slide_1": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/ChatGPT_Image_Jul_30_2026_03_57_22_PM.png",
-            "eyebrow": "1–31 Lorem",
-            "heading": "Everything at once. EASY.",
-            "subheading": "Collection for teenagers",
-            "link_text": "Read more",
-            "link": ""
+            "image": "shopify://shop_images/2._T.V_Unit_Desktop_Banner.webp",
+            "mobile_image": "shopify://shop_images/2._T.V_Unit_Desktop_Mobile.webp",
+            "eyebrow": "11.11 SALE",
+            "heading": "The Center of Your Space.",
+            "subheading": "UP TO 40% OFF",
+            "link_text": "Shop T.V Units",
+            "link": "shopify://collections/t-v-units"
           }
         },
         "slide_2": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/ChatGPT_Image_Jul_30_2026_03_57_22_PM.png",
-            "eyebrow": "1–28 Ipsum",
-            "heading": "Amet consectetur. ELIT.",
-            "subheading": "Sed do eiusmod tempor",
-            "link_text": "Read more",
-            "link": ""
+            "image": "shopify://shop_images/1._Wardrobe_Desktop_Banner.webp",
+            "mobile_image": "shopify://shop_images/1._Wardrobe_Mobile_Banner.webp",
+            "eyebrow": "11.11 SALE",
+            "heading": "Storage, Beautifully Designed.",
+            "subheading": "UP TO 40% OFF",
+            "link_text": "Shop  Wardrobes",
+            "link": "shopify://collections/wardrobes"
           }
         },
         "slide_3": {
           "type": "slide",
           "settings": {
-            "image": "shopify://shop_images/ChatGPT_Image_Jul_30_2026_03_57_22_PM.png",
-            "eyebrow": "1–30 Dolor",
-            "heading": "Tempor incididunt. LABORE.",
-            "subheading": "Ut enim ad minim veniam",
-            "link_text": "Buy",
-            "link": ""
+            "image": "shopify://shop_images/1._Drawer_Unit_Desktop_Banner.webp",
+            "mobile_image": "shopify://shop_images/1._Drawer_Unit_Mobile_Banner.webp",
+            "eyebrow": "11.11 SALE",
+            "heading": "A Place for Everything",
+            "subheading": "UP TO 40% OFF",
+            "link_text": "Shop  Drawer Units",
+            "link": "shopify://collections/drawer-units"
           }
         }
       },
@@ -454,6 +457,7 @@
         "heading_size": "var(--font-size--3xl)",
         "description": "<p><strong>Thoughtfully designed to grow with your child, every step of the way.</strong><br/></p>",
         "image": "shopify://shop_images/Sunlit_Mushroom_Pajamas_Bedtime_Bounce.png",
+        "mobile_image_position": "50% 50%",
         "image_position": "50% 50%",
         "mobile_image_ratio": "auto",
         "mobile_card_width": 37,
