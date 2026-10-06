@@ -59,11 +59,20 @@
           %}
           <div class="showcase-hero__media">
             {% if block.settings.image != blank %}
-              {{
-                block.settings.image
-                | image_url: width: 2400
-                | image_tag: class: 'showcase-hero__image', loading: slide_loading, fetchpriority: slide_priority, alt: block.settings.heading, sizes: '100vw', widths: '480, 750, 1000, 1400, 1920, 2400'
-              }}
+              {%- comment -%}
+                Phones get the slide's mobile image when one is set. The first
+                slide is the page's LCP: its preload tags go to <head>
+                (layout/theme.liquid).
+              {%- endcomment -%}
+              {% render 'hero-picture',
+                image: block.settings.image,
+                mobile_image: block.settings.mobile_image,
+                class: 'showcase-hero__image',
+                alt: block.settings.heading,
+                loading: slide_loading,
+                fetchpriority: slide_priority,
+                preload: forloop.first
+              %}
             {% elsif request.design_mode %}
               {{ 'lifestyle-1' | placeholder_svg_tag: 'showcase-hero__image showcase-hero__image--placeholder' }}
             {% endif %}
@@ -473,7 +482,14 @@
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Background image"
+          "label": "Desktop image",
+          "info": "Desktop: 2400 × 1033 px (about 7:3). The slide is 620 px tall on every desktop, so wider screens crop the top and bottom."
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile image",
+          "info": "Shown below 750 px wide. Mobile: 1080 × 1274 px (about 6:7). Leave empty to use the desktop image. Its focal point (Shopify image editor) is kept."
         },
         {
           "type": "text",
