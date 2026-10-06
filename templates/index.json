@@ -641,138 +641,24 @@
     },
     "s7_promo": {
       "type": "showcase-promo-grid",
-      "blocks": {
-        "t1": {
-          "type": "tile",
-          "settings": {
-            "name": "Sofas",
-            "discount": "-40%",
-            "link": ""
-          }
-        },
-        "t2": {
-          "type": "tile",
-          "settings": {
-            "name": "Cabinets and shelving",
-            "discount": "-50%",
-            "link": ""
-          }
-        },
-        "t3": {
-          "type": "tile",
-          "settings": {
-            "name": "Chests of drawers and bedside tables",
-            "discount": "-60%",
-            "link": ""
-          }
-        },
-        "t4": {
-          "type": "tile",
-          "settings": {
-            "name": "Carpets and textiles",
-            "discount": "-60%",
-            "link": ""
-          }
-        },
-        "t5": {
-          "type": "tile",
-          "settings": {
-            "name": "Tables and chairs",
-            "discount": "-50%",
-            "link": ""
-          }
-        },
-        "t6": {
-          "type": "tile",
-          "settings": {
-            "name": "Armchairs",
-            "discount": "-40%",
-            "link": ""
-          }
-        },
-        "t7": {
-          "type": "tile",
-          "settings": {
-            "name": "Beds and mattresses",
-            "discount": "-55%",
-            "link": ""
-          }
-        },
-        "t8": {
-          "type": "tile",
-          "settings": {
-            "name": "Bed sheets",
-            "discount": "-45%",
-            "link": ""
-          }
-        },
-        "t9": {
-          "type": "tile",
-          "settings": {
-            "name": "Lighting",
-            "discount": "-45%",
-            "link": ""
-          }
-        },
-        "t10": {
-          "type": "tile",
-          "settings": {
-            "name": "Lorem dolor",
-            "discount": "-30%",
-            "link": ""
-          }
-        },
-        "t11": {
-          "type": "tile",
-          "settings": {
-            "name": "Ipsum amet",
-            "discount": "-35%",
-            "link": ""
-          }
-        },
-        "t12": {
-          "type": "tile",
-          "settings": {
-            "name": "Consectetur",
-            "discount": "-25%",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "t1",
-        "t2",
-        "t3",
-        "t4",
-        "t5",
-        "t6",
-        "t7",
-        "t8",
-        "t9",
-        "t10",
-        "t11",
-        "t12"
-      ],
       "settings": {
         "heading": "We will deliver quickly",
         "show_heading_icon": true,
-        "heading_icon": "truck",
+        "heading_icon": "package-check",
         "heading_suffix": "from 1 day",
         "heading_size": "var(--font-size--3xl)",
         "subtext": "Furniture and home goods you don't have to wait for",
-        "button_label": "See all",
+        "button_label": "View all",
         "button_link": "",
-        "columns": 6,
+        "columns": 4,
         "section_width": "page-width",
         "background_color": "#dfe7dd",
         "text_color": "",
-        "tile_background": "#ffffff",
-        "badge_background": "#f3c98b",
-        "badge_text_color": "#1c1c1c",
         "button_background": "#333333",
         "button_text_color": "#ffffff",
         "padding-block-start": 56,
-        "padding-block-end": 56
+        "padding-block-end": 56,
+        "collection": "ready-to-ship"
       }
     },
     "s7c_payments": {
