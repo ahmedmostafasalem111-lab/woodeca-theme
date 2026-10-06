@@ -676,7 +676,13 @@
       background-color: var(--color-background, #fff);
     }
 
+    /*
+      Full card width. The base rule's `align-items: start` (for the desktop grid)
+      carries into this flex column and stopped the box stretching, so it shrank
+      to ~89% and the card's white background showed beside it over the photo.
+    */
     .spotlight-item__media {
+      width: 100%;
       aspect-ratio: 1 / 1;
       border-radius: 3px;
       background-color: #f3f3f3;
