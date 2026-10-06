@@ -16,6 +16,10 @@
   # own proportion, exactly as desktop does; the presets are for a deliberately
   # different mobile crop.
   assign mobile_ratio = spotlight_ratio
+  # A separate mobile image: "Match the image" follows that image on phones.
+  if section.settings.mobile_image != blank
+    assign mobile_ratio = section.settings.mobile_image.aspect_ratio | default: spotlight_ratio
+  endif
   case section.settings.mobile_image_ratio
     when '1/1'
       assign mobile_ratio = 1
@@ -55,7 +59,11 @@
     --spotlight-thumb-background: {{ section.settings.thumb_background | default: '#f2f2f0' }};
     --spotlight-image-ratio: {{ spotlight_ratio }};
     --spotlight-mobile-ratio: {{ mobile_ratio }};
+    {%- if section.settings.mobile_image != blank %}
+    --spotlight-image-position: {{ section.settings.mobile_image_position | default: '50% 50%' }};
+    {%- else %}
     --spotlight-image-position: {{ section.settings.image_position | default: '50% 50%' }};
+    {%- endif %}
     {%- comment -%}
       Resolved here rather than in the stylesheet so the percentage and the ratio
       meet in one place: a share of the banner's height, where the banner is
@@ -86,11 +94,16 @@
   <div class="showcase-spotlight__columns">
     <div class="showcase-spotlight__media">
       {% if section.settings.image != blank %}
-        {{
-          section.settings.image
-          | image_url: width: 1600
-          | image_tag: loading: 'lazy', class: 'showcase-spotlight__image', alt: section.settings.heading, sizes: '(min-width: 990px) 57vw, 100vw', widths: '400, 600, 800, 1000, 1300, 1600'
-        }}
+        {%- comment -%} Phones get the mobile image when one is set. {%- endcomment -%}
+        {% render 'hero-picture',
+          image: section.settings.image,
+          mobile_image: section.settings.mobile_image,
+          mobile_position: section.settings.mobile_image_position,
+          class: 'showcase-spotlight__image',
+          alt: section.settings.heading,
+          loading: 'lazy',
+          sizes: '(min-width: 990px) 57vw, 100vw'
+        %}
       {% elsif request.design_mode %}
         {{ 'lifestyle-2' | placeholder_svg_tag: 'showcase-spotlight__image showcase-spotlight__image--placeholder' }}
       {% endif %}
@@ -802,7 +815,32 @@
     {
       "type": "image_picker",
       "id": "image",
-      "label": "Lifestyle image"
+      "label": "Desktop image",
+      "info": "Desktop: 2400 × 1673 px (about 10:7). The phone banner uses the same shape unless a mobile image or \"Banner shape on phones\" says otherwise."
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile image",
+      "info": "Shown below 750 px wide. Mobile: 1080 × 753 px (about 10:7); with \"Banner shape on phones: Match the image\" the phone banner takes this image's own shape. The product cards overlap its bottom 12%. Leave empty to use the desktop image."
+    },
+    {
+      "type": "select",
+      "id": "mobile_image_position",
+      "label": "Mobile image focal point",
+      "options": [
+        { "value": "50% 0%", "label": "Top" },
+        { "value": "0% 50%", "label": "Left" },
+        { "value": "50% 50%", "label": "Center" },
+        { "value": "100% 50%", "label": "Right" },
+        { "value": "50% 100%", "label": "Bottom" },
+        { "value": "0% 0%", "label": "Top left" },
+        { "value": "100% 0%", "label": "Top right" },
+        { "value": "0% 100%", "label": "Bottom left" },
+        { "value": "100% 100%", "label": "Bottom right" }
+      ],
+      "default": "50% 50%",
+      "info": "Which part of the mobile image to keep when the phone banner crops it. Only used when a mobile image is set."
     },
     {
       "type": "select",
