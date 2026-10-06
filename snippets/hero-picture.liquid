@@ -4,7 +4,8 @@
   Renders a <picture>: below 750px the phone source (the mobile image, or the
   desktop image when no mobile image is set), from 750px the desktop image.
   Each has its own srcset, so a phone downloads only the phone file and a
-  desktop only the desktop file.
+  desktop only the desktop file. The phone srcset stops at 750px: no phone,
+  whatever its pixel density, downloads a bigger file. Desktop: 1100–2400px.
 
   The <picture> is `display: contents`, so the <img> keeps exactly the place it
   had in each section's layout (absolute, grid or flex child) and every
@@ -52,8 +53,10 @@
     assign has_mobile = true
   endif
 
+  # Phones: 375–750px only, so no phone (even at 3x) downloads more than the
+  # 750px file.
   capture phone_srcset
-    for w in (1..4)
+    for w in (1..3)
       case w
         when 1
           assign px = 375
@@ -61,8 +64,6 @@
           assign px = 550
         when 3
           assign px = 750
-        when 4
-          assign px = 1100
       endcase
       echo phone | image_url: width: px | append: ' ' | append: px | append: 'w'
       unless forloop.last
