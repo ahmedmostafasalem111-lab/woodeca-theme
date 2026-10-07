@@ -904,10 +904,15 @@
 
     /*
       Logo centred on the row itself, so it stays centred with two icons on the
-      left (menu, search) and three on the right (account, phone, cart).
+      left (menu, search) and two on the right (phone, cart).
     */
     .showcase-header__main-inner {
       position: relative;
+    }
+
+    /* Account lives in the menu drawer on phones ("Sign in" / "My account"). */
+    .showcase-header__account {
+      display: none;
     }
 
     .showcase-header__logo {
