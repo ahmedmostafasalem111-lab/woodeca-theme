@@ -32,8 +32,28 @@ const whenLoadedAndIdle = new Promise((resolve) => {
   else window.addEventListener('load', afterLoad, { once: true });
 });
 
-/** @param {HTMLElement} host */
+/**
+ * Click to play: the smallest MP4 whose height covers the hero at this screen's
+ * pixel density (data-sources: "url height,url height"), else the largest.
+ * Falls back to the mobile/desktop pick when the list is missing.
+ * @param {HTMLElement} host
+ */
 function videoSource(host) {
+  const sources = (host.dataset.sources ?? '')
+    .split(',')
+    .map((entry) => {
+      const [url, height] = entry.trim().split(' ');
+      return { url, height: Number(height) };
+    })
+    .filter((source) => source.url && source.height > 0)
+    .sort((a, b) => a.height - b.height);
+
+  if (sources.length > 0) {
+    const ratio = parseFloat(getComputedStyle(host).getPropertyValue('--story-hero-ratio')) || 16 / 9;
+    const needed = (host.clientWidth * (window.devicePixelRatio || 1)) / ratio;
+    return (sources.find((source) => source.height >= needed) ?? sources[sources.length - 1]).url;
+  }
+
   const phone = window.matchMedia('(max-width: 749px)').matches;
   return (phone ? host.dataset.srcMobile : host.dataset.srcDesktop) || host.dataset.srcDesktop;
 }

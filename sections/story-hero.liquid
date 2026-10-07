@@ -56,6 +56,20 @@
       assign image = video.preview_image
     endif
   endif
+
+  # Click to play: every MP4 rendition as "url height", so the script can pick
+  # the smallest one that covers the hero at the screen's pixel density.
+  assign click_sources = ''
+  if click_mode
+    capture click_sources
+      for source in mp4s
+        echo source.url | append: ' ' | append: source.height
+        unless forloop.last
+          echo ','
+        endunless
+      endfor
+    endcapture
+  endif
 -%}
 
 {% if section.settings.show_breadcrumbs %}
@@ -76,6 +90,7 @@
   {% endif %}
   {% if click_mode %}
     data-mode="click"
+    data-sources="{{ click_sources | strip }}"
   {% endif %}
 >
   {% if image != blank %}
