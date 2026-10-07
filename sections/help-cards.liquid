@@ -182,6 +182,8 @@
   .help-cards__item {
     display: flex;
     min-width: 0;
+    /* Deep links (/pages/returns#warranty) land below the sticky header, not under it. */
+    scroll-margin-top: calc(var(--header-height, 72px) + 16px);
   }
 
   .help-card {
