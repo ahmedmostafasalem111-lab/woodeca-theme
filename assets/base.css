@@ -2266,12 +2266,15 @@ main > .shopify-section:first-child .section:not(.disable-section-top-offset) {
   Judge.me's classes only; nothing else in the widget is restyled.
 */
 .jdgm-all-reviews-widget-v2025 {
+  /* Judge.me reads these for its write-review button. */
+  --jdgm-write-review-bg-color: var(--color-primary-button-background);
+  --jdgm-write-review-text-color: var(--color-primary-button-text);
   font-family: var(--font-body--family);
 }
 
-.jdgm-all-reviews-widget-v2025 .jdgm-write-rev-link,
-.jdgm-all-reviews-widget-v2025 .jdgm-btn--solid,
-.jdgm-all-reviews-widget-v2025 .jdgm-paginate__load-more {
+.jdgm-widget.jdgm-all-reviews-widget-v2025 .jdgm-write-rev-link,
+.jdgm-widget.jdgm-all-reviews-widget-v2025 .jdgm-btn--solid,
+.jdgm-widget.jdgm-all-reviews-widget-v2025 .jdgm-paginate__load-more {
   border: var(--style-border-width-primary, 1px) solid var(--color-primary-button-border, var(--color-primary-button-background));
   border-radius: 999px;
   background-color: var(--color-primary-button-background);
@@ -2280,13 +2283,13 @@ main > .shopify-section:first-child .section:not(.disable-section-top-offset) {
   font-weight: 600;
 }
 
-.jdgm-all-reviews-widget-v2025 .jdgm-write-rev-link:hover,
-.jdgm-all-reviews-widget-v2025 .jdgm-btn--solid:hover,
-.jdgm-all-reviews-widget-v2025 .jdgm-paginate__load-more:hover {
+.jdgm-widget.jdgm-all-reviews-widget-v2025 .jdgm-write-rev-link:hover,
+.jdgm-widget.jdgm-all-reviews-widget-v2025 .jdgm-btn--solid:hover,
+.jdgm-widget.jdgm-all-reviews-widget-v2025 .jdgm-paginate__load-more:hover {
   background-color: var(--color-primary-button-hover-background);
   color: var(--color-primary-button-hover-text, var(--color-primary-button-text));
 }
 
-.jdgm-all-reviews-widget-v2025 .jdgm-btn--border {
+.jdgm-widget.jdgm-all-reviews-widget-v2025 .jdgm-btn--border {
   border-radius: 999px;
 }
