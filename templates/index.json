@@ -958,75 +958,24 @@
         "padding-block-end": 36
       }
     },
-    "s11_gallery": {
-      "type": "showcase-social-gallery",
+    "reviews_carousel": {
+      "type": "reviews-carousel",
       "blocks": {
-        "g1": {
-          "type": "photo",
-          "settings": {
-            "caption": "@lorem_ipsum",
-            "link": ""
-          }
-        },
-        "g2": {
-          "type": "photo",
-          "settings": {
-            "caption": "@lorem_ipsum",
-            "link": ""
-          }
-        },
-        "g3": {
-          "type": "photo",
-          "settings": {
-            "caption": "@lorem_ipsum",
-            "link": ""
-          }
-        },
-        "g4": {
-          "type": "photo",
-          "settings": {
-            "caption": "@lorem_ipsum",
-            "link": ""
-          }
-        },
-        "g5": {
-          "type": "photo",
-          "settings": {
-            "caption": "@lorem_ipsum",
-            "link": ""
-          }
-        },
-        "g6": {
-          "type": "photo",
-          "settings": {
-            "caption": "@lorem_ipsum",
-            "link": ""
-          }
+        "judge_me_cards_carousel": {
+          "type": "shopify://apps/judge-me-reviews/blocks/cards_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {}
         }
       },
       "block_order": [
-        "g1",
-        "g2",
-        "g3",
-        "g4",
-        "g5",
-        "g6"
+        "judge_me_cards_carousel"
       ],
       "settings": {
         "heading": "Real Homes. Real Reviews.",
-        "heading_size": "var(--font-size--3xl)",
-        "subtext": "See what our customers say about Woodeca and how our furniture looks in their homes.",
-        "columns": 4,
-        "columns_mobile": 2,
-        "show_arrows": true,
-        "show_progress": true,
+        "subtitle": "See what our customers say about Woodeca.",
+        "show_badge": true,
         "section_width": "page-width",
-        "seo_heading": "Loved by Customers Across Egypt",
-        "seo_body": "",
-        "background_color": "",
-        "text_color": "",
-        "padding-block-start": 36,
-        "padding-block-end": 36
+        "padding-block-start": 40,
+        "padding-block-end": 40
       }
     }
   },
@@ -1041,6 +990,6 @@
     "s7c_payments",
     "s7b_why",
     "s8_carousel_new",
-    "s11_gallery"
+    "reviews_carousel"
   ]
 }

@@ -1,0 +1,156 @@
+{% comment %}
+  "Real Homes. Real Reviews." Our heading, subtitle and rating badge around
+  Judge.me's official Cards Carousel app block (added as an @app block).
+  The badge reads Judge.me's own published rating and count (shop metafields
+  judgeme.all_reviews_rating / all_reviews_count) and links to the Reviews
+  page. With no reviews, nothing renders: no empty box.
+{% endcomment %}
+{%- liquid
+  assign review_count = shop.metafields.judgeme.all_reviews_count.value | default: shop.metafields.judgeme.all_reviews_count | plus: 0
+  assign review_rating = shop.metafields.judgeme.all_reviews_rating.value | default: shop.metafields.judgeme.all_reviews_rating | plus: 0
+  assign rating_rounded = review_rating | round: 1
+  assign rating_percent = review_rating | divided_by: 5.0 | times: 100 | round: 1
+-%}
+{% if review_count > 0 %}
+  <div
+    class="section section--{{ section.settings.section_width }} reviews-carousel spacing-style"
+    style="{% render 'spacing-padding', settings: section.settings %}"
+  >
+    <div class="reviews-carousel__header">
+      <div class="reviews-carousel__intro">
+        {% if section.settings.heading != blank %}
+          <h2 class="reviews-carousel__heading section-title">{{ section.settings.heading }}</h2>
+        {% endif %}
+        {% if section.settings.subtitle != blank %}
+          <p class="reviews-carousel__subtitle">{{ section.settings.subtitle }}</p>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_badge %}
+        <a
+          class="reviews-carousel__badge"
+          href="{{ section.settings.badge_link | default: '/pages/reviews' }}"
+          aria-label="Rated {{ rating_rounded }} out of 5 from {{ review_count }} reviews. Read all reviews"
+        >
+          <span class="reviews-carousel__stars" style="--rating-percent: {{ rating_percent }}%;" aria-hidden="true">
+            <span class="reviews-carousel__stars-fill">★★★★★</span>★★★★★
+          </span>
+          <span class="reviews-carousel__score">{{ rating_rounded }}</span>
+          <span class="reviews-carousel__count">{{ review_count }} reviews</span>
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="reviews-carousel__widget">
+      {% for block in section.blocks %}
+        {% render block %}
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .reviews-carousel__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-block-end: 18px;
+  }
+
+  .reviews-carousel__heading {
+    margin: 0;
+  }
+
+  .reviews-carousel__subtitle {
+    margin: 6px 0 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+    font-size: var(--font-size--md);
+    line-height: 1.5;
+  }
+
+  /* Rating badge: Judge.me's own rating and count, in Judge.me's star colour. */
+  .reviews-carousel__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-foreground);
+    font-size: 14px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .reviews-carousel__badge:hover .reviews-carousel__count {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .reviews-carousel__stars {
+    position: relative;
+    display: inline-block;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    font-size: 16px;
+    letter-spacing: 1px;
+    line-height: 1;
+  }
+
+  .reviews-carousel__stars-fill {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    width: var(--rating-percent, 100%);
+    overflow: hidden;
+    color: var(--reviews-star-color, #e0ca1e);
+    white-space: nowrap;
+  }
+
+  .reviews-carousel__score {
+    font-weight: 600;
+  }
+
+  .reviews-carousel__count {
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
+  }
+
+  /* The carousel itself is Judge.me's; it only gets the page width and no page overflow. */
+  .reviews-carousel__widget {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  @media screen and (min-width: 990px) {
+    .reviews-carousel__header {
+      margin-block-end: 24px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Reviews carousel",
+  "tag": "section",
+  "class": "section-reviews-carousel",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Real Homes. Real Reviews." },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "See what our customers say about Woodeca." },
+    { "type": "checkbox", "id": "show_badge", "label": "Show rating badge", "default": true },
+    { "type": "url", "id": "badge_link", "label": "Rating badge link", "info": "Defaults to /pages/reviews." },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    { "type": "range", "id": "padding-block-start", "label": "Top padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding-block-end", "label": "Bottom padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 }
+  ],
+  "blocks": [{ "type": "@app" }],
+  "presets": [{ "name": "Reviews carousel" }]
+}
+{% endschema %}
