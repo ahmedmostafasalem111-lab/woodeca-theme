@@ -18,14 +18,14 @@
           "type": "column",
           "settings": {
             "heading": "About",
-            "menu": "footer-1"
+            "menu": "footer-1-new-theme"
           }
         },
         "col_2": {
           "type": "column",
           "settings": {
             "heading": "Customer service",
-            "menu": "footer-2"
+            "menu": "footer-2-new-theme"
           }
         },
         "col_3": {
