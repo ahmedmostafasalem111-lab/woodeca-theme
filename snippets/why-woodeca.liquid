@@ -1,0 +1,180 @@
+{%- doc -%}
+  "Why Woodeca" heading and feature grid, shared by the homepage and the product
+  page (both through the showcase-why section, each with its own blocks).
+
+  Each feature shows its "Outline icon" (Lucide, see lucide-icon), else the
+  uploaded image, else the older built-in icon, so placements that haven't
+  picked an outline icon look as they did. Icons are 36px, 32px on phones, in
+  the text colour. The heading is centred over the whole section width.
+
+  @param {object} section - The showcase-why section (heading, show_numbers, mobile_layout, feature blocks).
+
+  @example
+  {% render 'why-woodeca', section: section %}
+{%- enddoc -%}
+{%- liquid
+  assign features = section.blocks | where: 'type', 'feature'
+  assign mobile_layout = section.settings.mobile_layout | default: 'grid'
+-%}
+
+{% if section.settings.heading != blank %}
+  <h2 class="why-woodeca__heading section-title">{{ section.settings.heading }}</h2>
+{% endif %}
+
+{% if features.size > 0 %}
+  <div class="why-woodeca__grid why-woodeca__grid--mobile-{{ mobile_layout }}">
+    {% for block in features %}
+      <div class="why-woodeca__item" {{ block.shopify_attributes }}>
+        {% if section.settings.show_numbers %}
+          <span class="why-woodeca__number" aria-hidden="true">{{ forloop.index }}</span>
+        {% elsif block.settings.outline_icon != blank and block.settings.outline_icon != 'none' %}
+          <span class="why-woodeca__icon" aria-hidden="true">
+            {%- render 'lucide-icon', name: block.settings.outline_icon -%}
+          </span>
+        {% elsif block.settings.icon_image != blank %}
+          <span class="why-woodeca__icon why-woodeca__icon--image" aria-hidden="true">
+            {{- block.settings.icon_image | image_url: width: 220 | image_tag: loading: 'lazy', alt: '', sizes: '106px', widths: '110, 220' -}}
+          </span>
+        {% else %}
+          {% assign icon_file = 'icon-' | append: block.settings.icon | append: '.svg' %}
+          <span class="svg-wrapper why-woodeca__icon why-woodeca__icon--image" aria-hidden="true">
+            {{- icon_file | inline_asset_content -}}
+          </span>
+        {% endif %}
+
+        {% if block.settings.title != blank %}
+          <p class="why-woodeca__title">{{ block.settings.title }}</p>
+        {% endif %}
+
+        {% if block.settings.description != blank %}
+          <p class="why-woodeca__text">{{ block.settings.description }}</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  /* Centred over the full section width, whatever the number of columns. */
+  .why-woodeca__heading {
+    margin: 0 0 32px;
+    text-align: center;
+  }
+
+  .why-woodeca__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--why-columns, 4), minmax(0, 1fr));
+    gap: 40px 32px;
+  }
+
+  /* One rhythm for every card: icon → 16px → title → 6px → text. */
+  .why-woodeca__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .why-woodeca__icon {
+    display: flex;
+    width: 36px;
+    height: 36px;
+    margin-block-end: 16px;
+    color: var(--color-foreground);
+  }
+
+  .why-woodeca__icon svg,
+  .why-woodeca__icon img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* Uploaded images and the older built-in icons keep the section's icon size. */
+  .why-woodeca__icon--image {
+    width: var(--why-icon-size, 64px);
+    height: var(--why-icon-size, 64px);
+    --icon-stroke-width: 1;
+  }
+
+  .why-woodeca__number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin-block-end: 16px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
+    border-radius: 50%;
+    font-size: var(--font-size--md);
+    font-weight: 600;
+  }
+
+  .why-woodeca__title {
+    margin: 0 0 6px;
+    font-size: var(--font-size--md);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  .why-woodeca__text {
+    margin: 0;
+    max-width: 34ch;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
+    font-size: var(--font-size--sm);
+    text-wrap: balance;
+  }
+
+  @media screen and (max-width: 989px) {
+    .why-woodeca__grid--mobile-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px 16px;
+    }
+
+    .why-woodeca__grid--mobile-carousel {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(70%, 1fr);
+      grid-template-columns: none;
+      gap: var(--gap-md);
+      margin-inline: calc(var(--page-margin, 16px) * -1);
+      padding-inline: var(--page-margin, 16px);
+      scroll-padding-inline-start: var(--page-margin, 16px);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .why-woodeca__grid--mobile-carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .why-woodeca__grid--mobile-carousel > .why-woodeca__item {
+      scroll-snap-align: start;
+    }
+  }
+
+  /* Phones: tighter, same rhythm in every card. */
+  @media screen and (max-width: 749px) {
+    .why-woodeca__heading {
+      margin-block-end: 20px;
+    }
+
+    .why-woodeca__icon,
+    .why-woodeca__number {
+      width: 32px;
+      height: 32px;
+      margin-block-end: 10px;
+    }
+
+    .why-woodeca__icon--image {
+      width: var(--why-icon-size, 64px);
+      height: var(--why-icon-size, 64px);
+    }
+
+    .why-woodeca__title {
+      margin-block-end: 4px;
+    }
+  }
+{% endstylesheet %}

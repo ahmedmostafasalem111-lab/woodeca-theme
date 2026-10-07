@@ -47,48 +47,8 @@
     <div class="showcase-why__band-background" aria-hidden="true"></div>
 
     <div class="showcase-why__band">
-      {% if section.settings.heading != blank %}
-        <h2 class="showcase-why__heading section-title">{{ section.settings.heading }}</h2>
-      {% endif %}
-
-      {% if features.size > 0 %}
-        {%- comment -%}
-          `mobile_layout` is opt-in and defaults to the grid, so every existing
-          placement of this section keeps the layout it already had. The carousel
-          variant only changes behaviour below the mobile breakpoint.
-        {%- endcomment -%}
-        <div class="showcase-why__grid showcase-why__grid--mobile-{{ section.settings.mobile_layout | default: 'grid' }}">
-          {% for block in features %}
-            <div class="why-feature" {{ block.shopify_attributes }}>
-              {%- comment -%}
-                Numbering is opt-in, for the places this grid describes a sequence
-                rather than a set of unrelated benefits. It replaces the icon
-                rather than sitting beside it, so the row keeps one visual rhythm.
-              {%- endcomment -%}
-              {% if section.settings.show_numbers %}
-                <span class="why-feature__number" aria-hidden="true">{{ forloop.index }}</span>
-              {% else %}
-                <span class="svg-wrapper why-feature__icon" aria-hidden="true">
-                  {% if block.settings.icon_image != blank %}
-                    {{ block.settings.icon_image | image_url: width: 220 | image_tag: loading: 'lazy', alt: '', sizes: '106px', widths: '110, 220' }}
-                  {% else %}
-                    {% assign icon_file = 'icon-' | append: block.settings.icon | append: '.svg' %}
-                    {{- icon_file | inline_asset_content -}}
-                  {% endif %}
-                </span>
-              {% endif %}
-
-              {% if block.settings.title != blank %}
-                <p class="why-feature__title">{{ block.settings.title }}</p>
-              {% endif %}
-
-              {% if block.settings.description != blank %}
-                <p class="why-feature__text">{{ block.settings.description }}</p>
-              {% endif %}
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
+      {%- comment -%} Heading and features: shared with the product page (snippets/why-woodeca). {%- endcomment -%}
+      {% render 'why-woodeca', section: section %}
     </div>
   {% endif %}
 
@@ -111,70 +71,14 @@
     background-color: var(--why-band-background);
   }
 
-  /* Sits in the same row, but inside the page container. */
+  /*
+    Sits in the same row, but inside the page container. The heading and
+    feature grid inside it are styled in snippets/why-woodeca.
+  */
   .showcase-why__band {
     grid-column: 2;
     grid-row: 1;
     padding-block: var(--padding-4xl);
-  }
-
-  /* Title style: .section-title (base.css); ~18px to the content (14px on phones). */
-  .showcase-why__heading {
-    margin: 0 0 18px;
-  }
-
-  .showcase-why__grid {
-    display: grid;
-    grid-template-columns: repeat(var(--why-columns, 4), minmax(0, 1fr));
-    gap: var(--gap-xl);
-  }
-
-  .why-feature {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--gap-xs);
-    text-align: center;
-  }
-
-  /* Sized off the same variable as the icon it replaces, so a numbered row and
-     an icon row line up at exactly the same height. */
-  .why-feature__number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--why-icon-size, 64px);
-    height: var(--why-icon-size, 64px);
-    border: 1px solid rgb(var(--color-foreground-rgb) / var(--opacity-20));
-    border-radius: 50%;
-    font-size: var(--font-size--lg);
-    font-weight: 600;
-  }
-
-  .why-feature__icon,
-  .why-feature__icon svg,
-  .why-feature__icon img {
-    width: var(--why-icon-size, 64px);
-    height: var(--why-icon-size, 64px);
-    object-fit: contain;
-    color: var(--color-foreground);
-    /* Thin stroke to match the line-art reference. */
-    --icon-stroke-width: 1;
-  }
-
-  .why-feature__title {
-    margin: 0;
-    font-size: var(--font-size--md);
-    font-weight: 600;
-    text-wrap: balance;
-  }
-
-  .why-feature__text {
-    margin: 0;
-    max-width: 34ch;
-    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
-    font-size: var(--font-size--sm);
-    text-wrap: balance;
   }
 
   /* Mission sits on the page background, below the tinted band. */
@@ -196,63 +100,14 @@
     margin-block-end: 0;
   }
 
-  @media screen and (max-width: 989px) {
-    /*
-      One card plus a peek of the next, swiped rather than stacked. Uses the same
-      native scroll-snap mechanic as the other rows on the site — no library, and
-      the dots below are the affordance.
-    */
-    .showcase-why__grid--mobile-carousel {
-      display: flex;
-      grid-template-columns: none;
-      gap: var(--gap-md);
-      margin-inline: calc(var(--page-margin, 16px) * -1);
-      padding-inline: var(--page-margin, 16px);
-      scroll-padding-inline-start: var(--page-margin, 16px);
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
-    }
-
-    .showcase-why__grid--mobile-carousel::-webkit-scrollbar {
-      display: none;
-    }
-
-    .showcase-why__grid--mobile-carousel > .why-feature {
-      flex: 0 0 calc(100% - 22%);
-      scroll-snap-align: start;
-    }
-
-    .showcase-why__grid--mobile-grid {
-      /* Two per row on tablet and phone, same stacking order. */
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--gap-lg);
-    }
-
-    /*
-      A tenth larger below the desktop breakpoint. Scaled off the merchant's own
-      icon size rather than a second fixed number, so changing the setting still
-      changes both breakpoints together.
-    */
-    .why-feature__icon,
-    .why-feature__icon svg,
-    .why-feature__icon img {
-      width: calc(var(--why-icon-size, 64px) * 1.1);
-      height: calc(var(--why-icon-size, 64px) * 1.1);
-    }
-  }
-
   @media screen and (max-width: 749px) {
-    .showcase-why__band,
+    /* Compact on phones: the same space above the heading and below the cards. */
+    .showcase-why__band {
+      padding-block: 32px;
+    }
+
     .showcase-why__mission {
       padding-block: var(--padding-2xl);
-    }
-
-    .showcase-why__heading {
-      margin-block-end: 14px;
-    }
-
-    .showcase-why__mission {
       font-size: var(--font-size--lg);
     }
   }
@@ -409,6 +264,20 @@
       "type": "feature",
       "name": "Feature",
       "settings": [
+        {
+          "type": "select",
+          "id": "outline_icon",
+          "label": "Outline icon",
+          "options": [
+            { "value": "none", "label": "None (use the icon or image below)" },
+            { "value": "factory", "label": "Factory" },
+            { "value": "package-check", "label": "Package check" },
+            { "value": "shield-check", "label": "Shield check" },
+            { "value": "headset", "label": "Headset" }
+          ],
+          "default": "none",
+          "info": "Thin line icon in the text colour (Lucide). Takes priority over the icon and image below."
+        },
         {
           "type": "select",
           "id": "icon",

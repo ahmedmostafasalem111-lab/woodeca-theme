@@ -785,6 +785,7 @@
         "f1": {
           "type": "feature",
           "settings": {
+            "outline_icon": "factory",
             "icon": "store",
             "icon_image": "shopify://shop_images/USP_1.svg",
             "title": "Factory-Direct Prices",
@@ -794,6 +795,7 @@
         "f2": {
           "type": "feature",
           "settings": {
+            "outline_icon": "package-check",
             "icon": "shield",
             "icon_image": "shopify://shop_images/USP_2.svg",
             "title": "Shop Risk-Free",
@@ -803,6 +805,7 @@
         "f3": {
           "type": "feature",
           "settings": {
+            "outline_icon": "shield-check",
             "icon": "truck",
             "icon_image": "shopify://shop_images/USP_3.svg",
             "title": "Built to Last",
@@ -812,6 +815,7 @@
         "f4": {
           "type": "feature",
           "settings": {
+            "outline_icon": "headset",
             "icon": "chat",
             "icon_image": "shopify://shop_images/USP_4.svg",
             "title": "Here to Help",
