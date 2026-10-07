@@ -1,0 +1,29 @@
+{
+  "sections": {
+    "intro": {
+      "type": "page-intro",
+      "settings": {
+        "heading": "Customer Reviews",
+        "text": "Real reviews from Woodeca customers across Egypt.",
+        "padding-block-start": 32,
+        "padding-block-end": 8
+      }
+    },
+    "reviews": {
+      "type": "showcase-apps",
+      "blocks": {
+        "judge_me_all_reviews": {
+          "type": "shopify://apps/judge-me-reviews/blocks/all_reviews_page/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {}
+        }
+      },
+      "block_order": ["judge_me_all_reviews"],
+      "settings": {
+        "section_width": "page-width",
+        "padding-block-start": 16,
+        "padding-block-end": 64
+      }
+    }
+  },
+  "order": ["intro", "reviews"]
+}
