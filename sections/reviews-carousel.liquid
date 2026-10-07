@@ -132,7 +132,8 @@
     stay Judge.me's own, so swiping isn't affected.
   */
   @media screen and (max-width: 749px) {
-    .reviews-carousel__widget .jdgm-cards-wrapper {
+    /* One class more than Judge.me's own ".jdgm-cards-carousel .jdgm-cards-wrapper", which loads later. */
+    .reviews-carousel .reviews-carousel__widget .jdgm-cards-wrapper {
       width: 100%;
       max-width: 100%;
       margin-inline: 0;
