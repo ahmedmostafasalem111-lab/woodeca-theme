@@ -1242,13 +1242,19 @@
       "settings": [
         {
           "type": "paragraph",
-          "content": "A toggle-switch pill mapped onto one Shopify filter value. Find the parameter name by applying the filter once and copying it out of the URL."
+          "content": "A toggle-switch pill. Set a product tag to filter by tag, or a Shopify filter parameter and value. The pill only shows when products in the collection match."
         },
         {
           "type": "text",
           "id": "label",
           "label": "Label",
           "default": "In stock"
+        },
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Product tag",
+          "info": "For example ready-to-ship. When set, the filter parameter below is ignored."
         },
         {
           "type": "text",

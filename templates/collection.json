@@ -15,7 +15,8 @@
         "toggle_1": {
           "type": "quick_toggle",
           "settings": {
-            "label": "We will deliver quickly",
+            "label": "Ready to ship",
+            "tag": "ready-to-ship",
             "param_name": "filter.v.availability",
             "value": "1"
           }
@@ -23,16 +24,9 @@
         "toggle_2": {
           "type": "quick_toggle",
           "settings": {
-            "label": "At a discount",
+            "label": "On sale",
+            "tag": "on-sale",
             "param_name": "filter.p.m.custom.on_sale",
-            "value": "true"
-          }
-        },
-        "toggle_3": {
-          "type": "quick_toggle",
-          "settings": {
-            "label": "Stylish and inexpensive",
-            "param_name": "filter.p.m.custom.featured",
             "value": "true"
           }
         },
@@ -121,7 +115,6 @@
       "block_order": [
         "toggle_1",
         "toggle_2",
-        "toggle_3",
         "sub_1",
         "sub_5",
         "sub_2",

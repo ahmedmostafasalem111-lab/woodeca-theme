@@ -113,44 +113,74 @@
 
     {%- comment -%}
       ---- Configured quick-toggle pills ----
-      Merchant-defined toggles mapped onto a specific facet param/value. When the
-      pair is found among the native facets we use its real add/remove URLs and
-      active state; otherwise we fall back to appending the param, which Shopify
-      applies if the filter exists and ignores harmlessly if it doesn't.
+      Merchant-defined toggles. With a product tag set, the pill uses Shopify's
+      tag URL (/collections/bedroom/ready-to-ship) and only shows when products
+      in this collection carry that tag. Otherwise it maps onto a facet
+      param/value and only shows when that filter exists here and matches
+      products, so a pill can never look like a filter while doing nothing.
     {%- endcomment -%}
     {% assign quick_toggles = section.blocks | where: 'type', 'quick_toggle' %}
     {% for block in quick_toggles %}
       {% liquid
-        assign wanted_param = block.settings.param_name
-        assign wanted_value = block.settings.value
-        assign matched = null
+        assign show_toggle = false
+        assign toggle_is_on = false
+        assign quick_url = ''
+        assign wanted_tag = block.settings.tag | strip
 
-        for filter in collection.filters
-          if filter.type == 'boolean'
-            if filter.true_value.param_name == wanted_param
-              assign matched = filter.true_value
+        if wanted_tag != blank
+          assign tag_handle = wanted_tag | handleize
+          for current in current_tags
+            assign current_handle = current | handleize
+            if current_handle == tag_handle
+              assign toggle_is_on = true
             endif
-          else
-            for value in filter.values
-              if value.param_name == wanted_param and value.value == wanted_value
-                assign matched = value
-              endif
-            endfor
-          endif
-        endfor
-
-        if matched != null
-          assign toggle_is_on = matched.active
+          endfor
+          for tag in collection.all_tags
+            assign tag_handle_here = tag | handleize
+            if tag_handle_here == tag_handle
+              assign show_toggle = true
+            endif
+          endfor
           if toggle_is_on
-            assign quick_url = matched.url_to_remove
+            assign show_toggle = true
+            assign quick_url = collection.url
           else
-            assign quick_url = matched.url_to_add
+            assign quick_url = collection.url | append: '/' | append: tag_handle
           endif
         else
-          assign toggle_is_on = false
-          assign quick_url = collection.url | append: '?' | append: wanted_param | append: '=' | append: wanted_value
+          assign wanted_param = block.settings.param_name
+          assign wanted_value = block.settings.value
+          assign matched = null
+
+          for filter in collection.filters
+            if filter.type == 'boolean'
+              if filter.true_value.param_name == wanted_param
+                assign matched = filter.true_value
+              endif
+            else
+              for value in filter.values
+                if value.param_name == wanted_param and value.value == wanted_value
+                  assign matched = value
+                endif
+              endfor
+            endif
+          endfor
+
+          if matched != null
+            assign toggle_is_on = matched.active
+            if toggle_is_on
+              assign quick_url = matched.url_to_remove
+              assign show_toggle = true
+            else
+              assign quick_url = matched.url_to_add
+              if matched.count > 0
+                assign show_toggle = true
+              endif
+            endif
+          endif
         endif
       %}
+      {% unless show_toggle %}{% continue %}{% endunless %}
       <a
         href="{{ quick_url }}"
         class="collection-pill collection-pill--outline collection-pill--toggle"
