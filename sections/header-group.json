@@ -173,7 +173,7 @@
         "help_email_label": "",
         "show_language_switcher": true,
         "product_menu_label": "Shop By Product",
-        "mobile_product_menu": "main-menu",
+        "mobile_product_menu": "mobile-shop-by-product",
         "room_menu_label": "Shop By Room",
         "mobile_room_menu": "main-menu",
         "bestsellers_label": "Ready To Ship",

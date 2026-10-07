@@ -18,6 +18,7 @@
         "video": "shopify://files/videos/Woodeca Story - WEB.mp4",
         "video_mode": "click",
         "heading": "",
+        "subheading": "",
         "overlay_opacity": 20
       }
     },
@@ -56,7 +57,7 @@
       "type": "story-split",
       "settings": {
         "image": "shopify://shop_images/F3_DESKTOP_2.webp",
-        "image_side": "left",
+        "image_side": "right",
         "heading": "Better furniture. Without the middlemen.",
         "text": "<p>Traditional furniture shopping often means paying for expensive showrooms, distributors, and layers of markups.</p><p>At Woodeca, we cut out those extra costs by manufacturing and selling directly to you.</p><p>So more of what you spend goes into the furniture itself, not the journey it takes to reach your home.</p>",
         "link_label": "",
@@ -68,7 +69,7 @@
       "type": "story-split",
       "settings": {
         "image": "shopify://shop_images/Wardrobe_Installation_Team_at_Work_2.webp",
-        "image_side": "right",
+        "image_side": "left",
         "heading": "Online shopping. Real peace of mind.",
         "text": "<p></p><p>We believe buying furniture online should feel just as reassuring as seeing it in person.</p><p>That's why you can inspect your Woodeca furniture at home before paying. Love it? Keep it. Not what you expected? You can refuse it at no cost.</p><p>Your home. Your decision. No pressure.</p>",
         "link_label": "About our warranty",

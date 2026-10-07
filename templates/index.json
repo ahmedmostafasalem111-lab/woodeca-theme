@@ -787,8 +787,8 @@
           "settings": {
             "icon": "store",
             "icon_image": "shopify://shop_images/USP_1.svg",
-            "title": "Shop Direct & Save",
-            "description": "Built in our own factory and delivered straight to you — no middlemen,"
+            "title": "Factory-Direct Prices",
+            "description": "Made by us. Priced without middlemen."
           }
         },
         "f2": {
@@ -796,8 +796,8 @@
           "settings": {
             "icon": "shield",
             "icon_image": "shopify://shop_images/USP_2.svg",
-            "title": "Risk Free 14-Day Trial",
-            "description": "If it’s not love at first sight, send it back—no questions asked"
+            "title": "Shop Risk-Free",
+            "description": "Inspect before paying. 14-day returns."
           }
         },
         "f3": {
@@ -805,8 +805,8 @@
           "settings": {
             "icon": "truck",
             "icon_image": "shopify://shop_images/USP_3.svg",
-            "title": "Quality you can trust",
-            "description": "Enjoy peace of mind with our 3-year warranty on all products."
+            "title": "Built to Last",
+            "description": "Quality furniture. Backed by a 3-year warranty."
           }
         },
         "f4": {
@@ -814,8 +814,8 @@
           "settings": {
             "icon": "chat",
             "icon_image": "shopify://shop_images/USP_4.svg",
-            "title": "Customer Support That Cares",
-            "description": "We're here to help before, during, and after your purchase."
+            "title": "Here to Help",
+            "description": "Real support before and after delivery."
           }
         }
       },
@@ -832,8 +832,8 @@
         "show_numbers": false,
         "mobile_layout": "grid",
         "icon_size": 96,
-        "show_mission": true,
-        "mission": "<p>Our mission is to make it easy to create a home you'll love with modern, thoughtfully designed furniture built to last.</p>",
+        "show_mission": false,
+        "mission": "",
         "mission_size": "var(--font-size--2xl)",
         "section_width": "page-width",
         "band_background": "#f5f5f5",
@@ -927,9 +927,9 @@
         "n6"
       ],
       "settings": {
-        "heading": "New Products Catalog",
+        "heading": "Just Arrived",
         "heading_size": "var(--font-size--3xl)",
-        "description": "<p>Lorem ipsum is an online store for truly comfortable furniture. We offer our customers modern sofas, manufactured in-house, and guarantee not only high quality but also affordable prices.</p>",
+        "description": "<p>Fresh designs, made for your home.<br/></p>",
         "collection": "",
         "products_limit": 12,
         "default_stock_text": "",
@@ -950,57 +950,8 @@
         "discount_text_color": "#ffffff",
         "quick_add_background": "#1c1c1c",
         "quick_add_icon_color": "#ffffff",
-        "padding-block-start": 48,
-        "padding-block-end": 48
-      }
-    },
-    "s9_info": {
-      "type": "showcase-info-cards",
-      "blocks": {
-        "ic1": {
-          "type": "card",
-          "settings": {
-            "heading": "Design project as a gift",
-            "subtext": "We will refund its cost with loyalty program bonuses.",
-            "link": ""
-          }
-        },
-        "ic2": {
-          "type": "card",
-          "settings": {
-            "heading": "Lorem Club bonuses",
-            "subtext": "Update your interior profitably",
-            "link": ""
-          }
-        },
-        "ic3": {
-          "type": "card",
-          "settings": {
-            "heading": "You can try it on",
-            "subtext": "We deliver fabric samples to your home – order now",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "ic1",
-        "ic2",
-        "ic3"
-      ],
-      "settings": {
-        "show_section": true,
-        "heading": "More useful information",
-        "heading_size": "var(--font-size--3xl)",
-        "columns": 3,
-        "show_arrows": true,
-        "show_progress": true,
-        "section_width": "page-width",
-        "background_color": "",
-        "text_color": "",
-        "card_text_color": "#ffffff",
-        "scrim_opacity": 55,
-        "padding-block-start": 48,
-        "padding-block-end": 48
+        "padding-block-start": 28,
+        "padding-block-end": 36
       }
     },
     "s11_gallery": {
@@ -1058,20 +1009,20 @@
         "g6"
       ],
       "settings": {
-        "heading": "Decorating your home? Get inspired by real interiors!",
+        "heading": "Real Homes. Real Reviews.",
         "heading_size": "var(--font-size--3xl)",
-        "subtext": "Thousands of our clients have already shared photos of stylish apartments furnished with our furniture.",
+        "subtext": "See what our customers say about Woodeca and how our furniture looks in their homes.",
         "columns": 4,
         "columns_mobile": 2,
         "show_arrows": true,
         "show_progress": true,
         "section_width": "page-width",
-        "seo_heading": "Online furniture and home goods store in Lorem City",
-        "seo_body": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>",
+        "seo_heading": "Loved by Customers Across Egypt",
+        "seo_body": "",
         "background_color": "",
         "text_color": "",
-        "padding-block-start": 48,
-        "padding-block-end": 48
+        "padding-block-start": 36,
+        "padding-block-end": 36
       }
     }
   },
@@ -1086,7 +1037,6 @@
     "s7c_payments",
     "s7b_why",
     "s8_carousel_new",
-    "s9_info",
     "s11_gallery"
   ]
 }

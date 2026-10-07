@@ -12,12 +12,13 @@
     "hero": {
       "type": "b2b-hero",
       "settings": {
-        "image": "shopify://shop_images/ElaraBuffet200cmBrown4.webp",
+        "image": "shopify://shop_images/Designers_1_desktop.webp",
+        "mobile_image": "shopify://shop_images/Designers_1_Mobile.webp",
         "overlay_opacity": 45,
         "size": "compact",
-        "heading": "Partner with Woodeca",
-        "text": "Trade pricing, material samples and a dedicated contact for interior designers and architects.",
-        "button_label": "Join the program",
+        "heading": "Your Partner in Every Project.",
+        "text": "Bring your projects to life with factory-direct pricing, custom finishes, exclusive trade benefits, and dedicated support from production to installation.",
+        "button_label": "Partner with Woodeca",
         "button_link": "#enquiry"
       }
     },
@@ -165,28 +166,6 @@
         "request_type": "Request samples"
       }
     },
-    "projects": {
-      "type": "b2b-media-cards",
-      "settings": {
-        "heading": "Partner projects",
-        "heading_size": "md",
-        "text": "Homes and spaces designed by our partners, furnished by Woodeca.",
-        "body": "",
-        "tags": "",
-        "layout": "masonry",
-        "columns": "2",
-        "ratio": "2 / 3",
-        "card_style": "overlay",
-        "image_sizes": "(min-width: 990px) 555px, 100vw",
-        "band": false,
-        "button_label": "",
-        "button_link": "",
-        "file_label": "",
-        "file_url": "",
-        "prev_label": "Previous",
-        "next_label": "Next"
-      }
-    },
     "enquiry": {
       "type": "b2b-enquiry",
       "blocks": {
@@ -299,7 +278,6 @@
     "terms",
     "picks",
     "samples",
-    "projects",
     "enquiry"
   ]
 }
