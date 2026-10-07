@@ -8,7 +8,7 @@
 {%- liquid
   assign review_count = shop.metafields.judgeme.all_reviews_count.value | default: shop.metafields.judgeme.all_reviews_count | plus: 0
   assign review_rating = shop.metafields.judgeme.all_reviews_rating.value | default: shop.metafields.judgeme.all_reviews_rating | plus: 0
-  assign rating_rounded = review_rating | round: 1
+  assign rating_rounded = review_rating | round: 2
   assign rating_percent = review_rating | divided_by: 5.0 | times: 100 | round: 1
 -%}
 {% if review_count > 0 %}
@@ -118,6 +118,25 @@
     min-width: 0;
     max-width: 100%;
     overflow: hidden;
+  }
+
+  /* Our heading and rating badge replace the widget's own title and rating line. */
+  .reviews-carousel__widget .jdgm-cards-carousel > .jdgm-header {
+    display: none;
+  }
+
+  /*
+    Phones: Judge.me shows exactly one card in a centred window. Widening the
+    window to the section lets the next card peek in (about 1.4 cards) and lines
+    the active card up with the page gutter. Card width and the slide steps
+    stay Judge.me's own, so swiping isn't affected.
+  */
+  @media screen and (max-width: 749px) {
+    .reviews-carousel__widget .jdgm-cards-wrapper {
+      width: 100%;
+      max-width: 100%;
+      margin-inline: 0;
+    }
   }
 
   @media screen and (min-width: 990px) {
