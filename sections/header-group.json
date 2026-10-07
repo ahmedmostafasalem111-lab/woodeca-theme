@@ -115,7 +115,7 @@
           "type": "promo_link",
           "settings": {
             "label": "Storage Furniture",
-            "link": "shopify://collections/workspace",
+            "link": "shopify://collections/storage",
             "highlight": false
           }
         },
@@ -191,7 +191,7 @@
         "search_submit_label": "Search",
         "search_close_label": "Close search",
         "popular_heading": "Popular searches",
-        "popular_queries": "Sofas, Beds, T.V Units, Wardrobes, Dining tables",
+        "popular_queries": "Wardrobes, Beds, Drawer Units, T.V Units, Buffets",
         "search_empty_text": "No matches yet. Try a different word.",
         "show_account": true,
         "account_label": "Account",

@@ -155,6 +155,8 @@
   {% if subcollections != blank and subcollections.size > 0 %}
     <div class="collection-subcats">
       {% for subcollection in subcollections %}
+        {%- comment -%} An empty sub-collection ("0 Dining Tables") is a dead end: skip its tile. {%- endcomment -%}
+        {% if subcollection.products_count == 0 %}{% continue %}{% endif %}
         {% liquid
           assign sub_icon = subcollection.metafields[icon_ns][icon_key]
           if sub_icon.value != blank
