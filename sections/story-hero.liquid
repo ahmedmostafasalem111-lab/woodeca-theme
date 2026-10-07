@@ -10,11 +10,28 @@
   has loaded and gone idle (story-hero.js), and never with Save-Data, a 2G/3G
   connection or reduced motion — then the image stays. No video and no image:
   a solid dark band with the heading.
+
+  Video mode "Click to play with sound": the box takes the video's own aspect
+  ratio, the poster (image, else the video's preview image) is the LCP image
+  with a round play button over it, and nothing of the video is requested until
+  that button is pressed. Then it plays with sound and native controls, once;
+  at the end the poster comes back with a Replay button.
+
+  The heading/subheading and the dark overlay behind them are only rendered
+  when there is a heading or a subheading, in both modes.
 {% endcomment %}
 {%- liquid
   assign image = section.settings.image
   assign video = section.settings.video
   assign overlay = section.settings.overlay_opacity | default: 0 | divided_by: 100.0
+  assign click_mode = false
+  if section.settings.video_mode == 'click' and video != blank
+    assign click_mode = true
+  endif
+  assign has_text = false
+  if section.settings.heading != blank or section.settings.subheading != blank
+    assign has_text = true
+  endif
 
   # Smallest MP4 that still fills the screen: ≤720p for phones, ≤1080p for desktop.
   assign src_mobile = ''
@@ -51,11 +68,14 @@
 {% endif %}
 
 <story-hero-component
-  class="story-hero{% if image == blank and src_desktop == blank %} story-hero--empty{% endif %}"
-  style="--story-hero-overlay: {{ overlay }}; --story-hero-empty: {{ settings.color_palette.color1 | default: '#333333' }};"
+  class="story-hero{% if image == blank and src_desktop == blank %} story-hero--empty{% endif %}{% if click_mode %} story-hero--click{% endif %}"
+  style="--story-hero-overlay: {{ overlay }}; --story-hero-empty: {{ settings.color_palette.color1 | default: '#333333' }};{% if click_mode and video.aspect_ratio > 0 %} --story-hero-ratio: {{ video.aspect_ratio }};{% endif %}"
   {% if src_desktop != blank %}
     data-src-mobile="{{ src_mobile }}"
     data-src-desktop="{{ src_desktop }}"
+  {% endif %}
+  {% if click_mode %}
+    data-mode="click"
   {% endif %}
 >
   {% if image != blank %}
@@ -73,7 +93,16 @@
   %}
   {% endif %}
 
-  {% if src_desktop != blank %}
+  {% if click_mode %}
+    {%- comment -%} No src and preload="none": nothing is requested until the play button is pressed. {%- endcomment -%}
+    <video
+      class="story-hero__media story-hero__video"
+      playsinline
+      preload="none"
+      tabindex="-1"
+      aria-label="Woodeca story video"
+    ></video>
+  {% elsif src_desktop != blank %}
     <video
       class="story-hero__media story-hero__video"
       muted
@@ -85,10 +114,37 @@
     ></video>
   {% endif %}
 
-  <div class="story-hero__overlay" aria-hidden="true"></div>
+  {% if has_text %}
+    <div class="story-hero__overlay" aria-hidden="true"></div>
 
-  {% if section.settings.heading != blank %}
-    <h1 class="story-hero__heading">{{ section.settings.heading }}</h1>
+    <div class="story-hero__text">
+      {% if section.settings.heading != blank %}
+        <h1 class="story-hero__heading">{{ section.settings.heading }}</h1>
+      {% endif %}
+      {% if section.settings.subheading != blank %}
+        <p class="story-hero__subheading">{{ section.settings.subheading }}</p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if click_mode %}
+    <button
+      type="button"
+      class="story-hero__play"
+      aria-label="Play the Woodeca story video"
+      data-label-play="Play the Woodeca story video"
+      data-label-replay="Replay the Woodeca story video"
+    >
+      <span class="story-hero__play-circle">
+        <svg class="story-hero__play-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M8 5.5v13a.75.75 0 0 0 1.14.64l10.4-6.5a.75.75 0 0 0 0-1.28L9.14 4.86A.75.75 0 0 0 8 5.5z" fill="currentColor"/>
+        </svg>
+        <svg class="story-hero__replay-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v3.75h3.75" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="story-hero__replay-label" aria-hidden="true">Replay</span>
+      </span>
+    </button>
   {% endif %}
 </story-hero-component>
 
@@ -159,6 +215,24 @@
     text-align: center;
   }
 
+  .story-hero__text {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .story-hero__subheading {
+    max-width: 40ch;
+    margin: 0;
+    padding-inline: 16px;
+    color: #ffffff;
+    font-size: 16px;
+    line-height: 1.4;
+    text-align: center;
+  }
+
   @media screen and (min-width: 750px) {
     .story-hero {
       aspect-ratio: 1440 / 648;
@@ -166,6 +240,152 @@
 
     .story-hero__heading {
       font-size: clamp(72px, 7.64vw, 110px);
+    }
+
+    .story-hero__subheading {
+      font-size: 18px;
+    }
+  }
+
+  /* ---- Video mode: click to play with sound ---- */
+
+  /*
+    The video's own proportions at every width, so the whole frame shows.
+    Two classes so it also outranks the desktop ratio below.
+  */
+  .story-hero.story-hero--click {
+    aspect-ratio: var(--story-hero-ratio, 16 / 9);
+  }
+
+  .story-hero--click .story-hero__video {
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  .story-hero--click.is-playing .story-hero__video {
+    pointer-events: auto;
+  }
+
+  /* While it plays: only the video and its controls. */
+  .story-hero--click.is-playing .story-hero__image,
+  .story-hero--click.is-playing .story-hero__overlay,
+  .story-hero--click.is-playing .story-hero__text,
+  .story-hero--click.is-playing .story-hero__play {
+    visibility: hidden;
+  }
+
+  /* The whole poster is the button; the circle is what you see. */
+  .story-hero__play {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #121212;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .story-hero__play-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 64px;
+    height: 64px;
+    border-radius: 999px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 18px rgb(0 0 0 / 0.22);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .story-hero__play-icon {
+    width: 26px;
+    height: 26px;
+    /* Optical centre of a play triangle sits right of its box centre. */
+    margin-inline-start: 3px;
+  }
+
+  .story-hero__replay-icon {
+    display: none;
+    width: 22px;
+    height: 22px;
+  }
+
+  .story-hero__replay-label {
+    display: none;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .story-hero__play:hover .story-hero__play-circle {
+    transform: scale(1.06);
+    box-shadow: 0 6px 22px rgb(0 0 0 / 0.28);
+  }
+
+  .story-hero__play:focus-visible {
+    outline: none;
+  }
+
+  /* White ring with a dark edge, so it shows on light and dark posters. */
+  .story-hero__play:focus-visible .story-hero__play-circle {
+    outline: 3px solid #ffffff;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px #121212, 0 4px 18px rgb(0 0 0 / 0.22);
+  }
+
+  .story-hero--click.is-loading .story-hero__play {
+    cursor: progress;
+  }
+
+  .story-hero--click.is-loading .story-hero__play-circle {
+    opacity: 0.75;
+  }
+
+  /* After the end: a "Replay" pill in the same place. */
+  .story-hero--click.is-ended .story-hero__play-circle {
+    width: auto;
+    padding-inline: 20px 24px;
+  }
+
+  .story-hero--click.is-ended .story-hero__play-icon {
+    display: none;
+  }
+
+  .story-hero--click.is-ended .story-hero__replay-icon,
+  .story-hero--click.is-ended .story-hero__replay-label {
+    display: block;
+  }
+
+  @media screen and (min-width: 750px) {
+    .story-hero__play-circle {
+      width: 80px;
+      height: 80px;
+    }
+
+    .story-hero__play-icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    .story-hero--click.is-ended .story-hero__play-circle {
+      height: 64px;
+      padding-inline: 24px 28px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .story-hero__play-circle {
+      transition: none;
+    }
+
+    .story-hero__play:hover .story-hero__play-circle {
+      transform: none;
     }
   }
 {% endstylesheet %}
@@ -179,10 +399,22 @@
     { "type": "checkbox", "id": "show_breadcrumbs", "label": "Show breadcrumbs", "default": true },
     { "type": "text", "id": "breadcrumb_home_label", "label": "Breadcrumb home label", "default": "Home" },
     { "type": "text", "id": "breadcrumb_label", "label": "Breadcrumb page label", "default": "Our Story" },
-    { "type": "video", "id": "video", "label": "Video", "info": "Plays muted on a loop once the page has loaded. Not shown with data saver or a slow connection." },
+    { "type": "video", "id": "video", "label": "Video", "info": "See Video mode for how it plays." },
+    {
+      "type": "select",
+      "id": "video_mode",
+      "label": "Video mode",
+      "options": [
+        { "value": "background", "label": "Background loop (muted)" },
+        { "value": "click", "label": "Click to play with sound" }
+      ],
+      "default": "background",
+      "info": "Background loop: plays muted on a loop once the page has loaded; not shown with data saver or a slow connection. Click to play: a poster with a play button; the video only downloads when pressed, then plays once with sound and controls, at its own proportions."
+    },
     { "type": "image_picker", "id": "image", "label": "Desktop image", "info": "Shown before the video starts, and instead of it when there's no video. Desktop: 2400 × 1080 px (20:9)." },
     { "type": "image_picker", "id": "mobile_image", "label": "Mobile image", "info": "Shown below 750 px wide (also as the video's poster there). Mobile: 1080 × 1425 px (376:496, about 3:4). Leave empty to use the desktop image. Its focal point (Shopify image editor) is kept." },
     { "type": "text", "id": "heading", "label": "Heading", "default": "woodeca." },
+    { "type": "text", "id": "subheading", "label": "Subheading", "info": "Optional. With no heading and no subheading, no text or dark overlay is shown." },
     { "type": "range", "id": "overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 60, "step": 5, "unit": "%", "default": 20 }
   ],
   "presets": [{ "name": "Story hero" }]
