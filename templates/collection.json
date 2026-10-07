@@ -21,15 +21,6 @@
             "value": "1"
           }
         },
-        "toggle_2": {
-          "type": "quick_toggle",
-          "settings": {
-            "label": "On sale",
-            "tag": "on-sale",
-            "param_name": "filter.p.m.custom.on_sale",
-            "value": "true"
-          }
-        },
         "sub_1": {
           "type": "subcategory",
           "settings": {
@@ -114,7 +105,6 @@
       },
       "block_order": [
         "toggle_1",
-        "toggle_2",
         "sub_1",
         "sub_5",
         "sub_2",
