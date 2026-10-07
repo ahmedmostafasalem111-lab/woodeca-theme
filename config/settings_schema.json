@@ -2123,5 +2123,26 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Shown as outline icons in the footer, above the copyright line. Leave empty to hide an icon."
+      },
+      {
+        "type": "text",
+        "id": "social_facebook_link",
+        "label": "Facebook",
+        "placeholder": "https://www.facebook.com/…"
+      },
+      {
+        "type": "text",
+        "id": "social_instagram_link",
+        "label": "Instagram",
+        "placeholder": "https://www.instagram.com/…"
+      }
+    ]
   }
 ]

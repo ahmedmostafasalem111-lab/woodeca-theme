@@ -233,7 +233,45 @@
   {%- endcomment -%}
   {% if section.settings.show_bottom_band %}
     <div class="site-footer__band site-footer__band--bottom">
+      {%- liquid
+        assign social_links = 0
+        if settings.social_facebook_link != blank
+          assign social_links = social_links | plus: 1
+        endif
+        if settings.social_instagram_link != blank
+          assign social_links = social_links | plus: 1
+        endif
+        for block in socials
+          if block.settings.link != blank
+            assign social_links = social_links | plus: 1
+          endif
+        endfor
+      -%}
+      {% if social_links > 0 %}
       <div class="footer-bottom__social">
+        {%- comment -%} Theme settings → Social media: outline icons, new tab. {%- endcomment -%}
+        {% if settings.social_facebook_link != blank %}
+          <a
+            href="{{ settings.social_facebook_link }}"
+            class="footer-social footer-social--outline"
+            target="_blank"
+            rel="noopener"
+            aria-label="Woodeca on Facebook"
+          >
+            {%- render 'lucide-icon', name: 'facebook', class: 'footer-social__svg' -%}
+          </a>
+        {% endif %}
+        {% if settings.social_instagram_link != blank %}
+          <a
+            href="{{ settings.social_instagram_link }}"
+            class="footer-social footer-social--outline"
+            target="_blank"
+            rel="noopener"
+            aria-label="Woodeca on Instagram"
+          >
+            {%- render 'lucide-icon', name: 'instagram', class: 'footer-social__svg' -%}
+          </a>
+        {% endif %}
         {% for block in socials %}
           {% if block.settings.link == blank %}{% continue %}{% endif %}
           <a
@@ -252,6 +290,7 @@
           </a>
         {% endfor %}
       </div>
+      {% endif %}
 
       <div class="footer-bottom__center">
         {% if section.settings.acknowledgement != blank %}
@@ -504,6 +543,24 @@
     width: 20px;
     height: 20px;
     object-fit: contain;
+  }
+
+  /* Outline icons from Theme settings → Social media: text colour, 20px, even gaps. */
+  .footer-social--outline {
+    display: inline-flex;
+    padding: 4px;
+    color: var(--footer-text-color, currentColor);
+    transition: opacity var(--animation-speed, 0.2s) ease;
+  }
+
+  .footer-social--outline:hover {
+    opacity: 0.7;
+  }
+
+  .footer-social__svg {
+    display: block;
+    width: 20px;
+    height: 20px;
   }
 
   @media screen and (max-width: 989px) {
