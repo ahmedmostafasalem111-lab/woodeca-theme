@@ -475,7 +475,7 @@
         "cta_background": "#333333",
         "cta_text_color": "#ffffff",
         "section_width": "page-width",
-        "padding-block-start": 40,
+        "padding-block-start": 28,
         "padding-block-end": 48
       }
     },
@@ -525,7 +525,7 @@
         "card_footer_background": "#f2f2f0",
         "arrow_background": "#1c1c1c",
         "arrow_icon_color": "#ffffff",
-        "padding-block-start": 48,
+        "padding-block-start": 28,
         "padding-block-end": 48
       }
     },
@@ -637,31 +637,44 @@
         "discount_text_color": "#ffffff",
         "quick_add_background": "#1c1c1c",
         "quick_add_icon_color": "#ffffff",
-        "padding-block-start": 48,
+        "padding-block-start": 32,
         "padding-block-end": 48
       }
     },
     "s7_promo": {
       "type": "showcase-promo-grid",
       "settings": {
-        "heading": "We will deliver quickly",
+        "heading": "In a Hurry?",
         "show_heading_icon": true,
         "heading_icon": "package-check",
-        "heading_suffix": "from 1 day",
+        "heading_suffix": "Ready to Ship Get It in 5 Days",
         "heading_size": "var(--font-size--3xl)",
-        "subtext": "Furniture and home goods you don't have to wait for",
+        "subtext": "Love it today. Have it home in just 5 days.",
+        "collection": "ready-to-ship",
+        "products_limit": 12,
         "button_label": "View all",
         "button_link": "",
         "columns": 4,
+        "columns_mobile": 1,
+        "peek_mobile": 0.8,
+        "show_arrows": true,
+        "show_progress": true,
+        "show_quick_add": true,
+        "show_swatches": true,
         "section_width": "page-width",
         "background_color": "#dfe7dd",
-        "card_media_background": "#FFFFFF",
         "text_color": "",
         "button_background": "#333333",
         "button_text_color": "#ffffff",
-        "padding-block-start": 56,
-        "padding-block-end": 56,
-        "collection": "ready-to-ship"
+        "card_media_background": "#ffffff",
+        "card_badge_background": "#f6e6c3",
+        "card_badge_text_color": "#1c1c1c",
+        "card_discount_background": "#e8705a",
+        "card_discount_text_color": "#ffffff",
+        "card_quick_add_background": "#1c1c1c",
+        "card_quick_add_icon_color": "#ffffff",
+        "padding-block-start": 36,
+        "padding-block-end": 48
       }
     },
     "s7c_payments": {

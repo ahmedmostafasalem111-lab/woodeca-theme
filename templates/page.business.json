@@ -12,11 +12,11 @@
     "hero": {
       "type": "b2b-hero",
       "settings": {
-        "image": "shopify://shop_images/RimalBuffet180cmLightoak2.webp",
+        "image": "shopify://shop_images/F1_DESKTOP.webp",
         "overlay_opacity": 45,
         "size": "large",
-        "heading": "Furniture for your business, made in our own factory",
-        "text": "We furnish hotels, offices, restaurants, cafés and residential projects across Egypt, from a single order to a full fit-out.",
+        "heading": "Your Vision. Our Factory.                        Built for Business.",
+        "text": "From hotels and offices to restaurants and large-scale projects, we manufacture quality furniture directly from our factory to your project",
         "button_label": "Discuss your project",
         "button_link": "#enquiry"
       }
@@ -27,7 +27,7 @@
         "card_1": {
           "type": "card",
           "settings": {
-            "image": "shopify://shop_images/13_07e4852e-2a92-4001-8eb3-3a160d1d4146.jpg",
+            "image": "shopify://shop_images/hospital.webp",
             "title": "Hotels & Hospitality",
             "subtitle": "",
             "collection": "",
@@ -38,7 +38,7 @@
         "card_2": {
           "type": "card",
           "settings": {
-            "image": "shopify://shop_images/12_54aa6207-2686-44fd-b541-11d78b2ffaa2.jpg",
+            "image": "shopify://shop_images/Office.webp",
             "title": "Offices & Coworking",
             "subtitle": "",
             "collection": "",
@@ -49,7 +49,7 @@
         "card_3": {
           "type": "card",
           "settings": {
-            "image": "shopify://shop_images/Dining_Banner.jpg",
+            "image": "shopify://shop_images/Resturant.webp",
             "title": "Restaurants & Cafés",
             "subtitle": "",
             "collection": "",
@@ -60,7 +60,7 @@
         "card_4": {
           "type": "card",
           "settings": {
-            "image": "shopify://shop_images/TaliaT.vUnit200cmLightoak4.webp",
+            "image": "shopify://shop_images/residential.webp",
             "title": "Residential & Compounds",
             "subtitle": "",
             "collection": "",
@@ -76,9 +76,9 @@
         "card_4"
       ],
       "settings": {
-        "heading": "For businesses of every size",
+        "heading": "Furniture Solutions for Every Business",
         "heading_size": "lg",
-        "text": "From one piece to a complete project. We handle production, delivery and installation.",
+        "text": "From concept to completion, we manufacture and furnish hotels, offices, restaurants, and large-scale developments. Factory-direct production, nationwide delivery, and professional installation.",
         "body": "",
         "tags": "",
         "layout": "row",
@@ -168,22 +168,13 @@
         "note": ""
       }
     },
-    "intro": {
-      "type": "b2b-text",
-      "settings": {
-        "heading": "Woodeca for business",
-        "heading_size": "lg",
-        "text": "<p>We're an Egyptian furniture maker selling direct, with no middlemen and no showroom markup. That means honest prices, made-to-order flexibility and a team that stands behind every piece long after delivery.</p>",
-        "band": true
-      }
-    },
     "manufacturing": {
       "type": "b2b-media-cards",
       "blocks": {
         "card_1": {
           "type": "card",
           "settings": {
-            "image": "shopify://shop_images/Niyra2DoorWardrobe-Black4.webp",
+            "image": "shopify://shop_images/F3_Mobile.png",
             "title": "",
             "subtitle": "",
             "collection": "",
@@ -194,7 +185,7 @@
         "card_2": {
           "type": "card",
           "settings": {
-            "image": "shopify://shop_images/Niyra2DoorWardrobe-Black5.webp",
+            "image": "shopify://shop_images/f4_mobile.png",
             "title": "",
             "subtitle": "",
             "collection": "",
@@ -205,7 +196,7 @@
         "card_3": {
           "type": "card",
           "settings": {
-            "image": "shopify://shop_images/EmiliaGreyMakeupVanities3.jpg",
+            "image": "shopify://shop_images/F1_Mobile.png",
             "title": "",
             "subtitle": "",
             "collection": "",
@@ -237,28 +228,6 @@
         "file_url": "",
         "prev_label": "Previous",
         "next_label": "Next"
-      }
-    },
-    "projects": {
-      "type": "b2b-media-cards",
-      "settings": {
-        "heading": "Completed projects",
-        "heading_size": "lg",
-        "text": "A selection of hotels, offices and homes we have furnished.",
-        "body": "",
-        "tags": "",
-        "layout": "carousel",
-        "columns": "4",
-        "ratio": "2 / 3",
-        "card_style": "overlay",
-        "image_sizes": "(min-width: 990px) 25vw, 300px",
-        "band": false,
-        "button_label": "",
-        "button_link": "",
-        "file_label": "",
-        "file_url": "",
-        "prev_label": "Previous projects",
-        "next_label": "Next projects"
       }
     },
     "process": {
@@ -413,7 +382,7 @@
         "card_6"
       ],
       "settings": {
-        "heading": "What we make",
+        "heading": "Explore Our Collection",
         "heading_size": "lg",
         "text": "",
         "body": "",
@@ -529,9 +498,7 @@
     "hero",
     "segments",
     "benefits",
-    "intro",
     "manufacturing",
-    "projects",
     "process",
     "directions",
     "enquiry"
