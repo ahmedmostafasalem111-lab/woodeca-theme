@@ -279,33 +279,37 @@
         "w1": {
           "type": "feature",
           "settings": {
+            "outline_icon": "factory",
             "icon": "return",
-            "title": "14-day hassle-free returns",
-            "description": "Exchange or refund any product — no questions asked."
+            "title": "Factory-Direct Prices",
+            "description": "Made by us. Priced without middlemen."
           }
         },
         "w2": {
           "type": "feature",
           "settings": {
+            "outline_icon": "package-check",
             "icon": "shield",
-            "title": "Egyptian craftsmanship guarantee",
-            "description": "The finest quality materials and local expertise."
+            "title": "Shop Risk-Free",
+            "description": "Inspect before paying. 14-day returns."
           }
         },
         "w3": {
           "type": "feature",
           "settings": {
+            "outline_icon": "shield-check",
             "icon": "card",
-            "title": "Easy instalments",
-            "description": "Secure your order today with flexible instalment options."
+            "title": "Built to Last",
+            "description": "Quality furniture. Backed by a 3-year warranty."
           }
         },
         "w4": {
           "type": "feature",
           "settings": {
+            "outline_icon": "headset",
             "icon": "truck",
-            "title": "Fast shipping",
-            "description": "Reliable delivery to all served areas."
+            "title": "Here to Help",
+            "description": "Real support before and after delivery."
           }
         }
       },
@@ -316,7 +320,7 @@
         "w4"
       ],
       "settings": {
-        "heading": "Why Woodeca",
+        "heading": "Why Woodeca?",
         "heading_size": "var(--font-size--3xl)",
         "columns": 4,
         "show_numbers": false,
