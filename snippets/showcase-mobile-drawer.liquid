@@ -16,6 +16,7 @@
   assign icon_key = section.settings.menu_icon_key | default: 'tile_icon'
   assign product_menu = section.settings.mobile_product_menu
   assign room_menu = section.settings.mobile_room_menu
+  assign collection_menu = section.settings.mobile_collection_menu
 %}
 
 {%- comment -%}
@@ -88,6 +89,22 @@
             >
               <span class="mobile-drawer__row-label">
                 {{- section.settings.room_menu_label | default: 'Shop By Room' -}}
+              </span>
+              <span class="svg-wrapper mobile-drawer__chevron" aria-hidden="true">
+                {{- 'icon-chevron-right.svg' | inline_asset_content -}}
+              </span>
+            </button>
+          {% endif %}
+
+          {% if collection_menu != blank %}
+            <button
+              type="button"
+              class="mobile-drawer__row mobile-drawer__row--drill"
+              data-drawer-to="collection"
+              aria-label="{{ section.settings.collection_menu_label | default: 'Shop by Collection' | escape }}"
+            >
+              <span class="mobile-drawer__row-label">
+                {{- section.settings.collection_menu_label | default: 'Shop by Collection' -}}
               </span>
               <span class="svg-wrapper mobile-drawer__chevron" aria-hidden="true">
                 {{- 'icon-chevron-right.svg' | inline_asset_content -}}
@@ -257,17 +274,22 @@
         Rendered from the navigation menus, with each row enriched by the linked
         collection's icon metafield where one exists.
       {%- endcomment -%}
-      {% for pair in (1..2) %}
+      {% for pair in (1..3) %}
         {% liquid
-          if forloop.first
-            assign view_key = 'product'
-            assign view_menu = product_menu
-            assign view_title = section.settings.product_menu_label | default: 'Shop By Product'
-          else
-            assign view_key = 'room'
-            assign view_menu = room_menu
-            assign view_title = section.settings.room_menu_label | default: 'Shop By Room'
-          endif
+          case forloop.index
+            when 1
+              assign view_key = 'product'
+              assign view_menu = product_menu
+              assign view_title = section.settings.product_menu_label | default: 'Shop By Product'
+            when 2
+              assign view_key = 'room'
+              assign view_menu = room_menu
+              assign view_title = section.settings.room_menu_label | default: 'Shop By Room'
+            else
+              assign view_key = 'collection'
+              assign view_menu = collection_menu
+              assign view_title = section.settings.collection_menu_label | default: 'Shop by Collection'
+          endcase
         %}
 
         {% if view_menu != blank %}
