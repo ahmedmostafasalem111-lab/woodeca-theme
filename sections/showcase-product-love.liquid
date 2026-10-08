@@ -10,10 +10,10 @@
   swiped — no arrows, no dots, and no slider library: native overflow scrolling
   already does all of it, including momentum and keyboard paging.
 
-  Below 990px images are capped by height so a portrait and a landscape detail
-  shot sit on the same baseline; from 990px they are square, so the square
-  detail shots aren't cropped to a strip. The type is a step down from the
-  page's body size — this block is a supporting detail, not a hero.
+  Images are square at every width: the detail shots are 1080×1080, so a square
+  box shows them whole (no crop) and reserves its height before the image loads.
+  The type is a step down from the page's body size — this block is a
+  supporting detail, not a hero.
 
   The whole section removes itself when the metafield is empty.
 {% endcomment %}
@@ -55,7 +55,7 @@
               {{
                 slide.image
                 | image_url: width: 800
-                | image_tag: loading: 'lazy', class: 'love-card__image', alt: slide.heading, sizes: '(min-width: 990px) 460px, (min-width: 750px) 38vw, 70vw', widths: '300, 450, 600, 800, 1000'
+                | image_tag: loading: 'lazy', class: 'love-card__image', alt: slide.heading, sizes: '(min-width: 990px) 460px, (min-width: 750px) 38vw, 68vw', widths: '300, 450, 600, 800, 1000'
               }}
             </div>
           {% endif %}
@@ -122,19 +122,17 @@
     scroll-snap-align: start;
   }
 
-  /*
-    Fixed height, not a fixed ratio: mixed portrait and landscape detail shots
-    then share a baseline instead of each setting its own box height.
-  */
   .love-card__media {
     border-radius: var(--style-border-radius-inputs, 8px);
     overflow: hidden;
   }
 
+  /* Square at every width: the 1080×1080 shots show whole, and the box keeps its height while loading. */
   .love-card__image {
     display: block;
     width: 100%;
-    height: var(--love-image-height, 210px);
+    height: auto;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
   }
 
@@ -167,30 +165,20 @@
       flex-basis: calc(100% - var(--love-peek));
     }
 
-    .love-card__image {
-      height: calc(var(--love-image-height, 210px) * 0.9);
-    }
-
     .love-card__text {
       font-size: var(--font-size--xs);
     }
   }
 
   /*
-    Desktop: square images, uncropped. Two square cards across the full page
-    would be ~550px tall at 1440, so the track is capped and centred under the
-    centred heading: cards come out at 460px with the same two-and-a-peek view
-    (2 full cards + the 18% peek) as before.
+    Desktop: two square cards across the full page would be ~550px tall at 1440,
+    so the track is capped and centred under the centred heading: cards come out
+    at 460px with the same two-and-a-peek view (2 full cards + the 18% peek).
   */
   @media screen and (min-width: 990px) {
     .product-love__grid {
       max-width: 1140px;
       margin-inline: auto;
-    }
-
-    .love-card__image {
-      height: auto;
-      aspect-ratio: 1 / 1;
     }
   }
 {% endstylesheet %}
@@ -239,7 +227,8 @@
       "max": 420,
       "step": 10,
       "unit": "px",
-      "default": 210
+      "default": 210,
+      "info": "No longer used: images are square at every width. Kept so saved settings stay valid."
     },
     {
       "type": "checkbox",
