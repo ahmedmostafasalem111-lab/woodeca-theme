@@ -14,7 +14,7 @@
     metafield     — a product_list metafield on the product
     family        — "Shop the collection": the product's own range. The collection in the
                     product's `shop_collection` metafield wins; otherwise the first word of
-                    the title picks `<word>-collection` (Niyra → niyra-collection). Hidden
+                    the title picks `<word>-collection` (Niyra → niyra-collection) if the product is in it. Hidden
                     when there's no such collection or it has fewer than 2 other products.
 {% endcomment %}
 
@@ -29,6 +29,12 @@
       assign family_word = product.title | split: ' ' | first | handleize
       assign family_handle = family_word | append: '-collection'
       assign family_collection = collections[family_handle]
+      # A matched name isn't enough: the product must be in that collection
+      # (the Clover bed shares the name but is excluded from Clover's rules).
+      assign in_family = product.collections | where: 'id', family_collection.id | size
+      if in_family == 0
+        assign family_collection = null
+      endif
     endif
     if family_collection.id == blank
       assign family_collection = null
