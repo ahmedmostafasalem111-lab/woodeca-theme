@@ -3,6 +3,10 @@ import { formatMoney } from '@theme/showcase-money';
 import { trapFocus, removeTrapFocus } from '@theme/focus';
 import { cairoToday, addWorkingDays } from '@theme/showcase-delivery-estimate';
 
+// Row thumbnails show at 72–96px: ask the CDN for 240px (sharp at 2.5×) instead of the
+// 400px image the drawer cards use.
+const rowThumb = (src) => src.replace(/([?&])width=\d+/, '$1width=240');
+
 /**
  * Set builder (snippets/showcase-set-builder.liquid) on set products.
  *
@@ -224,7 +228,7 @@ class ShowcaseSetBuilderComponent extends Component {
           : '';
         const note = buyable ? '' : `<span class="set-row__note">${escapeHtml(this.#soldOutText(colour))}</span>`;
         return `<li class="set-row${buyable ? '' : ' set-row--unavailable'}">
-          <span class="set-row__media">${image ? `<img src="${escapeHtml(image)}" alt="" loading="lazy" width="400" height="400">` : ''}</span>
+          <span class="set-row__media">${image ? `<img src="${escapeHtml(rowThumb(image))}" alt="" loading="lazy" width="240" height="240">` : ''}</span>
           <span class="set-row__text">
             <a class="set-row__name" href="${escapeHtml(component.url)}">${escapeHtml(component.title)}</a>
             ${dims ? `<span class="set-row__dims">${escapeHtml(dims)}</span>` : ''}
