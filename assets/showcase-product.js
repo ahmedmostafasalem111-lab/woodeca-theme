@@ -128,9 +128,10 @@ class ShowcaseProductComponent extends Component {
       );
     };
 
+    // The first callback runs after layout and before paint; calling publish() here as
+    // well read the bar's size mid-parse and forced an extra layout.
     this.#barObserver = new ResizeObserver(publish);
     this.#barObserver.observe(bar);
-    publish();
   }
 
   /**

@@ -28,8 +28,9 @@ class ScrollRowComponent extends Component {
   connectedCallback() {
     super.connectedCallback();
     this.refs.track.addEventListener('scroll', this.#onScroll, { passive: true });
+    // The observer's first callback runs after layout and before paint, so it sets the
+    // arrows and progress thumb without reading the track's size mid-parse (a forced reflow).
     this.#resizeObserver.observe(this.refs.track);
-    this.#update();
   }
 
   disconnectedCallback() {
