@@ -1,0 +1,4 @@
+# Developer files: kept in the repo for editor type-checking, never uploaded to the theme (Cleanup 9).
+assets/*.d.ts
+assets/jsconfig.json
+assets/package.json
