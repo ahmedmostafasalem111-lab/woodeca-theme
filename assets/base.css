@@ -1558,6 +1558,11 @@ product-price.text-block:is(.h1, .h2, .h3, .h4, .h5, .h6) .volume-pricing-note {
   transition: top var(--animation-speed) ease, font-size var(--animation-speed) ease;
 }
 
+/* Bold in rich text (descriptions, page content) reads at 600. */
+.rte :is(strong, b) {
+  font-weight: 600;
+}
+
 /* RTE styles */
 .rte,
 .shopify-policy__title {

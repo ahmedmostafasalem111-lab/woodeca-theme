@@ -41,9 +41,10 @@
     text-transform: none;
   }
 
-  /* Bold words inside a sentence read at normal weight (the description marks
-     those lines, see showcase-prose-mixed-bold). */
+  /* Bold words read at 600, including inside a sentence (spec labels such as
+     "Wardrobe:" in the descriptions). */
+  .showcase-prose :is(strong, b),
   .showcase-prose [data-prose-mixed] :is(strong, b) {
-    font-weight: inherit;
+    font-weight: 600;
   }
 {% endstylesheet %}
