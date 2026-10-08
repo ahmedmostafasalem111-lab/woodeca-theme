@@ -31,6 +31,7 @@
     (first) image loads eagerly for the first row (cards 1–4) and the first card gets
     fetchpriority high; on phones card 2 does too (via a preload); without it every
     card's image is lazy.
+  @param {string} [image_sizes] - The image `sizes` attribute, for rows whose cards aren't the grid's width. Default '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw'.
   @param {boolean} [show_dimensions] - Render the dimensions line when the metafield exists.
   @param {string} [dimensions_namespace] - Metafield namespace for dimensions. Default 'custom'.
   @param {string} [dimensions_key] - Metafield key for dimensions. Default 'dimensions'.
@@ -162,6 +163,8 @@
     endfor
   endif
 
+  assign card_sizes = image_sizes | default: '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw'
+
   # The (first) image loads eagerly only for the first row of a grid; the very
   # first card is the likely LCP image.
   assign card_loading = 'lazy'
@@ -199,7 +202,7 @@
           as="image"
           href="{{ preload_image | image_url: width: 600 }}"
           imagesrcset="{% render 'showcase-srcset', image: preload_image, widths: '200,300,400,500,600' %}"
-          imagesizes="(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw"
+          imagesizes="{{ card_sizes }}"
           fetchpriority="high"
           media="(max-width: 989px)"
         >
@@ -241,14 +244,14 @@
               {{
                 slide_image
                 | image_url: width: 600
-                | image_tag: loading: card_loading, fetchpriority: card_priority, class: 'showcase-card__image', alt: card_title, draggable: 'false', sizes: '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw', widths: '200, 300, 400, 500, 600'
+                | image_tag: loading: card_loading, fetchpriority: card_priority, class: 'showcase-card__image', alt: card_title, draggable: 'false', sizes: card_sizes, widths: '200, 300, 400, 500, 600'
               }}
             {% else %}
               <img
                 class="showcase-card__image"
                 data-src="{{ slide_image | image_url: width: 600 }}"
                 data-srcset="{% render 'showcase-srcset', image: slide_image, widths: '200,300,400,500,600' %}"
-                sizes="(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw"
+                sizes="{{ card_sizes }}"
                 data-alt="{{ card_title | escape }}"
                 alt=""
                 width="{{ slide_image.width }}"
@@ -288,7 +291,7 @@
           {{
             card_image
             | image_url: width: 600
-            | image_tag: loading: card_loading, fetchpriority: card_priority, class: 'showcase-card__image', alt: card_title, draggable: 'false', sizes: '(min-width: 990px) 23vw, (min-width: 750px) 30vw, 50vw', widths: '200, 300, 400, 500, 600'
+            | image_tag: loading: card_loading, fetchpriority: card_priority, class: 'showcase-card__image', alt: card_title, draggable: 'false', sizes: card_sizes, widths: '200, 300, 400, 500, 600'
           }}
         {% elsif request.design_mode %}
           {{ 'product-apparel-1' | placeholder_svg_tag: 'showcase-card__image showcase-card__image--placeholder' }}

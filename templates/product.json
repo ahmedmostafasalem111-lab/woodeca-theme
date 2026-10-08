@@ -367,7 +367,7 @@
         "metafield_key_b": "similar_products",
         "products_limit": 12,
         "columns": 4,
-        "columns_mobile": 2,
+        "columns_mobile": 1,
         "show_swatches": true,
         "show_reviews": true,
         "card_stock_text": "In stock",
@@ -376,6 +376,7 @@
         "text_color": "",
         "padding-block-start": 48,
         "padding-block-end": 0,
+        "mobile_peek": 0.6,
         "view_all_label": "View all"
       }
     },
@@ -395,7 +396,7 @@
         "metafield_key_b": "similar_products",
         "products_limit": 12,
         "columns": 4,
-        "columns_mobile": 2,
+        "columns_mobile": 1,
         "show_swatches": true,
         "show_reviews": true,
         "card_stock_text": "In stock",
@@ -403,7 +404,8 @@
         "background_color": "",
         "text_color": "",
         "padding-block-start": 48,
-        "padding-block-end": 48
+        "padding-block-end": 48,
+        "mobile_peek": 0.6
       }
     },
     "judgeme_reviews": {

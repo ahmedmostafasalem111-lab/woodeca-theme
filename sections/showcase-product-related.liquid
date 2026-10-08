@@ -34,6 +34,13 @@
       assign family_collection = null
     endif
   endif
+
+  # Phones show columns_mobile cards plus a peek of the next one. Tell the browser the
+  # card's real width (minus the page gutters, ~10%) so it picks the right image size.
+  assign mobile_peek = section.settings.mobile_peek | default: 0.2
+  assign mobile_cards = section.settings.columns_mobile | plus: mobile_peek
+  assign card_sizes_mobile = 90.0 | divided_by: mobile_cards | round | append: 'vw'
+  assign card_sizes = '(min-width: 990px) 23vw, (min-width: 750px) 30vw, ' | append: card_sizes_mobile
 %}
 
 {%- comment -%}
@@ -77,7 +84,8 @@
           image: variant.featured_image,
           url: variant.url,
           stock_text: section.settings.card_stock_text,
-          show_quick_add: true
+          show_quick_add: true,
+          image_sizes: card_sizes
         %}
       </div>
     {% endfor %}
@@ -91,7 +99,8 @@
           product: related,
           show_quick_add: true,
           show_swatches: section.settings.show_swatches,
-          show_reviews: section.settings.show_reviews
+          show_reviews: section.settings.show_reviews,
+          image_sizes: card_sizes
         %}
       </div>
     {% endfor %}
@@ -123,7 +132,8 @@
         product: related,
         show_quick_add: true,
         show_swatches: section.settings.show_swatches,
-        show_reviews: section.settings.show_reviews
+        show_reviews: section.settings.show_reviews,
+        image_sizes: card_sizes
       %}
     </div>
   {% endfor %}
@@ -219,7 +229,8 @@
             content: panel_a,
             columns: section.settings.columns,
             columns_mobile: section.settings.columns_mobile,
-            gap: 'var(--gap-lg)',
+            gap: 'var(--gap-xl)',
+            peek: mobile_peek,
             prev_label: 'Previous products',
             next_label: 'Next products'
           %}
@@ -236,7 +247,8 @@
             content: panel_b,
             columns: section.settings.columns,
             columns_mobile: section.settings.columns_mobile,
-            gap: 'var(--gap-lg)',
+            gap: 'var(--gap-xl)',
+            peek: mobile_peek,
             prev_label: 'Previous products',
             next_label: 'Next products'
           %}
@@ -247,7 +259,8 @@
         content: panel_a,
         columns: section.settings.columns,
         columns_mobile: section.settings.columns_mobile,
-        gap: 'var(--gap-lg)',
+        gap: 'var(--gap-xl)',
+        peek: mobile_peek,
         prev_label: 'Previous products',
         next_label: 'Next products'
       %}
@@ -305,6 +318,20 @@
     font-size: var(--font-size--sm, 0.875rem);
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+
+  /* Arrows centre on the square image, not the whole card (as on divan.ru). The
+     viewport is a size container so 100cqw is the row width. */
+  @media screen and (min-width: 750px) {
+    .product-related .scroll-row__viewport {
+      container-type: inline-size;
+    }
+
+    .product-related .scroll-row__arrow {
+      top: calc(
+        (100cqw - var(--scroll-row-gap) * (var(--scroll-row-columns) - 1)) / var(--scroll-row-columns) / 2
+      );
+    }
   }
 
 {% endstylesheet %}
@@ -450,6 +477,16 @@
       "max": 3,
       "step": 1,
       "default": 2
+    },
+    {
+      "type": "range",
+      "id": "mobile_peek",
+      "label": "Next card peek on mobile",
+      "info": "How much of the next card shows, as a share of a card.",
+      "min": 0,
+      "max": 0.8,
+      "step": 0.1,
+      "default": 0.2
     },
     {
       "type": "checkbox",
