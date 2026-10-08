@@ -127,11 +127,14 @@
   href="{{ 'events.js' | asset_url }}"
   fetchpriority="low"
 >
-<script
-  src="{{ 'popover-polyfill.js' | asset_url }}"
-  type="module"
-  fetchpriority="low"
-></script>
+{%- comment -%}
+  The popover polyfill (26 KB) is only for browsers without the Popover API
+  (Safari before 17). Same check as the polyfill's own isSupported(), so modern
+  browsers no longer download it.
+{%- endcomment -%}
+<script type="module">
+  if (!('popover' in HTMLElement.prototype)) import('{{ 'popover-polyfill.js' | asset_url }}');
+</script>
 <script
   src="{{ 'overflow-list.js' | asset_url }}"
   type="module"
