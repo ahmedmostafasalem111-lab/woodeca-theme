@@ -12,11 +12,28 @@
     recommendations — Shopify's product-recommendations API (server-rendered)
     collection    — a picked collection
     metafield     — a product_list metafield on the product
+    family        — "Shop the collection": the product's own range. The collection in the
+                    product's `shop_collection` metafield wins; otherwise the first word of
+                    the title picks `<word>-collection` (Niyra → niyra-collection). Hidden
+                    when there's no such collection or it has fewer than 2 other products.
 {% endcomment %}
 
 {% liquid
   assign ns = section.settings.metafield_namespace | default: 'custom'
   assign use_tabs = section.settings.enable_tabs
+
+  assign family_collection = null
+  if section.settings.source_a == 'family'
+    assign family_collection = product.metafields[ns].shop_collection.value
+    if family_collection == blank
+      assign family_word = product.title | split: ' ' | first | handleize
+      assign family_handle = family_word | append: '-collection'
+      assign family_collection = collections[family_handle]
+    endif
+    if family_collection.id == blank
+      assign family_collection = null
+    endif
+  endif
 %}
 
 {%- comment -%}
@@ -30,6 +47,8 @@
         assign source_products = null
       when 'collection'
         assign source_products = section.settings.collection_a.products
+      when 'family'
+        assign source_products = family_collection.products
       when 'metafield'
         assign source_products = product.metafields[ns][section.settings.metafield_key_a].value
       else
@@ -115,15 +134,37 @@
   assign panel_a_content = panel_a | strip
   assign panel_b_content = panel_b | strip
 
+  assign has_b = false
+  if panel_b_content != blank
+    assign has_b = true
+  endif
+
   assign has_a = false
   if panel_a_content != blank
     assign has_a = true
   endif
 
-  assign has_b = false
-  if panel_b_content != blank
-    assign has_b = true
+  if section.settings.source_a == 'family'
+    assign family_others = 0
+    for related in family_collection.products limit: section.settings.products_limit
+      if related.id != product.id
+        assign family_others = family_others | plus: 1
+      endif
+    endfor
+    if family_others < 2
+      assign has_a = false
+      assign has_b = false
+    endif
   endif
+
+  assign view_all_url = null
+  case section.settings.source_a
+    when 'family'
+      assign view_all_url = family_collection.url
+    when 'collection'
+      assign view_all_url = section.settings.collection_a.url
+  endcase
+
 %}
 
 {% if has_a or has_b %}
@@ -141,7 +182,17 @@
     "
   >
     {% if section.settings.heading != blank %}
-      <h2 class="product-related__heading section-title">{{ section.settings.heading }}</h2>
+      <div class="product-related__head">
+        <h2 class="product-related__heading section-title">{{ section.settings.heading }}</h2>
+        {% if section.settings.view_all_label != blank and view_all_url != blank and use_tabs == false %}
+          <a
+            href="{{ view_all_url }}"
+            class="product-related__view-all"
+          >
+            {{- section.settings.view_all_label -}}
+          </a>
+        {% endif %}
+      </div>
     {% endif %}
 
     {% if use_tabs and has_b %}
@@ -241,6 +292,21 @@
     margin-block-end: var(--margin-xl);
   }
 
+  .product-related__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--gap-md);
+  }
+
+  .product-related__view-all {
+    flex: none;
+    color: inherit;
+    font-size: var(--font-size--sm, 0.875rem);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
 {% endstylesheet %}
 
 {% schema %}
@@ -257,6 +323,12 @@
       "id": "heading",
       "label": "Heading",
       "default": "You may be interested in"
+    },
+    {
+      "type": "text",
+      "id": "view_all_label",
+      "label": "\"View all\" link",
+      "info": "Shown next to the heading when the source is a collection or \"Shop the collection\". Leave empty to hide."
     },
     {
       "type": "text",
@@ -301,9 +373,11 @@
         { "value": "recommendations", "label": "Shopify recommendations" },
         { "value": "variants", "label": "Other variants of this product" },
         { "value": "collection", "label": "A collection" },
-        { "value": "metafield", "label": "Product list metafield" }
+        { "value": "metafield", "label": "Product list metafield" },
+        { "value": "family", "label": "Shop the collection (product's range)" }
       ],
-      "default": "recommendations"
+      "default": "recommendations",
+      "info": "\"Shop the collection\" uses the product's \"Shop the collection\" metafield, or else the collection with handle <first word of the title>-collection (e.g. niyra-collection). Hidden when fewer than 2 other products."
     },
     {
       "type": "collection",

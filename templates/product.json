@@ -351,6 +351,34 @@
         "padding-block-end": 40
       }
     },
+    "shop_collection": {
+      "type": "showcase-product-related",
+      "settings": {
+        "heading": "Shop the collection",
+        "metafield_namespace": "custom",
+        "enable_tabs": false,
+        "tab_a_label": "In a different color",
+        "tab_b_label": "Similar products",
+        "source_a": "family",
+        "collection_a": "",
+        "metafield_key_a": "related_products",
+        "source_b": "recommendations",
+        "collection_b": "",
+        "metafield_key_b": "similar_products",
+        "products_limit": 12,
+        "columns": 4,
+        "columns_mobile": 2,
+        "show_swatches": true,
+        "show_reviews": true,
+        "card_stock_text": "In stock",
+        "section_width": "page-width",
+        "background_color": "",
+        "text_color": "",
+        "padding-block-start": 48,
+        "padding-block-end": 0,
+        "view_all_label": "View all"
+      }
+    },
     "related_interested": {
       "type": "showcase-product-related",
       "settings": {
@@ -407,6 +435,7 @@
     "specs",
     "why_woodeca",
     "why_we_love",
+    "shop_collection",
     "related_interested",
     "judgeme_reviews"
   ]
