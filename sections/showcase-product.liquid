@@ -71,6 +71,9 @@
   <div class="section section--{{ section.settings.section_width }} showcase-product__body spacing-style"
     style="{% render 'spacing-padding', settings: section.settings %}"
   >
+    {%- comment -%} Product + Offer + BreadcrumbList JSON-LD, in the server HTML. {%- endcomment -%}
+    {% render 'product-structured-data', product: product %}
+
     {%- comment -%} ---------- Breadcrumbs ---------- {%- endcomment -%}
     {% if section.settings.show_breadcrumbs %}
       {%- liquid

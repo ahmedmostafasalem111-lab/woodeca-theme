@@ -1,0 +1,105 @@
+{% doc %}
+  Server-rendered JSON-LD for a product page: one Product (brand Woodeca, an Offer
+  per variant) and its BreadcrumbList.
+
+  - "@id" is "<canonical URL>#product", the same id Judge.me's review script uses,
+    so both describe one Product entity.
+  - aggregateRating comes from the standard reviews.rating / reviews.rating_count
+    metafields, which Judge.me writes; it's only output when there is at least one review.
+  - Offer price is the variant's own price. For set products that is the set
+    product's variant price, which is also what the page renders before the set
+    builder runs (the builder total for the default set is the same figure).
+  - No GTIN: the Barcode field holds internal codes, not GTINs.
+  - The breadcrumb uses the product's main category (as the visible breadcrumb does
+    on the canonical /products/ URL), never the collection the visitor came from.
+
+  @param {object} product - The product.
+
+  @example
+  {% render 'product-structured-data', product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign origin = request.origin
+  assign product_url = origin | append: product.url
+  assign rating = product.metafields.reviews.rating.value
+  assign rating_count = product.metafields.reviews.rating_count.value | default: 0
+  assign currency = cart.currency.iso_code | default: shop.currency
+
+  capture crumb_handle
+    render 'product-category-handle', product: product
+  endcapture
+  assign crumb_handle = crumb_handle | strip
+  assign crumb_collection = collections[crumb_handle]
+
+  assign category_name = product.category.name | default: product.type
+  assign first_sku = product.selected_or_first_available_variant.sku
+-%}
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Product",
+        "@id": {{ product_url | append: '#product' | json }},
+        "name": {{ product.title | json }},
+        "url": {{ product_url | json }},
+        "description": {{ product.description | strip_html | strip_newlines | replace: '  ', ' ' | strip | json }},
+        {%- if product.images.size > 0 %}
+        "image": [
+          {%- for image in product.images limit: 10 -%}
+            {{ image | image_url: width: 1200 | prepend: 'https:' | json }}{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        ],
+        {%- endif %}
+        "brand": { "@type": "Brand", "name": "Woodeca" },
+        {%- if category_name != blank %}
+        "category": {{ category_name | json }},
+        {%- endif %}
+        {%- if first_sku != blank %}
+        "sku": {{ first_sku | json }},
+        {%- endif %}
+        {%- if rating != blank and rating_count > 0 %}
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": {{ rating.rating | json }},
+          "bestRating": {{ rating.scale_max | json }},
+          "worstRating": {{ rating.scale_min | json }},
+          "ratingCount": {{ rating_count | json }}
+        },
+        {%- endif %}
+        "offers": [
+          {%- for variant in product.variants -%}
+            {
+              "@type": "Offer",
+              {%- unless variant.title == 'Default Title' %}
+              "name": {{ product.title | append: ' – ' | append: variant.title | json }},
+              {%- endunless %}
+              "price": {{ variant.price | divided_by: 100.0 | json }},
+              "priceCurrency": {{ currency | json }},
+              "availability": "https://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
+              "itemCondition": "https://schema.org/NewCondition",
+              "url": {{ origin | append: variant.url | json }},
+              {%- if variant.sku != blank %}
+              "sku": {{ variant.sku | json }},
+              {%- endif %}
+              "image": {{ variant.image | default: product.featured_image | image_url: width: 1200 | prepend: 'https:' | json }}
+            }{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": {{ origin | append: routes.root_url | json }} },
+          {%- if crumb_collection != blank and crumb_collection.id != blank %}
+          { "@type": "ListItem", "position": 2, "name": {{ crumb_collection.title | json }}, "item": {{ origin | append: crumb_collection.url | json }} },
+          { "@type": "ListItem", "position": 3, "name": {{ product.title | json }}, "item": {{ product_url | json }} }
+          {%- else %}
+          { "@type": "ListItem", "position": 2, "name": {{ product.title | json }}, "item": {{ product_url | json }} }
+          {%- endif %}
+        ]
+      }
+    ]
+  }
+</script>
