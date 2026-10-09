@@ -2,6 +2,7 @@ import { Component } from '@theme/component';
 import { formatMoney } from '@theme/showcase-money';
 import { trapFocus, removeTrapFocus } from '@theme/focus';
 import { cairoToday, addWorkingDays } from '@theme/showcase-delivery-estimate';
+import { updateInstalments } from '@theme/showcase-instalments';
 
 // Row thumbnails show at 72–96px: ask the CDN for 240px (sharp at 2.5×) instead of the
 // 400px image the drawer cards use.
@@ -41,23 +42,8 @@ const BODY_LOCK = 'set-drawer-locked';
 const escapeHtml = (text) =>
   String(text ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] ?? c);
 
-/**
- * One monthly instalment in minor units, rounded UP to whole pounds — the same
- * integer maths as snippets/showcase-instalment-amount.liquid.
- *
- * @param {number} price
- * @param {number} months
- * @param {number} rateBp
- */
-function instalmentAmount(price, months, rateBp = 0) {
-  const divisor = months * 1_000_000;
-  const pounds = Math.floor(((rateBp + 10_000) * price + divisor - 1) / divisor);
-  return pounds * 100;
-}
-
 class ShowcaseSetBuilderComponent extends Component {
-  /** @type {{ setTitle: string, colour: string, headlineMonths: number, periodSuffix: string, providers: number,
-   *   plans: { key: string, months: number, rateBp: number }[], labels: Record<string, string>, components: SetComponent[] } | null} */
+  /** @type {{ setTitle: string, colour: string, labels: Record<string, string>, components: SetComponent[] } | null} */
   #data = null;
 
   /** @type {Selection} */
@@ -259,8 +245,6 @@ class ShowcaseSetBuilderComponent extends Component {
       saveBadge: one('saveBadge'),
       savePercent: one('savePercent'),
       stickyPriceTarget: one('stickyPriceTarget'),
-      instalmentHeadline: one('instalmentHeadline'),
-      instalmentRows: [...(this.#product?.querySelectorAll('[ref="instalmentRows[]"]') ?? [])],
     };
   }
 
@@ -284,7 +268,8 @@ class ShowcaseSetBuilderComponent extends Component {
       if (refs.savePercent) refs.savePercent.textContent = String(percent);
     }
 
-    this.#renderInstalments(totals.price, refs);
+    // The installment line and drawer, from the set total (no pieces: hidden).
+    updateInstalments(this.#product, totals.price);
     this.#renderDelivery(totals.leadMin, totals.leadMax);
 
     const labels = this.#data?.labels ?? {};
@@ -294,28 +279,6 @@ class ShowcaseSetBuilderComponent extends Component {
       button.disabled = empty || this.#adding;
       button.textContent = empty ? labels.empty || 'Add at least one piece' : labels.addToCart || 'Add to cart';
     }
-  }
-
-  /**
-   * @param {number} price
-   * @param {Record<string, any>} refs
-   */
-  #renderInstalments(price, refs) {
-    const data = this.#data;
-    if (!data || price <= 0) return;
-    const suffix = data.periodSuffix || 'mo';
-
-    let headline = null;
-    for (const plan of data.plans) {
-      const amount = instalmentAmount(price, plan.months, plan.rateBp);
-      if (data.providers > 0 && (headline === null || amount < headline)) headline = amount;
-      for (const row of refs.instalmentRows ?? []) {
-        if (row.dataset.instalmentKey === plan.key) row.textContent = `${formatMoney(amount)} / ${suffix}`;
-      }
-    }
-    // No providers: price ÷ the headline duration, as the section does.
-    if (headline === null) headline = instalmentAmount(price, data.headlineMonths || 6, 0);
-    if (refs.instalmentHeadline) refs.instalmentHeadline.innerHTML = formatMoney(headline);
   }
 
   /**

@@ -1,10 +1,13 @@
 import { Component } from '@theme/component';
+import { updateInstalments } from '@theme/showcase-instalments';
 
 /**
  * Product page hero.
  *
  * Owns the thumbnail gallery, mobile dot pagination, option pickers, quantity
- * stepper, the instalment and video dialogs, share, and Buy It Now.
+ * stepper, the video dialog, share, and Buy It Now. The installment line and
+ * its drawer are their own component (showcase-instalments.js); a variant
+ * change hands it the new price.
  *
  * Variant selection resolves against the matrix rendered by the option picker,
  * which already carries money formatted by Liquid — so switching a variant costs
@@ -16,14 +19,13 @@ import { Component } from '@theme/component';
  * @property {number} id
  * @property {string[]} options
  * @property {boolean} available
+ * @property {number} price - In minor units.
  * @property {string} priceHtml
  * @property {string | null} compareHtml
  * @property {number | null} savePercent
  * @property {string | null} image
  * @property {string | null} [imageSrcset]
  * @property {number | null} [mediaId]
- * @property {string} [instalmentHtml]
- * @property {Record<string, string>} [instalments]
  *
  * @typedef {object} Refs
  * @property {HTMLImageElement} [mainImage]
@@ -47,12 +49,6 @@ import { Component } from '@theme/component';
  * @property {HTMLButtonElement} [stickyAddButton]
  * @property {HTMLButtonElement} [buyNowButton]
  * @property {HTMLElement} [stickyBar]
- * @property {HTMLElement} [instalmentHeadline]
- * @property {HTMLElement[]} [instalmentRows]
- * @property {HTMLDialogElement} [instalmentDialog]
- * @property {HTMLElement[]} [instalmentTabs]
- * @property {HTMLElement[]} [instalmentPanels]
- * @property {HTMLElement} [instalmentTrack]
  * @property {HTMLDialogElement} [inspirationDialog]
  * @property {HTMLElement[]} [inspirationStages]
  *
@@ -192,21 +188,11 @@ class ShowcaseProductComponent extends Component {
       addButton,
       stickyAddButton,
       buyNowButton,
-      instalmentHeadline,
-      instalmentRows,
     } = this.refs;
 
     if (variantInput) variantInput.value = String(variant.id);
 
-    // Instalment figures were precomputed per variant, so this is a lookup.
-    if (instalmentHeadline && variant.instalmentHtml) {
-      instalmentHeadline.innerHTML = variant.instalmentHtml;
-    }
-
-    for (const row of instalmentRows ?? []) {
-      const text = variant.instalments?.[row.dataset.instalmentKey ?? ''];
-      if (text) row.textContent = text;
-    }
+    updateInstalments(this, variant.price);
 
     if (priceTarget) priceTarget.innerHTML = variant.priceHtml;
     if (stickyPriceTarget) stickyPriceTarget.innerHTML = variant.priceHtml;
@@ -371,78 +357,6 @@ class ShowcaseProductComponent extends Component {
       buyNowButton.disabled = false;
       if (defaultLabel) buyNowButton.textContent = defaultLabel;
     }
-  }
-
-  openInstalments() {
-    this.refs.instalmentDialog?.showModal();
-  }
-
-  closeInstalments() {
-    this.refs.instalmentDialog?.close();
-  }
-
-  /**
-   * Instalment modal: a provider logo was tapped — show only its plans.
-   *
-   * @param {Event} event
-   */
-  selectInstalmentProvider(event) {
-    const tab = /** @type {HTMLElement} */ (event.target)?.closest('[role="tab"]');
-    if (tab instanceof HTMLElement) this.#activateInstalmentTab(tab);
-  }
-
-  /**
-   * Arrow keys / Home / End move between provider tabs, as a tablist should.
-   *
-   * @param {KeyboardEvent} event
-   */
-  stepInstalmentProvider(event) {
-    const tabs = this.refs.instalmentTabs ?? [];
-    const current = tabs.indexOf(/** @type {HTMLElement} */ (event.target)?.closest('[role="tab"]'));
-    if (current < 0) return;
-
-    const rtl = getComputedStyle(this).direction === 'rtl';
-    const moves = { ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1, Home: -Infinity, End: Infinity };
-    const move = moves[/** @type {keyof typeof moves} */ (event.key)];
-    if (move === undefined) return;
-
-    event.preventDefault();
-    const next = Math.min(tabs.length - 1, Math.max(0, current + move));
-    const tab = tabs[next];
-    if (!tab) return;
-    this.#activateInstalmentTab(tab);
-    tab.focus();
-  }
-
-  /**
-   * Slider arrows (more than five providers): scroll by one logo.
-   *
-   * @param {Event} event
-   */
-  scrollInstalmentProviders(event) {
-    const button = /** @type {HTMLElement} */ (event.target)?.closest('[data-direction]');
-    const track = this.refs.instalmentTrack;
-    const tab = this.refs.instalmentTabs?.[0];
-    if (!(button instanceof HTMLElement) || !track || !tab) return;
-
-    const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
-    const rtl = getComputedStyle(track).direction === 'rtl';
-    const step = (tab.getBoundingClientRect().width + gap) * Number(button.dataset.direction) * (rtl ? -1 : 1);
-    track.scrollBy({ left: step, behavior: 'smooth' });
-  }
-
-  /** @param {HTMLElement} tab */
-  #activateInstalmentTab(tab) {
-    for (const candidate of this.refs.instalmentTabs ?? []) {
-      const active = candidate === tab;
-      candidate.setAttribute('aria-selected', String(active));
-      candidate.tabIndex = active ? 0 : -1;
-    }
-    for (const panel of this.refs.instalmentPanels ?? []) {
-      panel.hidden = panel.id !== tab.getAttribute('aria-controls');
-    }
-    // Keep the chosen logo fully in view when it sits at the slider's edge.
-    tab.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
   }
 
   /**

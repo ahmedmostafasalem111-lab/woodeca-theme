@@ -24,7 +24,7 @@
 
   @param {object} product - The set product.
   @param {object} selected_variant - The set colour selected on load.
-  @param {object} section - The product section, for labels and instalment plans.
+  @param {object} section - The product section, for labels.
   @param {object[]} components - product.metafields.custom.set_components.value
 
   @example
@@ -63,14 +63,6 @@
   assign label_add_to_cart = section.settings.add_to_cart_label | default: 'Add to cart'
   assign label_close = section.settings.set_close_label | default: 'Close'
 
-  # Instalment plans, as the instalment snippets compute them: provider rows
-  # "<block id>-<months>" with a rate, or the generic month blocks.
-  capture provider_plans
-    render 'showcase-instalment-plans', section: section
-  endcapture
-  assign provider_entries = provider_plans | strip | split: ';'
-  assign generic_plans = section.blocks | where: 'type', 'instalment_plan'
-
   # Pieces in the default set, for the box header before the script runs.
   assign default_count = 0
   for component in components
@@ -88,24 +80,6 @@
     {
       "setTitle": {{ product.title | json }},
       "colour": {{ set_colour | json }},
-      "headlineMonths": {{ section.settings.instalment_headline_months | default: 6 }},
-      "periodSuffix": {{ section.settings.instalment_short_period | default: 'mo' | json }},
-      "plans": [
-        {%- if provider_entries.size > 0 -%}
-          {%- for entry in provider_entries -%}
-            {%- assign parts = entry | split: '|' -%}
-            {"key": {{ parts[0] | append: '-' | append: parts[1] | json }}, "months": {{ parts[1] | times: 1 }}, "rateBp": {{ parts[2] | times: 1 }}}
-            {%- unless forloop.last %},{% endunless -%}
-          {%- endfor -%}
-        {%- else -%}
-          {%- for block in generic_plans -%}
-            {%- assign plan_months = block.settings.months | default: 3 -%}
-            {"key": {{ plan_months | append: '' | json }}, "months": {{ plan_months }}, "rateBp": 0}
-            {%- unless forloop.last %},{% endunless -%}
-          {%- endfor -%}
-        {%- endif -%}
-      ],
-      "providers": {{ provider_entries.size }},
       "labels": {
         "pieces": {{ label_pieces | json }},
         "addToCart": {{ label_add_to_cart | json }},

@@ -92,90 +92,15 @@
       The full variant matrix, with money formatted by Liquid so the client never
       has to build a currency string. Read once by the product component.
 
-      Instalment figures are precomputed here, per variant and per row, for the
-      same reason: a variant swap must be able to update the instalment bar and
-      table without formatting currency in JavaScript. Rows are keyed like the
-      modal's cells: "<provider block id>-<months>" for provider plans, or just
-      "<months>" for the generic plans used when no provider is set up. The
-      headline is the lowest provider row, or price ÷ the headline duration
-      without providers, as in showcase-product-installments.
+      "price" (minor units) is there for the installment line, which recomputes
+      its plans from it (showcase-instalments.js).
     {%- endcomment -%}
-    {% liquid
-      assign option_plans = section.blocks | where: 'type', 'instalment_plan'
-      capture provider_plans
-        render 'showcase-instalment-plans', section: section
-      endcapture
-      assign provider_entries = provider_plans | strip | split: ';'
-      assign plan_suffix = section.settings.instalment_short_period | default: 'mo'
-    %}
     <script type="application/json" ref="variantData">
       [
         {% for variant in product.variants %}
           {% liquid
-            # Monthly figures round UP to whole pounds, so the advertised
-            # instalment is never below the real one.
-            assign headline_amount = nil
-            capture instalment_rows
-              if provider_entries.size > 0
-                for entry in provider_entries
-                  assign parts = entry | split: '|'
-                  assign plan_months = parts[1] | times: 1
-                  assign plan_rate = parts[2] | times: 1
-                  capture plan_amount
-                    render 'showcase-instalment-amount', price: variant.price, months: plan_months, rate_bp: plan_rate
-                  endcapture
-                  assign plan_amount = plan_amount | times: 1
-                  if headline_amount == nil or plan_amount < headline_amount
-                    assign headline_amount = plan_amount
-                  endif
-                  capture plan_text
-                    render 'showcase-money', amount: plan_amount
-                    echo ' / '
-                    echo plan_suffix
-                  endcapture
-                  assign plan_key = parts[0] | append: '-' | append: plan_months
-                  echo plan_key | json
-                  echo ':'
-                  echo plan_text | json
-                  unless forloop.last
-                    echo ','
-                  endunless
-                endfor
-              else
-                for block in option_plans
-                  assign plan_months = block.settings.months | default: 3
-                  capture plan_amount
-                    render 'showcase-instalment-amount', price: variant.price, months: plan_months
-                  endcapture
-                  assign plan_amount = plan_amount | times: 1
-                  capture plan_text
-                    render 'showcase-money', amount: plan_amount
-                    echo ' / '
-                    echo plan_suffix
-                  endcapture
-                  # JSON object keys must be strings; a bare number made the whole matrix unparseable.
-                  echo plan_months | append: '' | json
-                  echo ':'
-                  echo plan_text | json
-                  unless forloop.last
-                    echo ','
-                  endunless
-                endfor
-              endif
-            endcapture
-            if headline_amount == nil
-              assign headline_months = section.settings.instalment_headline_months | default: 6
-              capture headline_amount
-                render 'showcase-instalment-amount', price: variant.price, months: headline_months
-              endcapture
-              assign headline_amount = headline_amount | times: 1
-            endif
-
             capture price_html
               render 'showcase-money', amount: variant.price
-            endcapture
-            capture instalment_html
-              render 'showcase-money', amount: headline_amount
             endcapture
             capture compare_html
               render 'showcase-money', amount: variant.compare_at_price
@@ -185,9 +110,8 @@
             "id": {{ variant.id | json }},
             "options": {{ variant.options | json }},
             "available": {{ variant.available | json }},
+            "price": {{ variant.price | json }},
             "priceHtml": {{ price_html | json }},
-            "instalmentHtml": {{ instalment_html | json }},
-            "instalments": { {{- instalment_rows -}} },
             "compareHtml": {%- if variant.compare_at_price > variant.price -%}
                 {{ compare_html | json }}
               {%- else -%}
