@@ -81,62 +81,60 @@
         {{- 'icon-card.svg' | inline_asset_content -}}
       </span>
 
-      <div class="instalment-line__body">
-        <p class="instalment-line__text">
-          {{ section.settings.instalment_prefix | default: 'Pay from' }}
-          <span class="instalment-line__amount" data-instalment-headline>
-            {%- render 'showcase-money', amount: headline_amount -%}
-          </span>
-          {{- '' -}}
-          <span class="instalment-line__period">/{{ section.settings.instalment_period_label | default: 'month' }}</span>
-          <span class="instalment-line__zero" data-instalment-zero {% if lowest_zero == nil %}hidden{% endif %}>
-            · {{ zero_label -}}
-          </span>
-        </p>
+      <p class="instalment-line__text">
+        {{ section.settings.instalment_prefix | default: 'Pay from' }}
+        <span class="instalment-line__amount" data-instalment-headline>
+          {%- render 'showcase-money', amount: headline_amount -%}
+        </span>
+        {{- '' -}}
+        <span class="instalment-line__period">/{{ section.settings.instalment_period_label | default: 'month' }}</span>
+        <span class="instalment-line__zero" data-instalment-zero {% if lowest_zero == nil %}hidden{% endif %}>
+          · {{ zero_label -}}
+        </span>
+      </p>
 
-        <div class="instalment-line__meta">
-          <ul class="instalment-line__logos" role="list">
-            {% assign shown = 0 %}
-            {% for block in section.blocks %}
-              {% assign block_key = '|' | append: block.id | append: '|' %}
-              {% unless block.type == 'instalment_provider' and provider_ids contains block_key %}
-                {% continue %}
-              {% endunless %}
-              {% if shown >= max_logos %}
-                {% break %}
-              {% endif %}
-              <li class="instalment-line__logo">
-                {% if block.settings.logo != blank %}
-                  {{
-                    block.settings.logo
-                    | image_url: width: 144
-                    | image_tag:
-                      loading: 'lazy',
-                      alt: block.settings.name,
-                      sizes: '48px',
-                      widths: '96, 144'
-                  }}
-                {% else %}
-                  <span class="instalment-line__logo-name">{{ block.settings.name }}</span>
-                {% endif %}
-              </li>
-              {% assign shown = shown | plus: 1 %}
-            {% endfor %}
-            {% if more_count > 0 %}
-              <li class="instalment-line__more">+{{ more_count }}</li>
+      <div class="instalment-line__meta">
+        <ul class="instalment-line__logos" role="list">
+          {% assign shown = 0 %}
+          {% for block in section.blocks %}
+            {% assign block_key = '|' | append: block.id | append: '|' %}
+            {% unless block.type == 'instalment_provider' and provider_ids contains block_key %}
+              {% continue %}
+            {% endunless %}
+            {% if shown >= max_logos %}
+              {% break %}
             {% endif %}
-          </ul>
+            <li class="instalment-line__logo">
+              {% if block.settings.logo != blank %}
+                {{
+                  block.settings.logo
+                  | image_url: width: 144
+                  | image_tag:
+                    loading: 'lazy',
+                    alt: block.settings.name,
+                    sizes: '48px',
+                    widths: '96, 144'
+                }}
+              {% else %}
+                <span class="instalment-line__logo-name">{{ block.settings.name }}</span>
+              {% endif %}
+            </li>
+            {% assign shown = shown | plus: 1 %}
+          {% endfor %}
+          {% if more_count > 0 %}
+            <li class="instalment-line__more">+{{ more_count }}</li>
+          {% endif %}
+        </ul>
 
-          <button
-            type="button"
-            class="instalment-line__link"
-            aria-haspopup="dialog"
-            aria-controls="InstalmentDrawer-{{ section.id }}"
-            on:click="/open"
-          >
-            {{- section.settings.instalment_view_label | default: 'View plans' -}}
-          </button>
-        </div>
+        <button
+          type="button"
+          class="instalment-line__link"
+          aria-haspopup="dialog"
+          aria-controls="InstalmentDrawer-{{ section.id }}"
+          on:click="/open"
+        >
+          {{- section.settings.instalment_view_label | default: 'View plans' -}}
+        </button>
       </div>
     </div>
 
@@ -260,10 +258,15 @@
     display: none;
   }
 
-  /* ---- Line: the assurance rows' type, icon and gap, on a light grey box ---- */
+  /*
+    ---- Line: the assurance rows' type, icon and gap, on a light grey box ----
+    Two rows: icon + "Pay from …", then the logos with "View plans" at the end,
+    across the full width (on one row they overflow a 390px phone).
+  */
   .instalment-line {
     display: flex;
-    align-items: flex-start;
+    flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
     padding: 10px 12px;
     border-radius: 12px;
@@ -279,23 +282,15 @@
     color: var(--color-foreground);
   }
 
-  /* Centre the icon on the first line of text (20px ≈ one 15px line). */
   .instalment-line .instalment-line__icon,
   .instalment-line .instalment-line__icon svg {
     width: 20px;
     height: 20px;
   }
 
-  .instalment-line__body {
-    flex: 1 1 auto;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px 12px;
-    min-width: 0;
-  }
-
   .instalment-line__text {
+    flex: 1 1 0;
+    min-width: 0;
     margin: 0;
   }
 
@@ -313,9 +308,12 @@
   }
 
   .instalment-line__meta {
+    flex: 1 1 100%;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+    gap: 6px 10px;
     min-width: 0;
   }
 
