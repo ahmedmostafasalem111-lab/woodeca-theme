@@ -1,22 +1,28 @@
 {% doc %}
-  One monthly instalment, in cents, rounded UP to whole pounds so the advertised
-  payment is never below the real one: price × (1 + rate) ÷ months.
+  One monthly instalment, in cents: price × (1 + extra cost) ÷ months, rounded
+  UP to whole pounds so the advertised payment is never below the real one.
+
+  Same steps as the installment spreadsheet: the total and the monthly payment
+  are each rounded to the piastre first, so a percentage typed to four decimals
+  (valU's 11.3353%) lands on the provider's own quote instead of a pound above.
 
   Integer maths only. Floating point turned 12,000 × 1.05 ÷ 6 into
-  2,100.0000000000005, which rounds up to a pound too many.
+  2,100.0000000000005, which rounds up to a pound too many. The JS twin is
+  instalmentAmount() in assets/showcase-instalments.js.
 
   @param {number} price - Price in cents.
   @param {number} months - Number of monthly payments.
-  @param {number} [rate_bp] - Rate in hundredths of a percent (500 = 5%). Default 0.
+  @param {number} [ppm] - Extra cost in millionths of the price (113353 = 11.3353%). Default 0.
 
   @example
-  {% capture amount %}{% render 'showcase-instalment-amount', price: variant.price, months: 6, rate_bp: 500 %}{% endcapture %}
+  {% capture amount %}{% render 'showcase-instalment-amount', price: variant.price, months: 6, ppm: 0 %}{% endcapture %}
 {% enddoc %}
 
 {%- liquid
-  assign rate_bp = rate_bp | default: 0
-  # 10,000 basis points × 100 cents per pound × months.
-  assign divisor = months | times: 1000000
-  assign pounds = rate_bp | plus: 10000 | times: price | plus: divisor | minus: 1 | divided_by: divisor
+  assign ppm = ppm | default: 0
+  assign total = ppm | plus: 1000000 | times: price | plus: 500000 | divided_by: 1000000
+  assign double_months = months | times: 2
+  assign monthly = total | times: 2 | plus: months | divided_by: double_months
+  assign pounds = monthly | plus: 99 | divided_by: 100
   echo pounds | times: 100
 -%}

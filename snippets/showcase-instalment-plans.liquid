@@ -1,34 +1,41 @@
 {% doc %}
-  Flattens the enabled "Instalment provider" blocks' plans into one string for
-  the instalment snippets to split: entries "block_id|months|rate_bp", joined by
-  ";". rate_bp is the rate in hundredths of a percent (5% → 500, 7.5% → 750), so
-  every instalment sum stays in integers.
+  Flattens the shown "Installment provider" blocks into one string for the
+  installment snippet to split: entries "block_id|months|ppm", joined by ";".
+  ppm is the extra cost in millionths of the price (11.3353% → 113353), so the
+  instalment sums stay in integers.
 
-  A provider's plans are typed as "3:0, 6:0, 9:5, 12:10" (months:rate%). Spaces
-  and "%" are ignored; an entry without a positive month count is skipped, and a
-  provider left with no valid plan is left out entirely.
+  A provider's months are typed as "3,6,9" and its extra cost % as one value for
+  every plan ("0") or one per plan in the same order ("11.3353,22.6828"); a plan
+  without its own value takes the last one given. Spaces and "%" are ignored; a
+  month count below 1 is skipped, and a provider left with no valid plan is left
+  out entirely.
 
   @param {object} section - The product section carrying the provider blocks.
 
   @example
-  {% capture provider_plans %}{% render 'showcase-instalment-plans', section: section %}{% endcapture %}
+  {% capture plan_text %}{% render 'showcase-instalment-plans', section: section %}{% endcapture %}
 {% enddoc %}
 
 {%- liquid
   for block in section.blocks
-    if block.type != 'instalment_logo' or block.settings.enabled == false
+    if block.type != 'instalment_provider' or block.settings.enabled == false
       continue
     endif
 
-    assign entries = block.settings.plans | remove: ' ' | remove: '%' | split: ','
-    for entry in entries
-      assign pair = entry | split: ':'
-      assign months = pair[0] | times: 1
+    assign month_list = block.settings.months | remove: ' ' | split: ','
+    assign extra_list = block.settings.extra_cost | default: '0' | remove: ' ' | remove: '%' | split: ','
+    assign last_extra = extra_list | last | default: '0'
+    for month_text in month_list
+      assign months = month_text | times: 1
       if months < 1
         continue
       endif
-      assign rate_bp = pair[1] | default: 0 | times: 100 | round
-      echo block.id | append: '|' | append: months | append: '|' | append: rate_bp | append: ';'
+      assign extra = extra_list[forloop.index0] | default: last_extra
+      assign ppm = extra | times: 10000 | round
+      if ppm < 0
+        assign ppm = 0
+      endif
+      echo block.id | append: '|' | append: months | append: '|' | append: ppm | append: ';'
     endfor
   endfor
 -%}

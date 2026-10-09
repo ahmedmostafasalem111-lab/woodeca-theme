@@ -60,7 +60,7 @@
     --product-cta-text: {{ section.settings.cta_text_color | default: '#ffffff' }};
     --product-gallery-background: {{ section.settings.gallery_background | default: '#f2f2f0' }};
     --product-accent: {{ section.settings.accent_color | default: '#e8342a' }};
-    --product-instalment-background: {{ section.settings.instalment_background | default: '#f4f2fb' }};
+    --product-instalment-background: {{ section.settings.instalment_background | default: '#f2f2f0' }};
     --product-title-size: {{ section.settings.title_size }};
     {% if section.settings.text_color != blank %}
       --color-foreground: {{ section.settings.text_color }};
@@ -1385,102 +1385,79 @@
     },
     {
       "type": "header",
-      "content": "Instalments"
+      "content": "Installments"
+    },
+    {
+      "type": "paragraph",
+      "content": "Providers and their plans are the \"Installment provider\" blocks below. The line hides itself when the product has no price or no provider is shown."
     },
     {
       "type": "checkbox",
       "id": "show_instalments",
-      "label": "Show instalment bar",
+      "label": "Show installment line",
       "default": true
-    },
-    {
-      "type": "range",
-      "id": "instalment_headline_months",
-      "label": "Headline duration",
-      "min": 2,
-      "max": 24,
-      "step": 1,
-      "unit": "mo",
-      "default": 6,
-      "info": "The collapsed bar shows the price divided by this number."
     },
     {
       "type": "text",
       "id": "instalment_prefix",
-      "label": "Bar prefix",
-      "default": "Starting From"
+      "label": "Line prefix",
+      "default": "Pay from"
     },
     {
       "type": "text",
       "id": "instalment_period_label",
-      "label": "Bar period label",
-      "default": "Month"
+      "label": "Per month label",
+      "default": "month"
     },
     {
       "type": "text",
-      "id": "instalment_subtext",
-      "label": "Bar subtext",
-      "default": "0% Down Payment • Fast Approval"
+      "id": "instalment_zero_label",
+      "label": "0% label",
+      "default": "0% interest",
+      "info": "After the amount on the line, and on every 0% plan in the drawer."
+    },
+    {
+      "type": "text",
+      "id": "instalment_view_label",
+      "label": "Drawer link",
+      "default": "View plans"
     },
     {
       "type": "text",
       "id": "instalment_modal_heading",
-      "label": "Modal heading",
-      "default": "Payment Methods"
+      "label": "Drawer heading",
+      "default": "Installment plans"
+    },
+    {
+      "type": "text",
+      "id": "instalment_price_label",
+      "label": "Drawer price label",
+      "default": "Price"
+    },
+    {
+      "type": "text",
+      "id": "instalment_estimate_label",
+      "label": "Estimate label",
+      "default": "estimate",
+      "info": "On the plans of providers set to \"Show amounts as estimates\"."
     },
     {
       "type": "text",
       "id": "instalment_close_label",
-      "label": "Modal close label",
+      "label": "Drawer close label",
       "default": "Close"
     },
     {
       "type": "text",
-      "id": "instalment_col_duration",
-      "label": "Duration column heading",
-      "default": "Duration"
-    },
-    {
-      "type": "text",
-      "id": "instalment_col_rate",
-      "label": "Rate column heading",
-      "default": "Rate"
-    },
-    {
-      "type": "text",
-      "id": "instalment_col_payment",
-      "label": "Payment column heading",
-      "default": "Monthly payment"
-    },
-    {
-      "type": "text",
-      "id": "instalment_months_label",
-      "label": "Months word",
-      "default": "months"
-    },
-    {
-      "type": "text",
-      "id": "instalment_short_period",
-      "label": "Short period label",
-      "default": "mo"
-    },
-    {
-      "type": "text",
-      "id": "instalment_providers_empty",
-      "label": "Empty provider strip text",
-      "default": "Provider logos appear here once added in the theme editor."
-    },
-    {
-      "type": "text",
       "id": "instalment_footnote",
-      "label": "Modal footnote",
-      "default": "Admin fees might be added in checkout."
+      "label": "Drawer footnote",
+      "default": "Plans are subject to the provider's approval and limits. Final amounts are confirmed at checkout."
     },
     {
       "type": "color",
       "id": "instalment_background",
-      "label": "Instalment bar background",
-      "default": "#f4f2fb"
+      "label": "Installment line background",
+      "default": "#f2f2f0"
     },
     {
       "type": "header",
@@ -1784,55 +1761,51 @@
       ]
     },
     {
-      "type": "instalment_plan",
-      "name": "Instalment plan",
+      "type": "instalment_provider",
+      "name": "Installment provider",
       "settings": [
-        {
-          "type": "range",
-          "id": "months",
-          "label": "Duration",
-          "min": 2,
-          "max": 24,
-          "step": 1,
-          "unit": "mo",
-          "default": 3
-        },
-        {
-          "type": "text",
-          "id": "rate_label",
-          "label": "Rate",
-          "default": "0%",
-          "info": "Display copy only — the monthly figure is always price divided by duration."
-        }
-      ]
-    },
-    {
-      "type": "instalment_logo",
-      "name": "Instalment provider",
-      "settings": [
-        {
-          "type": "text",
-          "id": "name",
-          "label": "Provider name"
-        },
         {
           "type": "image_picker",
           "id": "logo",
           "label": "Logo",
-          "info": "Shown as a tab in the payment methods popup. A wide logo on a transparent or white background works best."
+          "info": "Small next to the \"Pay from\" line (the first five providers) and in the plans drawer. A wide logo on white works best."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name"
+        },
+        {
+          "type": "text",
+          "id": "months",
+          "label": "Months",
+          "default": "3,6",
+          "info": "Plan lengths, separated by commas, e.g. 3,6,9."
+        },
+        {
+          "type": "text",
+          "id": "extra_cost",
+          "label": "Extra cost %",
+          "default": "0",
+          "info": "Total extra on top of the price. One value for all plans (0 = 0% interest), or one per plan in the order of Months, e.g. 11.3353,22.6828. Monthly = price × (1 + extra %) ÷ months, rounded up to whole pounds."
+        },
+        {
+          "type": "checkbox",
+          "id": "estimate",
+          "label": "Show amounts as estimates",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "note",
+          "label": "Note",
+          "info": "Optional. One short line under the name in the drawer."
         },
         {
           "type": "checkbox",
           "id": "enabled",
-          "label": "Enabled",
+          "label": "Show this provider",
           "default": true
-        },
-        {
-          "type": "text",
-          "id": "plans",
-          "label": "Plans",
-          "default": "3:0, 6:0, 9:0, 12:0",
-          "info": "Months:rate% pairs separated by commas, e.g. 3:0, 6:0, 9:5, 12:10. Monthly payment = price × (1 + rate) ÷ months, rounded up to whole pounds."
         }
       ]
     }

@@ -28,26 +28,114 @@
             "icon": "return"
           }
         },
-        "p1": {
-          "type": "instalment_plan",
+        "instalment_halan": {
+          "type": "instalment_provider",
           "settings": {
-            "months": 3,
-            "rate_label": "0%"
+            "logo": "shopify://shop_images/2.png",
+            "name": "Halan",
+            "months": "3,6,9",
+            "extra_cost": "0",
+            "estimate": false,
+            "note": "",
+            "enabled": true
           }
         },
-        "p2": {
-          "type": "instalment_plan",
+        "instalment_sympl": {
+          "type": "instalment_provider",
           "settings": {
-            "months": 6,
-            "rate_label": "0%"
+            "logo": "shopify://shop_images/5.png",
+            "name": "Sympl",
+            "months": "1,2,3,4,5",
+            "extra_cost": "0",
+            "estimate": false,
+            "note": "",
+            "enabled": true
+          }
+        },
+        "instalment_valu": {
+          "type": "instalment_provider",
+          "settings": {
+            "logo": "shopify://shop_images/6.png",
+            "name": "valU",
+            "months": "3,6",
+            "extra_cost": "11.3353,22.6828",
+            "estimate": true,
+            "note": "Estimated from valU's quote",
+            "enabled": true
+          }
+        },
+        "instalment_cib": {
+          "type": "instalment_provider",
+          "settings": {
+            "logo": "shopify://shop_images/1_8186a6be-58bf-4851-8186-a8e5edef6e36.png",
+            "name": "CIB",
+            "months": "6",
+            "extra_cost": "0",
+            "estimate": false,
+            "note": "No fees",
+            "enabled": true
+          }
+        },
+        "instalment_nbe": {
+          "type": "instalment_provider",
+          "settings": {
+            "logo": "shopify://shop_images/4_63de3c7f-28a9-4a2a-9da2-256486ddd6a9.png",
+            "name": "National Bank of Egypt",
+            "months": "6",
+            "extra_cost": "0",
+            "estimate": false,
+            "note": "No fees",
+            "enabled": true
+          }
+        },
+        "instalment_banque_misr": {
+          "type": "instalment_provider",
+          "settings": {
+            "logo": "shopify://shop_images/8_c1a4bd5a-d82a-4733-a8cd-61c9a5c1c4c5.png",
+            "name": "Banque Misr",
+            "months": "6",
+            "extra_cost": "0",
+            "estimate": false,
+            "note": "No fees",
+            "enabled": true
+          }
+        },
+        "instalment_banque_du_caire": {
+          "type": "instalment_provider",
+          "settings": {
+            "logo": "shopify://shop_images/9_05176fcb-a875-4a45-8d27-25184e419109.png",
+            "name": "Banque du Caire",
+            "months": "6",
+            "extra_cost": "0",
+            "estimate": false,
+            "note": "No fees",
+            "enabled": true
+          }
+        },
+        "instalment_mashreq": {
+          "type": "instalment_provider",
+          "settings": {
+            "logo": "shopify://shop_images/7_dd50f5be-14ac-4503-80cc-a2081a5773b0.png",
+            "name": "Mashreq Bank",
+            "months": "6",
+            "extra_cost": "0",
+            "estimate": false,
+            "note": "No fees",
+            "enabled": true
           }
         }
       },
       "block_order": [
         "a1",
         "a3",
-        "p1",
-        "p2"
+        "instalment_halan",
+        "instalment_sympl",
+        "instalment_valu",
+        "instalment_cib",
+        "instalment_nbe",
+        "instalment_banque_misr",
+        "instalment_banque_du_caire",
+        "instalment_mashreq"
       ],
       "settings": {
         "show_breadcrumbs": true,
@@ -77,20 +165,12 @@
         "inspiration_play_label": "Play video",
         "inspiration_close_label": "Close video",
         "show_instalments": true,
-        "instalment_headline_months": 6,
-        "instalment_prefix": "Starting From",
-        "instalment_period_label": "Month",
-        "instalment_subtext": "0% Down Payment • Fast Approval",
-        "instalment_modal_heading": "Payment Methods",
+        "instalment_prefix": "Pay from",
+        "instalment_period_label": "month",
+        "instalment_modal_heading": "Installment plans",
         "instalment_close_label": "Close",
-        "instalment_col_duration": "Duration",
-        "instalment_col_rate": "Rate",
-        "instalment_col_payment": "Monthly payment",
-        "instalment_months_label": "months",
-        "instalment_short_period": "mo",
-        "instalment_providers_empty": "Provider logos appear here once added in the theme editor.",
-        "instalment_footnote": "Admin fees might be added in checkout.",
-        "instalment_background": "#f4f2fb",
+        "instalment_footnote": "Plans are subject to the provider's approval and limits. Final amounts are confirmed at checkout.",
+        "instalment_background": "#f2f2f0",
         "show_delivery_estimate": true,
         "delivery_lead_min_default": 5,
         "delivery_lead_max_default": 7,
@@ -123,7 +203,11 @@
         "cta_background": "#333333",
         "cta_text_color": "#ffffff",
         "padding-block-start": 24,
-        "padding-block-end": 40
+        "padding-block-end": 40,
+        "instalment_zero_label": "0% interest",
+        "instalment_view_label": "View plans",
+        "instalment_price_label": "Price",
+        "instalment_estimate_label": "estimate"
       }
     },
     "specs": {
