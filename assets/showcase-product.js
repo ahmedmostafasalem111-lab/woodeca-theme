@@ -446,11 +446,11 @@ class ShowcaseProductComponent extends Component {
   }
 
   /**
-   * Opens the tapped video full screen and starts it immediately.
+   * Opens the tapped video in the popup and starts it immediately.
    *
    * This runs inside the tap's own event handler, which is what lets the browser
-   * treat both the fullscreen request and the playback as user-initiated — from
-   * a timeout or a promise continuation, either can be refused.
+   * treat the playback (with sound) as user-initiated — from a timeout or a
+   * promise continuation it can be refused.
    *
    * @param {Event} event
    */
@@ -470,12 +470,12 @@ class ShowcaseProductComponent extends Component {
 
     dialog.showModal();
 
-    // Fullscreen on the dialog, so an external embed goes full screen too.
-    dialog.requestFullscreen?.().catch(() => {
-      // iOS Safari refuses fullscreen on anything but a <video>; the modal
-      // dialog already fills the screen there, so this is not worth surfacing.
-    });
-
+    // Plays inline in the popup (playsinline). Fullscreen is the video's own
+    // control button: Chrome/Android and desktop use the Fullscreen API on the
+    // <video>, iPhone Safari its native player. Forcing the dialog (or, on iOS,
+    // webkitEnterFullscreen) fullscreen on open made the dialog the fullscreen
+    // element, which skipped inline playback and left the video's own button
+    // without anything to do.
     const video = stage?.querySelector('video');
     if (video instanceof HTMLVideoElement) {
       video.currentTime = 0;
@@ -485,8 +485,6 @@ class ShowcaseProductComponent extends Component {
         video.muted = true;
         video.play().catch(() => {});
       });
-      // Where the dialog cannot go fullscreen, the video element still can.
-      if (!document.fullscreenElement) video.webkitEnterFullscreen?.();
     }
   }
 
