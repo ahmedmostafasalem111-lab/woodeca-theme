@@ -13,6 +13,7 @@
       "type": "b2b-hero",
       "settings": {
         "image": "shopify://shop_images/F1_DESKTOP.webp",
+        "mobile_image": "shopify://shop_images/F1_Mobile.webp",
         "overlay_opacity": 45,
         "size": "large",
         "heading": "Your Vision. Our Factory.                        Built for Business.",
