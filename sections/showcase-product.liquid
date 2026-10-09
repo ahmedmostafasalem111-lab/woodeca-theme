@@ -73,13 +73,25 @@
   >
     {%- comment -%} ---------- Breadcrumbs ---------- {%- endcomment -%}
     {% if section.settings.show_breadcrumbs %}
+      {%- liquid
+        # The collection the customer came from (/collections/<handle>/products/<handle>,
+        # linked from collection grids). Arriving directly (ads, search, homepage): the
+        # product's main category by product type, never its family collection.
+        assign crumb_collection = collection
+        if crumb_collection == blank or crumb_collection.id == blank
+          capture crumb_handle
+            render 'product-category-handle', product: product
+          endcapture
+          assign crumb_collection = collections[crumb_handle]
+        endif
+      -%}
       <nav class="product-breadcrumbs" aria-label="Breadcrumb">
         <a href="{{ routes.root_url }}">
           {{- section.settings.breadcrumb_home_label | default: 'Home' -}}
         </a>
-        {% if collection != blank %}
+        {% if crumb_collection != blank and crumb_collection.id != blank %}
           <span aria-hidden="true">/</span>
-          <a href="{{ collection.url }}">{{ collection.title }}</a>
+          <a href="{{ crumb_collection.url }}">{{ crumb_collection.title }}</a>
         {% endif %}
         <span aria-hidden="true">/</span>
         <span aria-current="page">{{ product.title }}</span>

@@ -51,6 +51,12 @@
   if product != blank and product != nil
     assign card_title = product.title
     assign card_url = product.url
+    # On collection pages the link carries the collection (/collections/<handle>/products/<handle>)
+    # so the product page's breadcrumb can show where the customer came from. The canonical tag
+    # still points at /products/<handle>. Elsewhere (sliders, search, homepage) the plain URL.
+    if template.name == 'collection' and collection != blank and collection.handle != blank
+      assign card_url = product.url | within: collection
+    endif
     assign card_image = product.featured_image
     capture card_price
       render 'showcase-money', amount: product.price
