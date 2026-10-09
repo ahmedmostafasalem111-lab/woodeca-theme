@@ -177,9 +177,6 @@
       "settings": {
         "heading": "Your cart",
         "close_label": "Close cart",
-        "show_countdown": true,
-        "countdown_text": "Products are limited, checkout within",
-        "countdown_minutes": 10,
         "remove_label": "Remove",
         "decrease_label": "Decrease quantity",
         "increase_label": "Increase quantity",
@@ -187,13 +184,11 @@
         "adding_text": "Adding to cart…",
         "add_error_text": "This item could not be added. Please try again.",
         "subtotal_label": "Subtotal",
-        "continue_label": "Continue Shopping",
         "checkout_label": "Check Out",
         "reassurance_text": "14-day returns on unused items in original condition, collected from your home",
         "empty_text": "Your cart is empty.",
         "empty_cta": "Start shopping",
-        "accent_color": "#e8342a",
-        "continue_color": "#1c1c1c"
+        "accent_color": "#e8342a"
       }
     }
   },

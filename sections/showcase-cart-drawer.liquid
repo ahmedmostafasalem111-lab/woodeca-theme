@@ -25,10 +25,8 @@
   data-cart-token="{{ cart.token }}"
   data-limit-text="{{ section.settings.stock_limit_text | default: 'Only [count] available' | escape }}"
   data-add-error-text="{{ section.settings.add_error_text | default: 'This item could not be added. Please try again.' | escape }}"
-  data-countdown-minutes="{{ section.settings.countdown_minutes | default: 10 }}"
   style="
     --cart-accent: {{ section.settings.accent_color | default: '#e8342a' }};
-    --cart-continue-background: {{ section.settings.continue_color | default: '#1c1c1c' }};
   "
   hidden
 >
@@ -58,22 +56,6 @@
       </button>
     </div>
 
-    {%- comment -%}
-      2 — Urgency banner. Rendered only when there is something to lose, and the
-      countdown itself is written by the script so the markup carries no stale
-      time from a cached render.
-    {%- endcomment -%}
-    {% if section.settings.show_countdown and has_items %}
-      <p class="cart-urgency" data-cart-urgency>
-        <span class="svg-wrapper cart-urgency__icon" aria-hidden="true">
-          {{- 'icon-fire.svg' | inline_asset_content -}}
-        </span>
-        <span>
-          {{ section.settings.countdown_text | default: 'Products are limited, checkout within' }}
-          <strong data-cart-countdown>—</strong>
-        </span>
-      </p>
-    {% endif %}
 
     {%- comment -%}
       An add opens the drawer on the click, before Shopify has answered. This
@@ -193,9 +175,6 @@
         </div>
 
         <div class="cart-drawer__actions">
-          <button type="button" class="cart-drawer__continue" data-cart-close>
-            {{- section.settings.continue_label | default: 'Continue Shopping' -}}
-          </button>
           <form action="{{ routes.cart_url }}" method="post" class="cart-drawer__checkout-form">
             <button type="submit" name="checkout" class="cart-drawer__checkout">
               {{- section.settings.checkout_label | default: 'Check Out' -}}
@@ -304,28 +283,6 @@
   }
 
   .cart-drawer__close svg {
-    width: 15px;
-    height: 15px;
-  }
-
-  .cart-urgency {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-2xs);
-    flex: 0 0 auto;
-    margin: 0;
-    padding: var(--padding-2xs) var(--padding-lg);
-    background-color: rgb(232 52 42 / 0.08);
-    color: var(--cart-accent, #e8342a);
-    font-size: var(--font-size--xs);
-  }
-
-  .cart-urgency__icon {
-    flex: 0 0 auto;
-    display: flex;
-  }
-
-  .cart-urgency__icon svg {
     width: 15px;
     height: 15px;
   }
@@ -492,9 +449,9 @@
     font-size: var(--font-size--lg);
   }
 
+  /* Check Out is the only action (the × closes the drawer): full width. */
   .cart-drawer__actions {
     display: flex;
-    gap: var(--gap-2xs);
   }
 
   .cart-drawer__checkout-form {
@@ -502,7 +459,6 @@
     margin: 0;
   }
 
-  .cart-drawer__continue,
   .cart-drawer__checkout {
     width: 100%;
     padding: var(--padding-sm) var(--padding-md);
@@ -514,10 +470,6 @@
     cursor: pointer;
   }
 
-  .cart-drawer__continue {
-    flex: 1 1 0;
-    background-color: var(--cart-continue-background, #1c1c1c);
-  }
 
   .cart-drawer__checkout {
     background-color: var(--cart-accent, #e8342a);
@@ -643,32 +595,6 @@
     },
     {
       "type": "header",
-      "content": "Urgency banner"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_countdown",
-      "label": "Show countdown",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "countdown_text",
-      "label": "Countdown text",
-      "default": "Products are limited, checkout within"
-    },
-    {
-      "type": "range",
-      "id": "countdown_minutes",
-      "label": "Countdown length",
-      "min": 1,
-      "max": 30,
-      "step": 1,
-      "unit": "m",
-      "default": 10
-    },
-    {
-      "type": "header",
       "content": "Line items"
     },
     {
@@ -722,12 +648,6 @@
     },
     {
       "type": "text",
-      "id": "continue_label",
-      "label": "Continue button",
-      "default": "Continue Shopping"
-    },
-    {
-      "type": "text",
       "id": "checkout_label",
       "label": "Checkout button",
       "default": "Check Out"
@@ -759,12 +679,6 @@
       "id": "accent_color",
       "label": "Checkout button",
       "default": "#e8342a"
-    },
-    {
-      "type": "color",
-      "id": "continue_color",
-      "label": "Continue button",
-      "default": "#1c1c1c"
     }
   ]
 }
