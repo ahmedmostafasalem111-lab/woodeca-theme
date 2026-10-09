@@ -513,32 +513,6 @@
     min-width: 0;
   }
 
-  /*
-    Hover lifts the card into an elevated panel that overlays its neighbours, so the
-    swatch row and controls have room without reflowing the grid. Scoped to the
-    collection grid — homepage and PDP carousels keep the flat card.
-    Pointer/hover query so it never latches on touch.
-  */
-  @media (hover: hover) and (pointer: fine) {
-    .collection-grid__item {
-      position: relative;
-    }
-
-    .collection-grid__item:hover {
-      z-index: var(--layer-raised, 5);
-    }
-
-    .collection-grid__item:hover .showcase-card {
-      position: absolute;
-      inset-inline: 0;
-      top: 0;
-      padding: var(--padding-sm);
-      border-radius: var(--style-border-radius-inputs, 8px);
-      background-color: var(--color-background, #fff);
-      box-shadow: 0 6px 24px rgb(0 0 0 / 0.12);
-    }
-  }
-
   /* ---- Mid-grid promo banner ---- */
   /*
     Height matches the product IMAGE box, not the whole card, so the banner sits

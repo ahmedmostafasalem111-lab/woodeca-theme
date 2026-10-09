@@ -507,6 +507,12 @@
     height: 100%;
   }
 
+  /* No grey flash when a card is tapped on phones. */
+  .showcase-card a,
+  .showcase-card button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   /*
     A press on the card that moves a few pixels (a normal hand) used to start
     the browser's native drag of the image/link: its shrunken ghost image read
