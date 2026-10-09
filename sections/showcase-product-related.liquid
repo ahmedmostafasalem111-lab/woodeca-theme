@@ -23,7 +23,7 @@
   assign use_tabs = section.settings.enable_tabs
 
   assign family_collection = null
-  if section.settings.source_a == 'family'
+  if section.settings.source_a == 'family' or section.settings.exclude_family
     assign family_collection = product.metafields[ns].shop_collection.value
     if family_collection == blank
       assign family_word = product.title | split: ' ' | first | handleize
@@ -38,6 +38,24 @@
     endif
     if family_collection.id == blank
       assign family_collection = null
+    endif
+  endif
+
+  # "You may also like" next to "Shop the collection": the family products that slider
+  # shows (it shows when the family has 2+ other products) are never repeated here.
+  # family_ids is ",id,id," for a cheap contains test; blank = no exclusion.
+  assign family_ids = ''
+  if section.settings.exclude_family and section.settings.source_a != 'family' and family_collection != null
+    assign family_others = 0
+    assign family_ids = ','
+    for fp in family_collection.products
+      assign family_ids = family_ids | append: fp.id | append: ','
+      if fp.id != product.id
+        assign family_others = family_others | plus: 1
+      endif
+    endfor
+    if family_others < 2
+      assign family_ids = ''
     endif
   endif
 
@@ -95,6 +113,91 @@
         %}
       </div>
     {% endfor %}
+  {% elsif family_ids != blank %}
+    {%- comment -%}
+      Same source, minus the current product and its family. Fewer than 4 left: top up
+      with the product's category (same product type, other families), then the
+      top-up collection (best sellers by default).
+    {%- endcomment -%}
+    {%- liquid
+      assign shown = 0
+      assign used_ids = ',' | append: product.id | append: ','
+      capture category_handle
+        render 'product-category-handle', product: product
+      endcapture
+      assign category_collection = collections[category_handle]
+      assign topup_collection = section.settings.topup_collection | default: collections['bestsellers']
+    -%}
+    {% for related in source_products %}
+      {%- liquid
+        if shown >= section.settings.products_limit
+          break
+        endif
+        assign key = ',' | append: related.id | append: ','
+        if used_ids contains key or family_ids contains key
+          continue
+        endif
+        assign used_ids = used_ids | append: related.id | append: ','
+        assign shown = shown | plus: 1
+      -%}
+      <div>
+        {% render 'showcase-product-card',
+          product: related,
+          show_quick_add: true,
+          show_swatches: section.settings.show_swatches,
+          show_reviews: section.settings.show_reviews,
+          image_sizes: card_sizes
+        %}
+      </div>
+    {% endfor %}
+    {% if shown < 4 %}
+      {% for related in category_collection.products %}
+        {%- liquid
+          if shown >= 4
+            break
+          endif
+          assign key = ',' | append: related.id | append: ','
+          if used_ids contains key or family_ids contains key
+            continue
+          endif
+          assign used_ids = used_ids | append: related.id | append: ','
+          assign shown = shown | plus: 1
+        -%}
+        <div>
+          {% render 'showcase-product-card',
+            product: related,
+            show_quick_add: true,
+            show_swatches: section.settings.show_swatches,
+            show_reviews: section.settings.show_reviews,
+            image_sizes: card_sizes
+          %}
+        </div>
+      {% endfor %}
+    {% endif %}
+    {% if shown < 4 %}
+      {% for related in topup_collection.products %}
+        {%- liquid
+          if shown >= 4
+            break
+          endif
+          assign key = ',' | append: related.id | append: ','
+          if used_ids contains key or family_ids contains key
+            continue
+          endif
+          assign used_ids = used_ids | append: related.id | append: ','
+          assign shown = shown | plus: 1
+        -%}
+        <div>
+          {% render 'showcase-product-card',
+            product: related,
+            show_quick_add: true,
+            show_swatches: section.settings.show_swatches,
+            show_reviews: section.settings.show_reviews,
+            image_sizes: card_sizes
+          %}
+        </div>
+      {% endfor %}
+    {% endif %}
   {% else %}
     {% for related in source_products limit: section.settings.products_limit %}
       {% if related.id == product.id %}
@@ -452,6 +555,19 @@
       "label": "Metafield key",
       "default": "similar_products",
       "visible_if": "{{ section.settings.source_b == 'metafield' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "exclude_family",
+      "label": "Don't repeat \"Shop the collection\" products",
+      "default": false,
+      "info": "For \"You may also like\": leaves out the current product's family when \"Shop the collection\" shows it, then tops up to 4 with the same product type and the top-up collection."
+    },
+    {
+      "type": "collection",
+      "id": "topup_collection",
+      "label": "Top-up collection",
+      "info": "Used last when fewer than 4 products are left. Default: Bestsellers."
     },
     {
       "type": "header",

@@ -1,0 +1,62 @@
+{% doc %}
+  Outputs the handle of the product's main category collection, from its product
+  type (Buffet → buffet, Wardrobes → wardrobes, T.v Units → t-v-units …). Kids pieces
+  share their type with adult ones, so the kids collection is used when the product
+  is in it and the adult one isn't. Outputs nothing when no category matches.
+  Capture it: {% capture h %}{% render 'product-category-handle', product: product %}{% endcapture %}
+
+  @param {object} product - The product.
+{% enddoc %}
+{%- liquid
+  assign type_key = product.type | handleize
+  case type_key
+    when 't-v-units', 'tv-units'
+      assign candidates = 't-v-units'
+    when 'buffet', 'buffets'
+      assign candidates = 'buffet'
+    when 'drawer-units'
+      assign candidates = 'drawer-units,kids-drawer-units'
+    when 'wardrobes'
+      assign candidates = 'wardrobes,kids-wardrobes'
+    when 'shoe-storage'
+      assign candidates = 'shoe-storage'
+    when 'bookcase', 'bookcases'
+      assign candidates = 'bookcase,kids-bookcases'
+    when 'desk', 'desks'
+      assign candidates = 'desks,kids-desks'
+    when 'beds'
+      assign candidates = 'beds-1,kids-beds'
+    when 'nightstand', 'nightstands'
+      assign candidates = 'nightstand,kids-nightstands'
+    when 'console'
+      assign candidates = 'console'
+    when 'makeup-vanities'
+      assign candidates = 'makeup-vanities'
+    when 'bedroom-sets'
+      assign candidates = 'bedroom-sets,kids-bedroom-sets'
+    else
+      assign candidates = ''
+  endcase
+
+  assign chosen = ''
+  assign fallback = ''
+  assign list = candidates | split: ','
+  for handle in list
+    assign c = collections[handle]
+    if c.id == blank
+      continue
+    endif
+    if fallback == blank
+      assign fallback = handle
+    endif
+    assign member = product.collections | where: 'id', c.id | size
+    if member > 0
+      assign chosen = handle
+      break
+    endif
+  endfor
+  if chosen == blank
+    assign chosen = fallback
+  endif
+  echo chosen
+-%}
