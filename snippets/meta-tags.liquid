@@ -115,6 +115,18 @@
   href="{{ canonical_url }}"
 >
 
+{%- comment -%}
+  Tag-filtered lists (e.g. /collections/wardrobes/ready-to-ship from the "Ready to
+  ship" toggle) are near-duplicates of their collection: keep them out of the index
+  but let crawlers follow their product links.
+{%- endcomment -%}
+{%- if current_tags -%}
+  <meta
+    name="robots"
+    content="noindex, follow"
+  >
+{%- endif -%}
+
 {% if page_description %}
   <meta
     name="description"
