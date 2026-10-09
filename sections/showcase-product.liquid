@@ -82,6 +82,7 @@
           capture crumb_handle
             render 'product-category-handle', product: product
           endcapture
+          assign crumb_handle = crumb_handle | strip
           assign crumb_collection = collections[crumb_handle]
         endif
       -%}

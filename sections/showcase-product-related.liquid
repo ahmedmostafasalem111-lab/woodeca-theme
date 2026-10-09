@@ -125,6 +125,7 @@
       capture category_handle
         render 'product-category-handle', product: product
       endcapture
+      assign category_handle = category_handle | strip
       assign category_collection = collections[category_handle]
       assign topup_collection = section.settings.topup_collection | default: collections['bestsellers']
     -%}
