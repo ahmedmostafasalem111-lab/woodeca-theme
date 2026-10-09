@@ -96,7 +96,8 @@
         "disabled": false,
         "settings": {}
       }
-    }
+    },
+    "favicon": "shopify://shop_images/woodeca-favicon-512.png"
   },
   "presets": {
     "Default": {
