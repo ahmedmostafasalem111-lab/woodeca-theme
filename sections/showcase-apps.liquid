@@ -17,16 +17,19 @@
   /*
     Judge.me "All reviews" page widget. Judge.me hides its server-rendered reviews
     until its script has set the widget up (~1.5–3 s), then the widget grows to
-    several thousand pixels and rebuilds its top area: the footer and the first
-    reviews jumped (CLS 1.3 on mobile). Reserve space so the footer starts below
-    the screen, and keep the widget invisible until Judge.me marks it ready
-    (.jdgm--done-setup-widget). If that never happens, it shows after 6 s anyway.
+    several thousand pixels and rebuilds its top area in steps (summary, actions
+    and photo gallery, Reviews/Questions tabs): the footer and the first reviews
+    jumped (CLS 1.3 on mobile). Reserve space so the footer starts below the
+    screen, and keep the widget invisible until its final top area is in place
+    (tabs + actions present; "done-setup" comes earlier). If that never happens,
+    it shows after 6 s anyway.
   */
   .jdgm-all-reviews-widget-v2025 {
     min-height: 120vh;
   }
 
-  .jdgm-all-reviews-widget-v2025:not(:has(.jdgm--done-setup-widget)) {
+  .jdgm-all-reviews-widget-v2025:not(:has(.jdgm-subtab)),
+  .jdgm-all-reviews-widget-v2025:not(:has(.jdgm-widget-actions-wrapper)) {
     visibility: hidden;
     animation: showcase-jdgm-reveal 0s 6s forwards;
   }
