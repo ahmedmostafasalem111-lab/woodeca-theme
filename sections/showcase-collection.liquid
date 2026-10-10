@@ -80,7 +80,26 @@
     </nav>
   {% endif %}
 
-  {%- comment -%} ---------- Title + result count ---------- {%- endcomment -%}
+  {%- comment -%}
+    ---------- Title + result count + intro ----------
+    The intro (the collection description, or the editorial text override) is
+    always in the HTML in full. Desktop: it sits in the title row, right of the
+    count, at most 2 lines, so the grid below doesn't move. Mobile: its own line
+    under the title, 2 lines, with a Read more toggle (checkbox + label, no JS).
+  {%- endcomment -%}
+  {% liquid
+    assign editorial = blank
+    if section.settings.show_editorial
+      assign editorial = section.settings.editorial_text
+      if editorial == blank
+        assign editorial = collection.description | strip_html | strip_newlines | strip
+      endif
+    endif
+    assign editorial_toggle = false
+    if editorial.size > 90
+      assign editorial_toggle = true
+    endif
+  %}
   <div class="collection-heading">
     <h1 class="collection-heading__title">{{ collection.title }}</h1>
     {% if section.settings.show_count %}
@@ -88,19 +107,23 @@
         {{- collection.products_count }} {{ section.settings.count_label | default: 'found' -}}
       </span>
     {% endif %}
-  </div>
 
-  {%- comment -%} ---------- Editorial line + read more ---------- {%- endcomment -%}
-  {% if section.settings.show_editorial %}
-    {% liquid
-      assign editorial = section.settings.editorial_text
-      if editorial == blank
-        assign editorial = collection.description
-      endif
-    %}
     {% if editorial != blank %}
       <div class="collection-editorial">
-        <span class="collection-editorial__text">{{ editorial | strip_html | truncate: 200 }}</span>
+        {% if editorial_toggle %}
+          <input
+            type="checkbox"
+            class="collection-editorial__toggle visually-hidden"
+            id="CollectionIntro-{{ section.id }}"
+          >
+        {% endif %}
+        <p class="collection-editorial__text">{{ editorial }}</p>
+        {% if editorial_toggle %}
+          <label class="collection-editorial__more" for="CollectionIntro-{{ section.id }}">
+            <span class="collection-editorial__more-open">{{ section.settings.editorial_more_label | default: 'Read more' }}</span>
+            <span class="collection-editorial__more-close">{{ section.settings.editorial_less_label | default: 'Read less' }}</span>
+          </label>
+        {% endif %}
 
         {% if section.settings.editorial_link_text != blank and section.settings.editorial_link != blank %}
           <a
@@ -115,7 +138,7 @@
         {% endif %}
       </div>
     {% endif %}
-  {% endif %}
+  </div>
 
   {%- comment -%} ---------- Hero banner ---------- {%- endcomment -%}
   {% if section.settings.show_banner %}
@@ -384,13 +407,73 @@
     font-weight: 400;
   }
 
+  /* Intro: its own line on mobile, 2 lines + Read more; full text stays in the HTML. */
   .collection-editorial {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--gap-2xs);
-    margin-block-start: var(--margin-md);
-    font-size: var(--font-size--md);
+    flex: 1 1 100%;
+    min-width: 0;
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-70, 0.7));
+    font-size: var(--font-size--sm);
+    line-height: 1.45;
+  }
+
+  .collection-editorial__text {
+    display: -webkit-box;
+    margin: 0;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .collection-editorial__toggle:checked ~ .collection-editorial__text {
+    display: block;
+    -webkit-line-clamp: unset;
+  }
+
+  .collection-editorial__more {
+    display: inline-block;
+    margin-block-start: 2px;
+    color: var(--color-foreground);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+
+  .collection-editorial__more-close,
+  .collection-editorial__toggle:checked ~ .collection-editorial__more .collection-editorial__more-open {
+    display: none;
+  }
+
+  .collection-editorial__toggle:checked ~ .collection-editorial__more .collection-editorial__more-close {
+    display: inline;
+  }
+
+  .collection-editorial__toggle:focus-visible ~ .collection-editorial__more {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  /* Desktop: in the title row, right of the count, never taller than the title, so the grid doesn't move. */
+  @media screen and (min-width: 990px) {
+    .collection-heading {
+      flex-wrap: nowrap;
+    }
+
+    .collection-editorial {
+      position: relative;
+      flex: 1 1 auto;
+      align-self: center;
+      max-width: 760px;
+      margin-inline-start: var(--margin-xl, 24px);
+      padding-inline-end: 90px;
+    }
+
+    .collection-editorial__more {
+      position: absolute;
+      inset-inline-end: 0;
+      inset-block-end: 0;
+      margin: 0;
+    }
   }
 
   .collection-editorial__link {
@@ -655,10 +738,6 @@
       font-size: var(--font-size--sm);
     }
 
-    .collection-editorial {
-      font-size: var(--font-size--sm);
-    }
-
     .collection-banner__image {
       height: 200px;
     }
@@ -793,6 +872,19 @@
       "id": "editorial_text",
       "label": "Editorial text",
       "info": "Leave blank to fall back to the collection description."
+    },
+    {
+      "type": "text",
+      "id": "editorial_more_label",
+      "label": "Expand label",
+      "default": "Read more",
+      "info": "Shown when the intro is longer than two lines."
+    },
+    {
+      "type": "text",
+      "id": "editorial_less_label",
+      "label": "Collapse label",
+      "default": "Read less"
     },
     {
       "type": "text",
