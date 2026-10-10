@@ -13,6 +13,26 @@
   {%- endfor -%}
 </div>
 
+{%- comment -%}
+  Reveal the Judge.me all-reviews widget once its layout has settled: Judge.me
+  builds its top area in steps and its own styles resize those parts afterwards,
+  so "done-setup" isn't the end. Shown when the widget's size hasn't changed for
+  600 ms (CSS shows it after 6 s regardless).
+{%- endcomment -%}
+<script>
+  (() => {
+    const widget = document.querySelector('.jdgm-all-reviews-widget-v2025');
+    if (!widget || typeof ResizeObserver === 'undefined') return;
+    let timer;
+    const ready = () => { widget.classList.add('is-settled'); observer.disconnect(); };
+    const observer = new ResizeObserver(() => {
+      clearTimeout(timer);
+      if (widget.querySelector('.jdgm--done-setup-widget')) timer = setTimeout(ready, 600);
+    });
+    observer.observe(widget);
+  })();
+</script>
+
 {% stylesheet %}
   /*
     Judge.me "All reviews" page widget. Judge.me hides its server-rendered reviews
@@ -20,18 +40,14 @@
     several thousand pixels and rebuilds its top area in steps (summary, actions
     and photo gallery, Reviews/Questions tabs): the footer and the first reviews
     jumped (CLS 1.3 on mobile). Reserve space so the footer starts below the
-    screen, and keep the widget invisible until its final top area is in place
-    (tabs, actions and the review medals, which Judge.me adds last; "done-setup"
-    comes earlier). If that never happens, it shows after 6 s anyway.
-    If the medals are ever switched off in Judge.me, drop the medals line below.
+    screen, and keep the widget invisible until its layout has settled (the
+    script below adds .is-settled). If that never happens, it shows after 6 s.
   */
   .jdgm-all-reviews-widget-v2025 {
     min-height: 120vh;
   }
 
-  .jdgm-all-reviews-widget-v2025:not(:has(.jdgm-subtab)),
-  .jdgm-all-reviews-widget-v2025:not(:has(.jdgm-widget-actions-wrapper)),
-  .jdgm-all-reviews-widget-v2025:not(:has(.jdgm-medals-wrapper)) {
+  .jdgm-all-reviews-widget-v2025:not(.is-settled) {
     visibility: hidden;
     animation: showcase-jdgm-reveal 0s 6s forwards;
   }
