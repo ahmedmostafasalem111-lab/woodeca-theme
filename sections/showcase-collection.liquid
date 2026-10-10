@@ -113,7 +113,7 @@
         {% if editorial_toggle %}
           <input
             type="checkbox"
-            class="collection-editorial__toggle visually-hidden"
+            class="collection-editorial__toggle"
             id="CollectionIntro-{{ section.id }}"
           >
         {% endif %}
@@ -414,6 +414,20 @@
     color: rgb(var(--color-foreground-rgb) / var(--opacity-70, 0.7));
     font-size: var(--font-size--sm);
     line-height: 1.45;
+  }
+
+  /* Always invisible (the theme's .visually-hidden reappears on focus, which a label click gives it). */
+  .collection-editorial__toggle {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    border: 0;
+    opacity: 0;
+    pointer-events: none;
   }
 
   .collection-editorial__text {
