@@ -36,6 +36,14 @@
   role="region"
   aria-label="{{ section.settings.carousel_label | default: 'Featured promotions' | escape }}"
 >
+  {%- comment -%}
+    The homepage's single H1. The slide headings are campaign lines that change
+    with each promotion, so they stay H2; this states what the site is, for search
+    engines and screen readers, without changing the design.
+  {%- endcomment -%}
+  {%- if request.page_type == 'index' and section.settings.page_heading != blank -%}
+    <h1 class="visually-hidden">{{ section.settings.page_heading }}</h1>
+  {%- endif -%}
   <div class="showcase-hero__viewport">
     <div
       class="showcase-hero__track"
@@ -367,6 +375,13 @@
       "label": "Accessible carousel label",
       "default": "Featured promotions",
       "info": "Announced by screen readers to describe the carousel."
+    },
+    {
+      "type": "text",
+      "id": "page_heading",
+      "label": "Page heading (hidden)",
+      "default": "Woodeca – Modern Furniture Made in Egypt",
+      "info": "The homepage's main heading (H1) for search engines and screen readers. Not shown on screen."
     },
     {
       "type": "header",
